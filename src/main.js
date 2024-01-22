@@ -1,40 +1,27 @@
-import './../style.css'
-import Phaser from 'phaser'
+import 'phaser';
+import MenuScene from './scenes/MenuScene';
+import GameScene from './scenes/GameScene';
+import EndScene from './scenes/EndScene';
+import CabinetScene from './scenes/CabinetScene';
 
 const VALUES = {
-  width:500,
-  height:500,
-  speedDown:300
-}
-
-class GameScene extends Phaser.Scene{
-  constructor(){super("scene-game")}
-
-  preload(){
-
-  }
-
-  create(){
-    
-  }
-
-  update(){
-    
-  }
-}
+  width: window.innerWidth,
+  height: window.innerHeight,
+  speedDown: 300,
+};
 
 const config = {
-  type:Phaser.AUTO,
-  width:VALUES.width,
-  height:VALUES.height,
-  canvas:gameCanvas,
-  physics:{
-    default:"arcade",
-    arcade:{
-      gravity:{y:VALUES.speedDown},
-      debug:true
-    }
-  }
-}
+  type: Phaser.AUTO,
+  width: VALUES.width,
+  height: VALUES.height,
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: VALUES.speedDown },
+      debug: true,
+    },
+  },
+  scene: [MenuScene, GameScene, EndScene, CabinetScene], // Ajouter toutes les scènes ici
+};
 
-const game = Phaser.game(config)
+const game = new Phaser.Game(config);
