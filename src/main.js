@@ -1,24 +1,40 @@
-import './style.css'
-/*import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import './../style.css'
+import Phaser from 'phaser'
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+const VALUES = {
+  width:500,
+  height:500,
+  speedDown:300
+}
 
-setupCounter(document.querySelector('#counter'))*/
+class GameScene extends Phaser.Scene{
+  constructor(){super("scene-game")}
+
+  preload(){
+
+  }
+
+  create(){
+    
+  }
+
+  update(){
+    
+  }
+}
+
+const config = {
+  type:Phaser.AUTO,
+  width:VALUES.width,
+  height:VALUES.height,
+  canvas:gameCanvas,
+  physics:{
+    default:"arcade",
+    arcade:{
+      gravity:{y:VALUES.speedDown},
+      debug:true
+    }
+  }
+}
+
+const game = Phaser.game(config)
