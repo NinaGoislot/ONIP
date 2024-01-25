@@ -1,36 +1,38 @@
 import Phaser from 'phaser';
 
-let test;
-
 class Customer extends Phaser.GameObjects.Graphics {
-    constructor(scene, x, y, name, initialMessage, commandeMessage, juice) {
+    constructor(scene, x, y, emotion, drink) {
         super(scene);
-
         scene.add.existing(this);
 
-        // Position du client
+        // ATTRIBUTS
         this.x = x;
         this.y = y;
-
-        // Créer le point bleu
-        this.fillStyle(0x0000FF, 1);
-        this.fillCircle(0, 0, 20);
-
-        // Afficher la bulle de dialogue
-        this.bubble = scene.add.text(x, y - 30, initialMessage, { fontSize: '16px', fill: '#fff' });
-
-        // Autres propriétés du client
-        this.name = name;
-        this.request = commandeMessage;
-        this.juice = juice;
-
-        test = commandeMessage;
+        this.firstDialogues = emotion.firstDialogues;
+        this.drink = drink;
+        this.dialogueIndex = 0;  // Index pour suivre la position actuelle dans le tableau de dialogues
+        this.successText = emotion.successText;
+        this.failureText = emotion.failureText;
     }
 
-    updateRequest() {
-            this.request = test;
-            this.bubble.setText(this.request);
-    }
+    // ACCESSEURS
+    get name() { return this._name; }
+    set name(newName) { this._name = newName; }
+
+    get presentation() { return this._presentation; }
+    set presentation(newPresentation) { this._presentation = newPresentation; }
+
+    get request() { return this._request; }
+    set request(newRequest) { this._request = newRequest; }
+
+    get drink() { return this._drink; }
+    set drink(newDrink) { this._drink = newDrink; }
+
+    get currentDialogue() { return this._currentDialogue; }
+    set currentDialogue(newCurrentDialogue) { this._currentDialogue = newCurrentDialogue; }
+
+    get succeed() { return this._succeed; }
+    set succeed(succeed) { this._succeed = succeed; }
 }
 
 export default Customer;
