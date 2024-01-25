@@ -1,0 +1,93 @@
+{
+    "cocktails": [
+      {
+        "id": 1,
+        "name": "Touc Touc Tac Tac",
+        "ingredients": [
+          { "alcoholId": 1, "quantity": 10 },
+          { "alcoholId": 2, "quantity": 10 }
+        ],
+        "movements": [1, 2, 3]
+      },
+      {
+        "id": 2,
+        "name": "Sinister",
+        "ingredients": [
+          { "alcoholId": 1, "quantity": 50 },
+          { "alcoholId": 2, "quantity": 20 }
+        ],
+        "movements": [1, 2, 3]
+      }
+    ],
+
+    "ingredients": [
+      {
+        "id": 1,
+        "name": "Jus de pomme",
+        "image": ""
+      },
+      {
+        "id": 2,
+        "name": "Vodka",
+        "image": ""
+      },
+      {
+        "id": 3,
+        "name": "Vin rouge",
+        "image": ""
+      }
+    ],
+
+    "movements": [
+      {
+        "id": 1,
+        "image": "",
+        "text": "Coup vers la gauche, coup vers la droite"
+      }
+    ],
+
+    "emotions": [
+      {
+        "id": 2,
+        "name": "Enjôleur",
+        "firstDialogues": ["Hey ! C'est la première fois que je viens ici, je compte sur vous.", "Huuuum, je pense que je vais prendre un "],
+        "secondaryDialogues": ["Cet endroit à l'air sympa", "Je pense que je viendrais avec ma petite amie la prochaine fois.", "Ce bar dégage quelque chose de romantique un peu, ca ferait un beau rancard."],
+        "successText": "Vous avez refait ma journée !",
+        "failureText": "Oh, c'est assez... inattendu.",
+        "favoriteExtra": 1
+      },
+      {
+        "id": 4,
+        "name": "Méprisant",
+        "firstDialogues": ["Hey toi, je voudrais un "],
+        "secondaryDialogues": ["Il est plutot petit ce bar. J'espère que la qualité sera au rendez vous au moins.", "Vous ne semblez pas vraiment savoir ce que vous faites.", "A ce stade j'aurais pu le faire moi même ce coktail."],
+        "successText": "C'est pas trop tôt. Hum.. Il y a un service correct ici, c'est déjà ça.",
+        "failureText": "Tss, vous n'êtes même pas capable de suivre une simple commande. Une telle incompétence c'est désolant.",
+        "favoriteExtra": 1
+      }
+    ],
+
+    "extras": [
+      {
+        "id": 1,
+        "name": "Glaçons",
+        "movement": 1
+      },
+      {
+        "id": 2,
+        "name": "Oranges",
+        "movement": 1
+      },
+      {
+        "id": 3,
+        "name": "Citrons",
+        "movement": 1
+      },
+      {
+        "id": 4,
+        "name": "Paillettes",
+        "movement": 1
+      }
+    ]
+  }
+  

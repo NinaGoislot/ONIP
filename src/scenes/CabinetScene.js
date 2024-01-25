@@ -5,25 +5,36 @@ class CabinetScene extends Phaser.Scene {
     super({ key: 'CabinetScene' });
   }
 
-  create(data) {
-    // Récupération des données de la demande initiale
-    const initialRequest = data.initialRequest;
+  create() {
+    // Récupérer les données de cocktails depuis le registre
+    const cocktailsData = this.game.registry.get('cocktails');
 
-    // Boutons pour sélectionner son jus
-    const orangeButton = this.add.text(100, 200, 'Jus d\'orange', { fontSize: '20px', fill: '#fff' });
-    const vodkaButton = this.add.text(300, 200, 'Vodka', { fontSize: '20px', fill: '#fff' });
-    const appleButton = this.add.text(500, 200, 'Jus de pomme', { fontSize: '20px', fill: '#fff' });
+     // Position initiale des boutons
+     let buttonX = 100;
+     let buttonY = 200;
 
-    // Association des événements de clic à chaque bouton
-    orangeButton.setInteractive().on('pointerdown', () => this.selectJuice('orange'));
-    vodkaButton.setInteractive().on('pointerdown', () => this.selectJuice('vodka'));
-    appleButton.setInteractive().on('pointerdown', () => this.selectJuice('pomme'));
+     // Créer des boutons pour chaque cocktail dans les données
+     for (const cocktail of cocktailsData) {
+       const cocktailButton = this.add.text(buttonX, buttonY, cocktail.name, { fontSize: '20px', fill: '#fff' });
+
+       // Associer l'événement de clic à chaque bouton
+       cocktailButton.setInteractive().on('pointerdown', () => this.selectJuice(cocktail.name));
+
+       // Ajuster la position pour le prochain bouton
+       buttonX += 300;
+
+       // Changer de ligne après chaque 3 boutons pour éviter de déborder à l'horizontale
+       if (buttonX > 500) {
+         buttonX = 100;
+         buttonY += 50;
+       }
+     }
   }
 
   selectJuice(juiceType) {
-    console.log(`Vous avez sélectionné le jus de ${juiceType}.`);
-    this.scene.resume('GameScene', { juiceType });
-    this.scene.stop('CabinetScene');
+    console.log(`Vous avez sélectionné ${juiceType}.`);
+    this.game.registry.set('playerJuiceChoice', juiceType);
+    this.scene.start('GameScene');
   }
 }
 
