@@ -41,6 +41,7 @@ let gameScale = {
   width:VALUES.width,
   height:VALUES.height
 }
+const parentDiv = document.querySelector("#parentDiv");
 // Fonction de redimensionnement
 function resize() {
   responsive.width = window.innerWidth;
@@ -58,6 +59,8 @@ function resize() {
     gameScale.width = responsive.width / game.config.width * game.config.width;
     gameScale.height = newHeight;
   }
+  parentDiv.style.width = gameScale.width + 'px';
+  parentDiv.style.height = gameScale.height + 'px';
 }
 
 // Gestionnaire d'événements pour le redimensionnement de la fenêtre
