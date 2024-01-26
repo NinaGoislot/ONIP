@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 class Customer extends Phaser.GameObjects.Graphics {
-    constructor(scene, x, y, emotion, drink) {
+    constructor(scene, x, y, emotion, drink, picture) {
         super(scene);
         scene.add.existing(this);
 
@@ -9,7 +9,10 @@ class Customer extends Phaser.GameObjects.Graphics {
         this.x = x;
         this.y = y;
         this.firstDialogues = emotion.firstDialogues;
+        this.secondaryDialogues = emotion.secondaryDialogues;
         this.drink = drink;
+        this.picture = picture;
+
         this.dialogueIndex = 0;  // Index pour suivre la position actuelle dans le tableau de dialogues
         this.successText = emotion.successText;
         this.failureText = emotion.failureText;

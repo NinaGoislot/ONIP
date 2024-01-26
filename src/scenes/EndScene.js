@@ -5,10 +5,10 @@ class EndScene extends Phaser.Scene {
 
     create() {
         // Affiche le score et le texte "Temps écoulé!"
-        const scoreText = this.add.text(200, 150, `Score: 2`, { fontSize: '32px', fill: '#fff' });
+        const scoreText = this.add.text(200, 150, `Score: ` + this.game.registry.get('score'), { fontSize: '32px', fill: '#fff' });
         this.add.text(200, 200, 'Temps écoulé!', { fontSize: '32px', fill: '#fff' });
 
-        // Ajoutez un bouton "Accueil"
+        // Bouton "Accueil"
         const homeButton = this.add.text(200, 250, 'Accueil', { fontSize: '24px', fill: '#fff' })
             .setInteractive()
             .on('pointerdown', () => this.goToMenu());

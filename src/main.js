@@ -1,9 +1,9 @@
 import 'phaser';
-import MenuScene from './scenes/MenuScene';
-import GameScene from './scenes/GameScene';
-import EndScene from './scenes/EndScene';
-import CabinetScene from './scenes/CabinetScene';
-import LoadDataScene from './scenes/LoadDataScene';
+import MenuScene from '@/scenes/MenuScene';
+import GameScene from '@/scenes/GameScene';
+import EndScene from '@/scenes/EndScene';
+import CabinetScene from '@/scenes/CabinetScene';
+import LoadDataScene from '@/scenes/LoadDataScene';
 
 const VALUES = {
   width: 1920,

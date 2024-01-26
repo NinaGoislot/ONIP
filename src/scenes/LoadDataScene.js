@@ -2,7 +2,7 @@ import 'phaser';
 
 class LoadDataScene extends Phaser.Scene {
     preload() {
-        this.load.json('globalGameData', '../../data/data.json');
+        this.load.json('globalGameData', './data/data.json');
     }
 
     create() {
