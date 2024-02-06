@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import {socket} from '../main.js';
 
 class GameCanva extends Phaser.GameObjects.Graphics {
     constructor(scene, customer, score) {
@@ -41,29 +42,47 @@ class GameCanva extends Phaser.GameObjects.Graphics {
 
     updateDialogue(dialogue) {
         this.customer.currentDialogue = dialogue; // Afficher le dialogue progressivement
-        
         this.writeDialogue(this.customer.currentDialogue);
     }
-
-    writeDialogue(dialogue) {
-        this.bubble.setText(dialogue);
-    }
-
     
     updateScore(score) {
         this.score = score;
         this.displayScore.setText(this.score)
     }
 
-    finalDialogue() {
+    finalDialogue(thos) {
         if (this.customer.succeed != null) {
             if (this.customer.succeed) {
-                this.writeDialogue(this.customer.successText);
+                this.writeDialogueLetterByLetter(this.customer.successText, thos);
             }
             else {
-                this.writeDialogue(this.customer.failureText);
+                this.writeDialogueLetterByLetter(this.customer.failureText, thos);
             }
         }
+    }
+
+    writeDialogue(dialogue) {
+        this.bubble.setText(dialogue);
+    }
+
+    menuPauseButton(scene, thos){
+        this.PauseButton = thos.add.text(0, 0, "PAUSE", { fontSize: '24px', fill: '#fff' })
+        .setInteractive({ cursor: 'pointer' })
+        .on('pointerdown', ()=> this.startPause(scene, thos))
+        .on('pointerover', () => this.PauseButton.setTint(0x90ee90))
+        .on('pointerout', () => this.PauseButton.setTint(0xffffff))
+    }
+
+    startPause(scene, thos, secondPaused){
+        thos.game.currentScene = scene.key;
+
+        let roomIdJoueur = thos.game.registry.get('roomIdJoueur');
+        if(!secondPaused){
+            socket.emit("PAUSED", roomIdJoueur);
+        }
+
+        scene.pause()
+        scene.launch('PauseScene', {'secondPaused':secondPaused});
     }
 }
 

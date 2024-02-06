@@ -1,9 +1,14 @@
 import 'phaser';
 import MenuScene from '@/scenes/MenuScene';
+import ConnexionScene from '@/scenes/ConnexionScene';
 import GameScene from '@/scenes/GameScene';
 import EndScene from '@/scenes/EndScene';
 import CabinetScene from '@/scenes/CabinetScene';
 import LoadDataScene from '@/scenes/LoadDataScene';
+import OptionsScene from '@/scenes/OptionsScene';
+import PauseScene from '@/scenes/PauseScene';
+import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
+const socket = io("http://127.0.0.1:3006"); //connexion au serveur socket.io
 
 const VALUES = {
   width: 1920,
@@ -17,14 +22,10 @@ const eventHandler = new Phaser.Events.EventEmitter();
 const config = {
   type: Phaser.AUTO,
   scale: {
-    // mode: Phaser.Scale.RESIZE,
-    // autoCenter: Phaser.Scale.CENTER_BOTH,
     parent: "parentDiv",
     width: VALUES.width,
     height: VALUES.height
   },
-  // width: VALUES.width,
-  // height: VALUES.height,
   physics: {
     default: "arcade",
     arcade: {
@@ -32,11 +33,18 @@ const config = {
       debug: true,
     },
   },
-  scene: [LoadDataScene, MenuScene, GameScene, EndScene, CabinetScene], // Ajouter toutes les scènes ici
+  dom: {
+    createContainer: true //pour ajouter du html
+  },
+  audio: {
+    disableWebAudio: true //pour ajouter du son
+  },
+  scene: [LoadDataScene, MenuScene, ConnexionScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene], // Ajouter toutes les scènes ici
 };
 
 var game = new Phaser.Game(config);
 
+// ******************************* RESPONSIVE DU JEU *******************************
 let responsive = {
   width:window.innerWidth,
   height:window.innerHeight,
@@ -70,4 +78,5 @@ function resize() {
 // Gestionnaire d'événements pour le redimensionnement de la fenêtre
 window.addEventListener('load', resize);
 window.addEventListener('resize', resize);
-export { gameScale, responsive };
+
+export { gameScale, socket };

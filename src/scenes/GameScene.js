@@ -1,8 +1,13 @@
 import Phaser from 'phaser';
 import Customer from '@/class/Customer'
 import GameCanva from '@/canvas/GameCanva'
+import {
+    gameScale,
+    socket
+} from '../main.js';
 
-const URL_PORTRAITS_CUSTOMERS = "./media/img/testPortraits/", NBR_PORTRAITS_CUSTOMERS = 3;
+const URL_PORTRAITS_CUSTOMERS = "./media/img/testPortraits/",
+    NBR_PORTRAITS_CUSTOMERS = 3;
 
 class GameScene extends Phaser.Scene {
 
@@ -19,13 +24,13 @@ class GameScene extends Phaser.Scene {
 
         // Définir le chemin de base pour les images
         this.load.path = URL_PORTRAITS_CUSTOMERS;
-    
+
         // Charger les images une par une
         for (let i = 1; i <= NBR_PORTRAITS_CUSTOMERS; i++) {
             this.load.image(`portrait${i}`, `${i}.jpg`);
             this.imageKeys.push(`portrait${i}`);
         }
-    
+
         // Écouter l'événement de chargement complet
         this.load.on('complete', () => {
             console.log('Chargement des images complet');
@@ -33,30 +38,45 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.ajoutClient = true;
 
         if (this.currentCustomer === null) {
 
-            //Set un nombre de client pour la partie
-            this.game.registry.set('nbrCustomers', 5);
+            //COMPTE A REBOURS
+            this.rebours = this.add.text(gameScale.width * 0.5, gameScale.height * 0.5, "", {
+                fontSize: '32px',
+                fill: '#fff'
+            })
 
-            // Création du client 
-            this.generateNewClient()
-            this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
+            //afficher compte à rebours
+            // const countdownPromise = new Promise((resolve) => {
+            //     this.compteARebours(resolve);
+            // });
 
-            // Fonction asynchrone pour afficher les dialogues successifs et ce qui se passe après
-            this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
-                this.showCabinetButton();
+            // Exécuter les autres fonctions une fois que la promesse est résolue
+            // countdownPromise.then(() => {
+                console.log("Le compte à rebours est terminé !");
+                //Set un nombre de client pour la partie
+                this.game.registry.set('nbrCustomers', 5);
 
-                // Démarrer le chrono du jeu
-                this.timer = this.time.delayedCall(45000, () => this.endGame(), [], this);
-            });
+                // Création du client 
+                this.generateNewClient()
+                this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
+                this.canva.menuPauseButton(this.scene, this);
 
-            // Stocker les données du client et de la scène principale dans le registre global du jeu
-            this.game.registry.set('customerData', this.currentCustomer);
+                // Fonction asynchrone pour afficher les dialogues successifs et ce qui se passe après
+                this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
+                        this.showCabinetButton()
+                });
+
+                // Stocker les données du client et de la scène principale dans le registre global du jeu
+                this.game.registry.set('customerData', this.currentCustomer);
+            // });
 
         } else {
             this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
             console.log("GAME_SCENE : Score actuel dans le dataManager : ", this.game.registry.get('score'))
+            this.canva.menuPauseButton(this.scene, this);
 
             this.showNextDialogue(this.currentCustomer.secondaryDialogues).then(() => {
                 const serviceButton = this.add.text(400, 400, 'Servir le client', {
@@ -71,9 +91,33 @@ class GameScene extends Phaser.Scene {
                 });
             });
         }
+
+        socket.on("GAME_PAUSED", (secondPaused) => {
+            this.canva.startPause(this.scene, this, secondPaused);
+        })
+
+        socket.on("NOMORE_CLIENT", (peut) => {
+            this.ajoutClient = peut;
+        })
     }
 
+    compteARebours = (resolve) => {
+        var duree = 3;
+        var intervalId = setInterval(() => {
+            if (duree <= 0) {
+                clearInterval(intervalId);
+                this.rebours.visible = false;
+                resolve();
+                return;
+            }
+            this.rebours.text = duree;
+            duree--;
+        }, 1000);
+    }
+
+
     endGame() {
+        socket.emit("GAME_OVER");
         this.game.registry.remove('customerData');
         this.game.registry.remove('nbrCustomers');
         this.scene.start('EndScene');
@@ -90,13 +134,14 @@ class GameScene extends Phaser.Scene {
         this.currentCustomer = new Customer(this, 300, 300, emotion, cocktail, randomImageKey);
 
         this.game.registry.set('nbrCustomers', this.game.registry.get('nbrCustomers') - 1);
-
     }
 
     playerChoiceCorrect() {
         const isCorrect = this.currentCustomer.drink.name === this.game.registry.get('playerJuiceChoice');
 
-        if (isCorrect) {this.canva.updateScore(this.canva.score + 10)};
+        if (isCorrect) {
+            this.canva.updateScore(this.canva.score + 10)
+        };
         this.game.registry.set('score', this.canva.score);
 
         return isCorrect;
@@ -110,13 +155,14 @@ class GameScene extends Phaser.Scene {
     serveCustomer() {
         this.currentCustomer.succeed = this.playerChoiceCorrect();
         this.showFinalDialogue().then(() => {
-            if (this.game.registry.get('nbrCustomers') > 0) {
+            if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
                 this.canva.remove();
                 this.generateNewClient();
                 this.canva.customer = this.currentCustomer;
 
                 this.wait(2000).then(() => {
                     this.canva.draw();
+                    //REGLER SOUCIS ICI STP
                     this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
                         this.game.registry.set('customerData', this.currentCustomer);
                         this.showCabinetButton();
@@ -150,11 +196,11 @@ class GameScene extends Phaser.Scene {
                 }
                 let displayedDialogue = currentDialogue.substring(0, j + 1);
                 this.canva.updateDialogue(displayedDialogue); // Afficher les dialogues lettre par lettre
-    
+
                 // Attendre un court laps de temps avant d'afficher la prochaine lettre
                 await new Promise(resolve => this.time.delayedCall(50, resolve));
             }
-    
+
             // Attendre 3 secondes après l'affichage complet du dialogue
             await new Promise(resolve => this.time.delayedCall(3000, resolve));
         }
@@ -162,7 +208,7 @@ class GameScene extends Phaser.Scene {
     
 
     showFinalDialogue = async () => {
-        this.canva.finalDialogue();
+        this.canva.finalDialogue(this.game);
 
         // Attendre 3 secondes avant le prochain dialogue
         await new Promise(resolve => this.time.delayedCall(3000, resolve));

@@ -1,8 +1,10 @@
 import 'phaser';
+import {socket} from '../main.js';
 
 class LoadDataScene extends Phaser.Scene {
     preload() {
         this.load.json('globalGameData', './data/data.json');
+        this.load.audio('theme', './media/audio/BE-song.mp3');
     }
 
     create() {
@@ -16,6 +18,18 @@ class LoadDataScene extends Phaser.Scene {
         this.game.registry.set('emotions', globalGameData.emotions);
         this.game.registry.set('extras', globalGameData.extras);
         this.game.registry.set('score', 0);
+        this.game.registry.set('connected', false);
+        socket.on("CONNECTED", () => {
+            this.game.registry.set('connected', true);
+        });
+
+
+        // POUR LA MUSIQUE
+        // this.load.audio('theme', './media/audio/BE-song.mp3');
+        this.music = this.sound.add('theme');
+        this.game.registry.set('music', this.music);
+        //juste pour pas que la musique dérange pendant les tests..
+        this.game.registry.get('music').pause();
 
         // Lancer la scène suivante (MenuScene dans cet exemple)
         this.scene.start('MenuScene');
