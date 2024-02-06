@@ -40,18 +40,16 @@ class GameCanva extends Phaser.GameObjects.Graphics {
     }
 
     updateDialogue(dialogue) {
-        if (this.customer.dialogueIndex < dialogue.length) {
-            this.customer.currentDialogue = dialogue[this.customer.dialogueIndex]; // Afficher le prochain dialogue
-
-            if (dialogue === this.customer.firstDialogues && this.customer.dialogueIndex == dialogue.length -1) {
-                this.customer.currentDialogue = this.customer.currentDialogue + this.customer.drink.name;
-            }
-
-            this.customer.dialogueIndex++;
-            this.writeDialogue(this.customer.currentDialogue);
-        }
+        this.customer.currentDialogue = dialogue; // Afficher le dialogue progressivement
+        
+        this.writeDialogue(this.customer.currentDialogue);
     }
 
+    writeDialogue(dialogue) {
+        this.bubble.setText(dialogue);
+    }
+
+    
     updateScore(score) {
         this.score = score;
         this.displayScore.setText(this.score)
@@ -66,10 +64,6 @@ class GameCanva extends Phaser.GameObjects.Graphics {
                 this.writeDialogue(this.customer.failureText);
             }
         }
-    }
-
-    writeDialogue(dialogue) {
-        this.bubble.setText(dialogue);
     }
 }
 

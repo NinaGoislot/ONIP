@@ -29,6 +29,9 @@ class MenuScene extends Phaser.Scene {
         const btnSoloMode = this.add.text(200, 200, 'Mode libre', { fontSize: '24px', fill: '#fff' })
             .setInteractive()
             .on('pointerdown', () => this.startGame());
+
+
+            
     }
 
     startGame() {

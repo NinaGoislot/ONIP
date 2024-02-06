@@ -140,14 +140,26 @@ class GameScene extends Phaser.Scene {
 
     showNextDialogue = async (dialogue) => {
         this.canva.customer.dialogueIndex = 0;
-
+    
         for (let i = 0; i < dialogue.length; i++) {
-            this.canva.updateDialogue(dialogue);
+            let currentDialogue = dialogue[i];
 
-            // Attendre 3 secondes avant le prochain dialogue
+            for (let j = 0; j < currentDialogue.length; j++) {
+                if (dialogue === this.currentCustomer.firstDialogues && currentDialogue == dialogue[dialogue.length -1]) {
+                    currentDialogue += this.currentCustomer.drink.name; // Ajouter le nom de la commande
+                }
+                let displayedDialogue = currentDialogue.substring(0, j + 1);
+                this.canva.updateDialogue(displayedDialogue); // Afficher les dialogues lettre par lettre
+    
+                // Attendre un court laps de temps avant d'afficher la prochaine lettre
+                await new Promise(resolve => this.time.delayedCall(50, resolve));
+            }
+    
+            // Attendre 3 secondes après l'affichage complet du dialogue
             await new Promise(resolve => this.time.delayedCall(3000, resolve));
         }
     }
+    
 
     showFinalDialogue = async () => {
         this.canva.finalDialogue();
