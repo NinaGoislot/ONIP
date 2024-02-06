@@ -1,0 +1,29 @@
+<style>
+    .login {
+        background: #eceeee;
+        border: 1px solid #42464b;
+        border-radius: 6px;
+        margin: auto;
+        width: 298px;
+    }
+</style>
+
+<div>
+    <div id="divJoin" class="login">
+        <input type="text" placeholder="Code de la partie" id="inputRoomId">
+        <input type="submit" value="Rejoindre une  partie" id="joinRoom">
+    </div>
+    <div id="putPseudo" hidden="">
+        <input type="text" id="idRoom" hidden>
+        <label>
+            Entre ton pseudo :
+            <input type="text" id="inputPseudo">
+        </label>
+        <button id="btnReady" hidden>Je suis prêt</button>
+        <p id="infoReady"></p>
+        <button id="btnPlay" disabled hidden>Lancer la partie</button>
+    </div>
+    <div id="partie" hidden>
+        <h1>Partie lancée !</h1>
+    </div>
+</div>
