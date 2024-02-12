@@ -5,6 +5,11 @@ class LoadDataScene extends Phaser.Scene {
     preload() {
         this.load.json('globalGameData', './data/data.json');
         this.load.audio('theme', './media/audio/BE-song.mp3');
+        socket.on("CONNECTED", () => {
+            console.log("je suis connectée")
+            this.game.registry.set('connected', true);
+        });
+        console.log(socket)
     }
 
     create() {
@@ -19,9 +24,6 @@ class LoadDataScene extends Phaser.Scene {
         this.game.registry.set('extras', globalGameData.extras);
         this.game.registry.set('score', 0);
         this.game.registry.set('connected', false);
-        socket.on("CONNECTED", () => {
-            this.game.registry.set('connected', true);
-        });
 
 
         // POUR LA MUSIQUE
