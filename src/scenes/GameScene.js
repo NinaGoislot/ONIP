@@ -375,6 +375,7 @@ class GameScene extends Phaser.Scene {
     showNextDialogue = async (dialogue) => {
         this.canva.isTalking = true;
         this.canva.customer.dialogueIndex = 0;
+    
         for (let i = 0; i < dialogue.length; i++) {
             let currentDialogue = dialogue[i];
             this.canva.isTalking = "talk"
@@ -397,8 +398,8 @@ class GameScene extends Phaser.Scene {
         // this.canva.isTalking = "stop"
         // console.log("stop ?", this.canva.isTalking)
     }
+    
 
-    //ici mettre lettre par lettre STP
     showFinalDialogue = async () => {
         this.canva.finalDialogue(this.game);
 

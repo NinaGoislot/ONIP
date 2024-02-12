@@ -109,7 +109,7 @@ class GameCanva extends Phaser.GameObjects.Graphics {
             this.clientImage.play('blink');
         }
     }
-
+    
     updateScore(score) {
         this.score = score;
         this.displayScore.setText(this.score)
