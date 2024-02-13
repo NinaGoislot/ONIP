@@ -23,7 +23,6 @@ class LoadDataScene extends Phaser.Scene {
         this.game.registry.set('emotions', globalGameData.emotions);
         this.game.registry.set('extras', globalGameData.extras);
         this.game.registry.set('score', 0);
-        this.game.registry.set('connected', false);
 
 
         // POUR LA MUSIQUE

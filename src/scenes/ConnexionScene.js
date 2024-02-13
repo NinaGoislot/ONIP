@@ -30,17 +30,23 @@ class ConnexionScene extends Phaser.Scene {
             socket.emit("CREATE_GAME", true);
             this.codePin = this.add.text(gameScale.width*0.1, gameScale.height * 0.25, "", { fontSize: '24px', fill: '#fff' });
             this.btnJouer = this.createButton(gameScale.width * 0.1, gameScale.height * 0.35, 'Lancer la partie', () => this.startGame(), true, false);
+            this.btnCopy = this.createButton(gameScale.width * 0.1, gameScale.height * 0.5, 'Copy', () => this.copy(this.codePin.text), false);
+
             window.addEventListener('resize', () => {
                 menuTxt.setPosition(gameScale.width*0.1, gameScale.height * 0.1)
                 this.codePin.setPosition(gameScale.width*0.1, gameScale.height * 0.2)
                 this.btnJouer.setPosition(gameScale.width*0.1, gameScale.height * 0.3)
             });
+
         } 
 // ******************************* MULTI ************************************************
         else {
             menuTxt.text = "Choix de la partie";
             this.infos = this.add.text(gameScale.width*0.1, gameScale.height * 0.25, "", { fontSize: '24px', fill: '#fff' });
             this.btnCreer = this.createButton(gameScale.width * 0.1, gameScale.height * 0.35, 'Créer une partie', () => this.createGame());
+
+            this.btnCopy = this.createButton(gameScale.width * 0.1, gameScale.height * 0.5, 'Copy', () => this.copy(this.infos.text), false);
+
             this.formJoin = this.add.dom(gameScale.width * 0.35, gameScale.height * 0.6).createFromCache('joinRoom');
             this.formJoin.addListener('click');
             window.addEventListener('resize', () => {
@@ -100,6 +106,7 @@ class ConnexionScene extends Phaser.Scene {
 
 // ******************************* SOCKET ************************************************
         socket.on("WAITING_FOR_SHAKER", (roomId) => {
+            this.btnCopy.visible = true;
             this.codePin.text = roomId;
             this.game.registry.set('roomIdJoueur', roomId);
         })
@@ -126,6 +133,7 @@ class ConnexionScene extends Phaser.Scene {
                 this.divJoin.setAttribute('hidden', '');
                 this.btnCreer.visible = false;
                 this.infos.text = "En attente des shakers : " + roomId;
+                this.btnCopy.visible = true;
             }
         })
 
@@ -166,6 +174,16 @@ class ConnexionScene extends Phaser.Scene {
 
     createGame() {
         socket.emit("CREATE_GAME", this.isSolo);
+    }
+
+    copy(texteARecopier){
+        navigator.clipboard.writeText(texteARecopier)
+        .then(() => {
+            console.log('Contenu copié avec succès !', texteARecopier);
+        })
+        .catch(err => {
+            console.error('Erreur lors de la copie du contenu :', err);
+        });
     }
 
     jouerBtn(){

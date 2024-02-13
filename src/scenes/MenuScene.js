@@ -45,7 +45,7 @@ class MenuScene extends Phaser.Scene {
             btnCredits.setPosition(gameScale.width*0.1, gameScale.height * 0.48)
         });
 
-        if(this.game.registry.has('connected')){
+        if(this.game.registry.get('connected')){
             btnJouer.input.enabled = true;
             btnModeLibre.input.enabled = true;
         }
@@ -89,6 +89,7 @@ class MenuScene extends Phaser.Scene {
     startGame() {
         // Lancer la scène de jeu
         this.scene.start('GameScene');
+        // this.scene.start('PourInShakerScene');
         socket.emit('START_SOLO');
     }
 

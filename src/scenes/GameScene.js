@@ -11,15 +11,15 @@ const URL_PORTRAITS_CUSTOMERS = "./media/img/testPortraits/",
     URL_BOTTLES_CARTE = "./media/img/bouteilles-carte/normal/",
     URL_BOTTLES_CARTE_GOLD = "./media/img/bouteilles-carte/luxe/",
     BOTTLE_CARD_IMG_YSCALE = 0.25,
-    BOTTLE_CARD_IMG_YSCALEAFTER = 0.03,
-    BOTTLE_CARD_IMG_YSCALEAFTER_HEIGHT = 6,
-    BOTTLE_CARD_IMG_XSCALE = 0.665,
+    BOTTLE_CARD_IMG_YSCALEAFTER = 0.02,
+    BOTTLE_CARD_IMG_YSCALEAFTER_HEIGHT = 2,
+    BOTTLE_CARD_IMG_XSCALE = 0.65,
     BOTTLE_CARD_GRID_NBR_ROW = 2,
     BOTTLE_CARD_GRID_NBR_COL_PLUS_1 = 4,
-    BOTTLE_CARD_IMG_WIDTHSCALE = 0.095,
-    BOTTLE_CARD_IMG_ANGLE = 2.27,
+    BOTTLE_CARD_IMG_WIDTHSCALE = 0.085,
+    BOTTLE_CARD_IMG_ANGLE = 2.5,
     BOTTLE_CARD_IMG_GAP_Y_BETWEEN = 0.11,
-    BOTTLE_CARD_IMG_GAP_X_SECOND_ROW = 0.01*0.333,
+    BOTTLE_CARD_IMG_GAP_X_SECOND_ROW = 0.01*0.55,
     URL_COCKTAIL = "./media/img/cocktails-verre/"
     ;
 
@@ -130,6 +130,7 @@ class GameScene extends Phaser.Scene {
                 this.generateNewClient()
                 this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
                 this.canva.menuPauseButton(this.scene);
+                this.drawBottleCocktail()
 
                 //background comptoir du bar devant le client
                 let backgroundBar = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bar-service');
@@ -276,15 +277,15 @@ class GameScene extends Phaser.Scene {
     }
 
     drawShaker(){
-        let shakerService = this.add.image(gameScale.width*0.425, gameScale.height*0.8, 'shaker-service');
+        let shakerService = this.add.image(gameScale.width*0.32, gameScale.height*0.83, 'shaker-service');
         shakerService.setScale(0.1);
-        shakerService.displayWidth = gameScale.width * 0.1;
+        shakerService.displayWidth = gameScale.width * 0.17;
         shakerService.scaleY = shakerService.scaleX
         // shaker responsive
         window.addEventListener('resize', () => {
-            shakerService.displayWidth = gameScale.width * 0.1;
+            shakerService.displayWidth = gameScale.width * 0.17;
             shakerService.scaleY = shakerService.scaleX
-            shakerService.setPosition(gameScale.width*0.425, gameScale.height*0.8)
+            shakerService.setPosition(gameScale.width*0.32, gameScale.height*0.83)
         });
     }
 
