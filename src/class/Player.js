@@ -1,21 +1,20 @@
 import Phaser from 'phaser';
 
 
-class Player extends Phaser.GameObjects.Graphics {
-    constructor(scene, pseudo, points) {
+class Player extends Phaser.Scene {
+    constructor(scene, pseudo, numeroPlayer, playerId) {
         super(scene);
 
-        scene.add.existing(this);
+        // Autres propriétés du joueur
+        this.pseudo = pseudo;
+        this.score = 0;
+        this.numeroPlayer = numeroPlayer;
+        this.playerId = playerId;
+        this.scene = scene;
 
-
-
-        // Créer le point bleu
-        this.fillStyle(0x0000FF, 1);
-        this.fillCircle(0, 0, 20);
-
-
-        // Autres propriétés du client
-        this.name = name;
+        this.nbGamePlayed = 0;
+        this.nbGoldenBottles = 0;
+        this.nbFirstCustomersServed = 0;
     }
 
     updateRequest(addPoints) {

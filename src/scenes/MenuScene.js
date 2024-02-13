@@ -27,12 +27,13 @@ class MenuScene extends Phaser.Scene {
 
         // Utilisation de la fonction pour créer les boutons
         let btnJouer = this.createButton(gameScale.width * 0.1, gameScale.height * 0.2, 'Jouer', () => this.jouerBtn(), true, false);
-        this.btnJouerSolo = this.createButton(gameScale.width * 0.25, gameScale.height * 0.17, 'Mode solo', () => this.startConnexion(true), false);
-        this.btnJouerMulti = this.createButton(gameScale.width * 0.25, gameScale.height * 0.23, 'Mode multi', () => this.startConnexion(false), false);
+        this.btnJouerSolo = this.createButton(gameScale.width * 0.25, gameScale.height * 0.17, 'Mode solo', () => this.goToLobby("solo"), false);
+        this.btnJouerMulti = this.createButton(gameScale.width * 0.25, gameScale.height * 0.23, 'Mode multi', () => this.goToLobby("multi"), false);
         let btnModeLibre = this.createButton(gameScale.width * 0.1, gameScale.height * 0.27, 'Mode libre', () => this.startGame(), true, false);
         let btnLeaderboard = this.createButton(gameScale.width * 0.1, gameScale.height * 0.34, 'Tableau d\'honneur', () => {});
         let btnOptions = this.createButton(gameScale.width * 0.1, gameScale.height * 0.41, 'Options', () => this.startOptions());
         let btnCredits = this.createButton(gameScale.width * 0.1, gameScale.height * 0.48, 'Crédits', () => {});
+
         //responsive des boutons
         window.addEventListener('resize', () => {
             menuTxt.setPosition(gameScale.width*0.1, gameScale.height * 0.1)
@@ -92,13 +93,19 @@ class MenuScene extends Phaser.Scene {
         socket.emit('START_SOLO');
     }
 
+    //Obsolète
     startConnexion(solo){
         this.game.registry.set('isSolo', solo);
-        this.scene.start('ConnexionScene')
+        //this.scene.start('ConnexionScene');
+    }
+
+    goToLobby(mode){
+        this.startConnexion(mode == "solo");
+        this.scene.start('Step1_CreateJoinLobbyScene');
     }
 
     startOptions(){
-        this.scene.start('OptionsScene')
+        this.scene.start('OptionsScene');
     }
 }
 

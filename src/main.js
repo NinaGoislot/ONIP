@@ -1,5 +1,9 @@
 import 'phaser';
 import MenuScene from '@/scenes/MenuScene';
+import Step1_CreateJoinLobbyScene from '@/scenes/Step1_CreateJoinLobbyScene';
+import Step2_LobbyScene from '@/scenes/Step2_LobbyScene';
+import Step3_ConnectPhoneScene from '@/scenes/Step3_ConnectPhoneScene';
+import Step4_PseudoScene from '@/scenes/Step4_PseudoScene';
 import ConnexionScene from '@/scenes/ConnexionScene';
 import GameScene from '@/scenes/GameScene';
 import EndScene from '@/scenes/EndScene';
@@ -7,7 +11,7 @@ import CabinetScene from '@/scenes/CabinetScene';
 import LoadDataScene from '@/scenes/LoadDataScene';
 import OptionsScene from '@/scenes/OptionsScene';
 import PauseScene from '@/scenes/PauseScene';
-import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
+import {io} from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 const socket = io("http://127.0.0.1:3006"); //connexion au serveur socket.io
 
 const VALUES = {
@@ -39,7 +43,7 @@ const config = {
   audio: {
     disableWebAudio: true //pour ajouter du son
   },
-  scene: [LoadDataScene, MenuScene, ConnexionScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene], // Ajouter toutes les scènes ici
+  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene], // Ajouter toutes les scènes ici
 };
 
 var game = new Phaser.Game(config);
