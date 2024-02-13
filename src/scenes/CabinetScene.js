@@ -55,7 +55,7 @@ class CabinetScene extends Phaser.Scene {
         takenBottleImg.setInteractive(false);
         takenBottleImg.visible = false;
         let roomIdJoueur = this.game.registry.get('roomIdJoueur');
-        socket.emit('A_JUICE_IS_TAKEN', this.aJuiceTaken, roomIdJoueur)
+        socket.emit('A_JUICE_IS_TAKEN', this.aJuiceTaken, roomIdJoueur);
       }
     })
 
