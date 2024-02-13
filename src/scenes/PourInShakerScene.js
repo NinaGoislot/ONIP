@@ -1,10 +1,7 @@
 import Phaser from 'phaser';
 import Customer from '@/class/Customer'
 import GameCanva from '@/canvas/GameCanva'
-import {
-    gameScale,
-    socket
-} from '../main.js';
+import {gameScale,socket} from '../main.js';
 
 class PourInShakerScene extends Phaser.Scene {
 
@@ -37,7 +34,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         socket.on("NOMORE_CLIENT", (peutPlus) => {
             this.ajoutClient = peutPlus;
-            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {fontSize: '32px',fill: '#fff'});
+            this.add.text(gameScale.width*0.8, gameScale.height*0.1, 'Dernier client', {fontSize: '32px',fill: '#fff'});
         })
     }
 }
