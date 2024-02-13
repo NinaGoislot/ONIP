@@ -1,3 +1,5 @@
+import Partie from '../class/Partie.js';
+import Player from '../class/Player.js';
 import {gameScale, socket} from '../main.js';
 
 class MenuScene extends Phaser.Scene {
@@ -89,20 +91,29 @@ class MenuScene extends Phaser.Scene {
 
     startGame() {
         // Lancer la scène de jeu
-        this.scene.start('GameScene');
-        // this.scene.start('PourInShakerScene');
-        socket.emit('START_SOLO');
+        this.player = new Player(this, "this.pseudo", 1, "12341");
+        this.partie = new Partie(this, "multi", "1234", this.player);
+        this.game.registry.set('rolePlayer', 1);
+        this.game.registry.set('partie', this.partie);
+        // this.scene.start('GameScene');
+        this.scene.start('PourInShakerScene');
+        // socket.emit('START_SOLO');
     }
 
     //Obsolète
     startConnexion(solo){
         this.game.registry.set('isSolo', solo);
         //this.scene.start('ConnexionScene');
+        if(solo){
+            this.scene.start('Step3_ConnectPhoneScene');
+        } else {
+            this.scene.start('Step1_CreateJoinLobbyScene');
+        }
     }
 
     goToLobby(mode){
         this.startConnexion(mode == "solo");
-        this.scene.start('Step1_CreateJoinLobbyScene');
+        // this.scene.start('Step1_CreateJoinLobbyScene');
     }
 
     startOptions(){

@@ -21,52 +21,51 @@ class GameCanva extends Phaser.GameObjects.Graphics {
     // FONCTIONS
 
     draw() {
+        // if (this.customer != {}) {
+        //     // this.clientImage = this.scene.add.image(270, 270, this.customer.picture);
+        //     // this.clientImage.setScale(0.1);
+        //     // this.clientImage.setVisible(true);
+        // }
         if (this.customer != {}) {
-            this.clientImage = this.scene.add.image(270, 270, this.customer.picture);
-            this.clientImage.setScale(0.1);
-            this.clientImage.setVisible(true);
-        }
-
-        // Créer l'image du client à la place du point bleu
-        this.clientImage = this.scene.add.sprite(gameScale.width * 0.15, gameScale.height, this.customer.picture).setOrigin(0.5, 1);
-        // this.clientImage.setScale(0.1);
-        // this.clientImage.setVisible(true);
-        this.clientImage.displayWidth = gameScale.width * 0.3;
-        this.clientImage.scaleY = this.clientImage.scaleX
-        //responsive client
-        window.addEventListener('resize', () => {
+            // Créer l'image du client à la place du point bleu
+            this.clientImage = this.scene.add.sprite(gameScale.width * 0.15, gameScale.height, this.customer.picture).setOrigin(0.5, 1);
             this.clientImage.displayWidth = gameScale.width * 0.3;
             this.clientImage.scaleY = this.clientImage.scaleX
-            this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height)
-        });
-        //animation talk et blink client
-        this.scene.anims.create({
-            key: 'clientTalk',
-            frames: this.scene.anims.generateFrameNumbers(this.customer.picture, {
-                start: 0,
-                end: 5
-            }),
-            frameRate: 6,
-            repeat: -1
-        })
-        this.scene.anims.create({
+            //responsive client
+            window.addEventListener('resize', () => {
+                 this.clientImage.displayWidth = gameScale.width * 0.3;
+                this.clientImage.scaleY = this.clientImage.scaleX
+                 this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height)
+            });
+            //animation talk et blink client
+            this.clientImage.anims.create({
+                key: 'clientTalk',
+                frames: this.scene.anims.generateFrameNumbers(this.customer.picture, {
+                    start: 0,
+                    end: 5
+                }),
+                frameRate: 6,
+                repeat: -1
+            })
+            this.clientImage.anims.create({
             key: 'blink',
-            frames: [
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 7, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, }
-            ],
-            frameRate: 6,
-            repeat: -1
-        })
+                frames: [
+                    { key: this.customer.picture, frame: 6, },
+                    { key: this.customer.picture, frame: 6, },
+                    { key: this.customer.picture, frame: 6, },
+                    { key: this.customer.picture, frame: 6, },
+                    { key: this.customer.picture, frame: 7, },
+                    { key: this.customer.picture, frame: 8, },
+                    { key: this.customer.picture, frame: 8, },
+                    { key: this.customer.picture, frame: 8, },
+                    { key: this.customer.picture, frame: 8, },
+                    { key: this.customer.picture, frame: 8, },
+                    { key: this.customer.picture, frame: 8, }
+                ],
+                frameRate: 6,
+                repeat: -1
+            })
+        }
 
         // Afficher la bulle de dialogue
         let fontSize = gameScale.width * 0.02
@@ -93,25 +92,15 @@ class GameCanva extends Phaser.GameObjects.Graphics {
         });
     }
 
-    remove() {
-        this.customer != {} ? this.clientImage.setVisible(false) : "";
-        this.bubble.setVisible(false);
-        this.displayScore.setVisible(false);
-    }
-
-    updateDialogue(currentDialogue) {
-        this.bubble.setText(currentDialogue);
-        this.animClientTalk(this.isTalking);
-    }
-
-    updateScore(score) {
-        this.score = score;
-        this.displayScore.setText(this.score)
-    }
-
-    //Obsolète ?
-    writeDialogue(dialogue) {
-        this.bubble.setText(dialogue);
+    animClientTalk(isTalking) {
+        if (isTalking == "talk") {
+            this.clientImage.play('clientTalk')
+            this.isTalking = "isTalking"
+        } else if (isTalking == "stop") {
+            this.clientImage.anims.restart();
+            this.clientImage.stop('clientTalk')
+            this.clientImage.play('blink');
+        }
     }
 
     menuPauseButton(scene) {
@@ -127,6 +116,12 @@ class GameCanva extends Phaser.GameObjects.Graphics {
             .on('pointerout', () => this.PauseButton.setTint(0xffffff))
     }
 
+    remove() {
+        this.customer != {} ? this.clientImage.setVisible(false) : "";
+        this.bubble.setVisible(false);
+        this.displayScore.setVisible(false);
+    }
+
     startPause(scene, secondPaused) {
         this.scene.game.currentScene = scene.key;
         let roomIdJoueur = this.scene.game.registry.get('roomIdJoueur');
@@ -137,6 +132,21 @@ class GameCanva extends Phaser.GameObjects.Graphics {
         scene.launch('PauseScene', {
             'secondPaused': secondPaused
         });
+    }
+
+    updateDialogue(currentDialogue) {
+        this.bubble.setText(currentDialogue);
+        this.animClientTalk(this.isTalking);
+    }
+
+    updateScore(score) {
+        this.score = score;
+        this.displayScore.setText(this.score)
+    }
+
+    //Obsolète ?
+    writeDialogue(dialogue) {
+        this.bubble.setText(dialogue);
     }
 }
 

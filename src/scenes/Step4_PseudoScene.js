@@ -32,7 +32,6 @@ class Step4_PseudoScene extends Phaser.Scene {
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
             background.setPosition(gameScale.width / 2, gameScale.height / 2);
-            this.infos.setPosition(gameScale.width * 0.1, gameScale.height * 0.25);
         });
 
         // ****** Actions ******
@@ -99,7 +98,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             putPseudo.setAttribute('hidden', '');
             partie.removeAttribute('hidden');
             this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
-            this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
+            this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.player);
             this.game.registry.set('partie', this.partie);
             
             this.scene.start('GameScene');
