@@ -18,7 +18,6 @@ class CabinetScene extends Phaser.Scene {
 
   preload(){
     this.load.image('armoireBouteilles', './media/img/armoire-deco.webp');
-    this.load.image('bouteille1', './media/img/bouteilles/bouteille1.webp');
 
     this.bottlesData = this.game.registry.get('ingredients');
     this.bottleImgKeys = [];
@@ -126,10 +125,24 @@ class CabinetScene extends Phaser.Scene {
 
   selectJuice(juiceType) {
     console.log(`Vous avez sélectionné ${juiceType.name}.`);
+    this.juicePicked(juiceType);
     this.game.registry.set('playerJuiceChoice', juiceType.name);
     let roomIdJoueur = this.game.registry.get('roomIdJoueur');
     socket.emit("SELECT_JUICE", juiceType.id, roomIdJoueur);
     this.scene.start('GameScene');
+  }
+
+  juicePicked(juice){
+    let juices = this.game.registry.get('ingredients');
+    juices[juice.id].picked = true
+    this.game.registry.set('ingredients', juices);
+  }
+
+  unPickedJuices(){
+    let juices = this.game.registry.get('ingredients');
+    for(let i=0; i<juices.length;i++){
+      juices[i].picked = false
+    }
   }
 
 

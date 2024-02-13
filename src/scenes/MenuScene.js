@@ -46,7 +46,7 @@ class MenuScene extends Phaser.Scene {
             btnCredits.setPosition(gameScale.width*0.1, gameScale.height * 0.48)
         });
 
-        if(this.game.registry.get('connected')){
+        if(this.game.registry.has('connected')){
             btnJouer.input.enabled = true;
             btnModeLibre.input.enabled = true;
         }

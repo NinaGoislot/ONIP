@@ -5,11 +5,8 @@ class LoadDataScene extends Phaser.Scene {
     preload() {
         this.load.json('globalGameData', './data/data.json');
         this.load.audio('theme', './media/audio/BE-song.mp3');
-
-        this.game.registry.set('connected', false);
-
         socket.on("CONNECTED", () => {
-            console.log("Je recois l'info CONNECTED");
+            console.log("je suis connectée")
             this.game.registry.set('connected', true);
         });
     }
@@ -25,8 +22,8 @@ class LoadDataScene extends Phaser.Scene {
         this.game.registry.set('emotions', globalGameData.emotions);
         this.game.registry.set('extras', globalGameData.extras);
         this.game.registry.set('score', 0);
-       
-        console.log(socket);
+        //this.game.registry.set('connected', false);
+
 
         // POUR LA MUSIQUE
         // this.load.audio('theme', './media/audio/BE-song.mp3');
