@@ -99,7 +99,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             putPseudo.setAttribute('hidden', '');
             partie.removeAttribute('hidden');
             this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
-            this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
+            this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.player);
             this.game.registry.set('partie', this.partie);
             
             this.scene.start('GameScene');

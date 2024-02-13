@@ -18,29 +18,57 @@ class GameCanva extends Phaser.GameObjects.Graphics {
         this.draw();
     }
 
-    // FONCTIONS
-
+    // --------------------------- FONCTIONS PRINCIPALES ---------------------------
     draw() {
         if (this.customer != {}) {
-            this.clientImage = this.scene.add.image(270, 270, this.customer.picture);
-            this.clientImage.setScale(0.1);
-            this.clientImage.setVisible(true);
+            this.drawCustomer();
         }
 
-        // Créer l'image du client à la place du point bleu
-        this.clientImage = this.scene.add.sprite(gameScale.width * 0.15, gameScale.height, this.customer.picture).setOrigin(0.5, 1);
-        // this.clientImage.setScale(0.1);
-        // this.clientImage.setVisible(true);
-        this.clientImage.displayWidth = gameScale.width * 0.3;
-        this.clientImage.scaleY = this.clientImage.scaleX
-        //responsive client
-        window.addEventListener('resize', () => {
-            this.clientImage.displayWidth = gameScale.width * 0.3;
-            this.clientImage.scaleY = this.clientImage.scaleX
-            this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height)
+        this.createAnimationCustomer();
+
+        this.drawDialogue();
+
+        this.displayScore = this.scene.add.text(20, 20, this.score, {
+            fontSize: '16px',
+            fill: '#fff'
         });
-        //animation talk et blink client
-        this.scene.anims.create({
+    }
+
+    // --------------------------- FONCTIONS DRAW ---------------------------
+    drawCustomer() {
+        this.clientImage = this.scene.add.sprite(gameScale.width * 0.15, gameScale.height, this.customer.picture).setOrigin(0.5, 1);
+        this.clientImage.displayWidth = gameScale.width * 0.3;
+        this.clientImage.scaleY = this.clientImage.scaleX;
+    }
+
+    drawDialogue() {
+        let fontSize = gameScale.width * 0.02
+        let bubbleWrap = gameScale.width * 0.25
+        this.bubble = this.scene.add.text(gameScale.width * 0.25, gameScale.height * 0.2, "", {
+            fontSize: fontSize + 'px',
+            fill: '#fff',
+            wordWrap: {
+                width: bubbleWrap
+            },
+            lineSpacing: 10
+        });
+    }
+
+    // --------------------------- FONCTIONS SECONDAIRES ---------------------------
+
+    animClientTalk(isTalking) {
+        if (isTalking == "talk") {
+            this.clientImage.play('clientTalk')
+            this.isTalking = "isTalking"
+        } else if (isTalking == "stop") {
+            this.clientImage.anims.restart();
+            this.clientImage.stop('clientTalk')
+            this.clientImage.play('blink');
+        }
+    }
+
+    createAnimationCustomer() {
+        this.clientImage.anims.create({
             key: 'clientTalk',
             frames: this.scene.anims.generateFrameNumbers(this.customer.picture, {
                 start: 0,
@@ -49,69 +77,56 @@ class GameCanva extends Phaser.GameObjects.Graphics {
             frameRate: 6,
             repeat: -1
         })
-        this.scene.anims.create({
+        this.clientImage.anims.create({
             key: 'blink',
-            frames: [
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 6, },
-                { key: this.customer.picture, frame: 7, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, },
-                { key: this.customer.picture, frame: 8, }
+            frames: [{
+                    key: this.customer.picture,
+                    frame: 6,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 6,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 6,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 6,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 7,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 8,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 8,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 8,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 8,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 8,
+                },
+                {
+                    key: this.customer.picture,
+                    frame: 8,
+                }
             ],
             frameRate: 6,
             repeat: -1
         })
-
-        // Afficher la bulle de dialogue
-        let fontSize = gameScale.width * 0.02
-        let bubbleWrap = gameScale.width*0.25
-        this.bubble = this.scene.add.text(gameScale.width * 0.25, gameScale.height*0.2, "", {
-            fontSize: fontSize + 'px',
-            fill: '#fff',
-            wordWrap: { width: bubbleWrap },
-            lineSpacing: 10
-        });
-        //responsive text
-        window.addEventListener('resize', () => {
-            fontSize = gameScale.width * 0.02
-            bubbleWrap = gameScale.width*0.25
-            this.bubble.setFontSize(fontSize);
-            this.bubble.setWordWrapWidth(bubbleWrap)
-            this.bubble.wordWrap = { width: gameScale.width * 0.25 };
-            this.bubble.setPosition(gameScale.width * 0.25, gameScale.height*0.2)
-        });
-
-        this.displayScore = this.scene.add.text(20, 20, this.score, {
-            fontSize: '16px',
-            fill: '#fff'
-        });
-    }
-
-    remove() {
-        this.customer != {} ? this.clientImage.setVisible(false) : "";
-        this.bubble.setVisible(false);
-        this.displayScore.setVisible(false);
-    }
-
-    updateDialogue(currentDialogue) {
-        this.bubble.setText(currentDialogue);
-        this.animClientTalk(this.isTalking);
-    }
-
-    updateScore(score) {
-        this.score = score;
-        this.displayScore.setText(this.score)
-    }
-
-    //Obsolète ?
-    writeDialogue(dialogue) {
-        this.bubble.setText(dialogue);
     }
 
     menuPauseButton(scene) {
@@ -127,16 +142,52 @@ class GameCanva extends Phaser.GameObjects.Graphics {
             .on('pointerout', () => this.PauseButton.setTint(0xffffff))
     }
 
+    remove() {
+        this.customer != {} ? this.clientImage.setVisible(false) : "";
+        this.bubble.setVisible(false);
+        this.displayScore.setVisible(false);
+    }
+
+    responsiveEvents() {
+        window.addEventListener('resize', () => {
+            //Bulle de dialogue
+            fontSize = gameScale.width * 0.02;
+            bubbleWrap = gameScale.width * 0.25;
+            this.bubble.setFontSize(fontSize);
+            this.bubble.setWordWrapWidth(bubbleWrap);
+            this.bubble.wordWrap = {
+                width: gameScale.width * 0.25
+            };
+            this.bubble.setPosition(gameScale.width * 0.25, gameScale.height * 0.2);
+
+            //Client
+            this.clientImage.displayWidth = gameScale.width * 0.3;
+            this.clientImage.scaleY = this.clientImage.scaleX;
+            this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height);
+        });
+
+    }
+
     startPause(scene, secondPaused) {
         this.scene.game.currentScene = scene.key;
         let roomIdJoueur = this.scene.game.registry.get('roomIdJoueur');
         if (!secondPaused) {
             socket.emit("PAUSED", roomIdJoueur);
         }
-        scene.pause()
+        scene.pause();
         scene.launch('PauseScene', {
             'secondPaused': secondPaused
         });
+    }
+
+    updateDialogue(currentDialogue) {
+        this.bubble.setText(currentDialogue);
+        this.animClientTalk(this.isTalking);
+    }
+
+    updateScore(score) {
+        this.score = score;
+        this.displayScore.setText(this.score)
     }
 }
 
