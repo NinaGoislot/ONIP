@@ -9,7 +9,6 @@ class LoadDataScene extends Phaser.Scene {
             console.log("je suis connectée")
             this.game.registry.set('connected', true);
         });
-        console.log(socket)
     }
 
     create() {

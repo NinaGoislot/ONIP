@@ -5,7 +5,7 @@ import {
 } from '../main.js';
 
 class GameCanva extends Phaser.GameObjects.Graphics {
-    constructor(scene, customer, score) {
+    constructor(scene, customer = {}, score = "0") {
         super(scene);
         scene.add.existing(this);
 
@@ -21,6 +21,12 @@ class GameCanva extends Phaser.GameObjects.Graphics {
     // FONCTIONS
 
     draw() {
+        if (this.customer != {}) {
+            this.clientImage = this.scene.add.image(270, 270, this.customer.picture);
+            this.clientImage.setScale(0.1);
+            this.clientImage.setVisible(true);
+        }
+
         // Créer l'image du client à la place du point bleu
         this.clientImage = this.scene.add.sprite(gameScale.width * 0.15, gameScale.height, this.customer.picture).setOrigin(0.5, 1);
         // this.clientImage.setScale(0.1);
@@ -88,43 +94,22 @@ class GameCanva extends Phaser.GameObjects.Graphics {
     }
 
     remove() {
-        this.clientImage.setVisible(false);
+        this.customer != {} ? this.clientImage.setVisible(false) : "";
         this.bubble.setVisible(false);
         this.displayScore.setVisible(false);
     }
 
-    updateDialogue(dialogue) {
-        this.customer.currentDialogue = dialogue; // Afficher le dialogue progressivement
-        this.writeDialogue(this.customer.currentDialogue);
-        this.animClientTalk(this.isTalking)
+    updateDialogue(currentDialogue) {
+        this.bubble.setText(currentDialogue);
+        this.animClientTalk(this.isTalking);
     }
 
-    animClientTalk(isTalking) {
-        if (isTalking == "talk") {
-            this.clientImage.play('clientTalk')
-            this.isTalking = "isTalking"
-        } else if (isTalking == "stop") {
-            this.clientImage.anims.restart();
-            this.clientImage.stop('clientTalk')
-            this.clientImage.play('blink');
-        }
-    }
-    
     updateScore(score) {
         this.score = score;
         this.displayScore.setText(this.score)
     }
 
-    finalDialogue() {
-        if (this.customer.succeed != null) {
-            if (this.customer.succeed) {
-                this.writeDialogue(this.customer.successText);
-            } else {
-                this.writeDialogue(this.customer.failureText);
-            }
-        }
-    }
-
+    //Obsolète ?
     writeDialogue(dialogue) {
         this.bubble.setText(dialogue);
     }

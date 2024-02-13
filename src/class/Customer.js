@@ -14,8 +14,10 @@ class Customer extends Phaser.GameObjects.Graphics {
         this.picture = picture;
 
         this.dialogueIndex = 0;  // Index pour suivre la position actuelle dans le tableau de dialogues
-        this.successText = emotion.successText;
-        this.failureText = emotion.failureText;
+        this.successDialogue = emotion.successText;
+        this.failureDialogue = emotion.failureText;
+
+        this.succeed = null ;
     }
 
     // ACCESSEURS

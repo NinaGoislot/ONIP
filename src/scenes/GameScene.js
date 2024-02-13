@@ -94,6 +94,13 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.rolePlayer = this.game.registry.get('rolePlayer');
+        this.partie = this.game.registry.get('partie');
+        this.emotions = this.game.registry.get('emotions');
+        this.cocktails = this.game.registry.get('cocktails');
+        this.ajoutClient = true;
+        this.dataCustomer = [];
+
         // add background service to scene
         let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-service');
         background.displayWidth = gameScale.width;
@@ -105,9 +112,11 @@ class GameScene extends Phaser.Scene {
             background.setPosition(gameScale.width/2, gameScale.height/2)
         });
 
-        this.ajoutClient = true;
-
         if (this.currentCustomer === null) {
+
+            // Création du canva 
+            this.canva = new GameCanva(this, this.game.registry.get('score'));
+            this.canva.menuPauseButton(this.scene, this);
 
             //COMPTE A REBOURS
             this.rebours = this.add.text(gameScale.width * 0.5, gameScale.height * 0.5, "", {
@@ -122,15 +131,33 @@ class GameScene extends Phaser.Scene {
 
             // Exécuter les autres fonctions une fois que la promesse est résolue
             // countdownPromise.then(() => {
-                // console.log("Le compte à rebours est terminé !");
-                //Set un nombre de client pour la partie
-                this.game.registry.set('nbrCustomers', 5);
+            console.log("Le compte à rebours est terminé !");
+            //Set un nombre de client pour la partie
+            this.game.registry.set('nbrCustomers', 5);
 
-                // Création du client 
-                this.generateNewClient()
-                this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
-                this.canva.menuPauseButton(this.scene);
-                this.drawBottleCocktail()
+            // Création du client
+            if (this.rolePlayer == 1) {
+                this.generateNewClient().then(() => {
+                    console.log("J'ai créé un client : ", this.dataCustomer)
+                    socket.emit("CREATE_FIRST_CUSTOMER", {
+                        currentCustomer: this.dataCustomer,
+                        idRoom: this.partie.roomId
+                    });
+                });
+            }
+
+            socket.on("RECEIVE_FIRST_CUSTOMER", (currentCustomer) => {
+                console.log("Je rentre dans le emit du client")
+                //this.currentCustomer = JSON.parse(currentCustomer);
+
+                if (this.rolePlayer == 2) {
+                    console.log("J2 reçoit bient l'info du socket");
+                }
+
+                this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotions, currentCustomer[0]), this.findObjectById(this.cocktails, currentCustomer[1]), currentCustomer[2]);
+
+                this.canva.customer = this.currentCustomer;
+                this.canva.draw();
 
                 //background comptoir du bar devant le client
                 let backgroundBar = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bar-service');
@@ -141,15 +168,20 @@ class GameScene extends Phaser.Scene {
                     backgroundBar.displayHeight = gameScale.width / backgroundBar.width * backgroundBar.height;
                     backgroundBar.setPosition(gameScale.width/2, gameScale.height/2)
                 });
+                
                 this.drawShaker();
 
                 // Fonction asynchrone pour afficher les dialogues successifs et ce qui se passe après
                 this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
-                        this.showCabinetButton()
+                    this.showCabinetButton()
                 });
 
+                this.game.registry.set('nbrCustomers', this.game.registry.get('nbrCustomers') - 1);
                 // Stocker les données du client et de la scène principale dans le registre global du jeu
                 this.game.registry.set('customerData', this.currentCustomer);
+
+            });
+
             // });
 
         } else {
@@ -179,6 +211,47 @@ class GameScene extends Phaser.Scene {
                     this.serveCustomer();
                 });
             });
+
+            //Tous les joueurs ont cliqués sur "Servir le client"
+            socket.on("ALL_PLAYERS_READY_TO_SERVE", () => {
+                this.readyText.setVisible(false);
+                this.showFinalDialogue().then(() => {
+                    if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
+                        this.canva.remove();
+                        if (this.rolePlayer == 1) {
+                            this.generateNewClient().then(() => {
+                                console.log("J'ai créé un client : ", this.dataCustomer)
+                                socket.emit("CREATE_NEXT_CUSTOMER", {
+                                    currentCustomer: this.dataCustomer,
+                                    idRoom: this.partie.roomId
+                                });
+                            });
+                        }
+                    } else {
+                        this.endGame();
+                    }
+                })
+            });
+
+            socket.on("RECEIVE_NEXT_CUSTOMER", (currentCustomer) => {
+                console.log("Je rentre dans le emit du client n°2");
+
+                this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotions, currentCustomer[0]), this.findObjectById(this.cocktails, currentCustomer[1]), currentCustomer[2]);
+                this.canva.customer = this.currentCustomer;
+
+                setTimeout(() => {
+                    console.log("Voici le client : ", this.currentCustomer);
+                    console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
+                    
+                    this.canva.draw();
+                    this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
+                        this.showCabinetButton();
+                    });
+
+                    this.game.registry.set('nbrCustomers', this.game.registry.get('nbrCustomers') - 1);
+                    this.game.registry.set('customerData', this.currentCustomer);
+                }, 2000);
+            });
         }
 
         socket.on("GAME_PAUSED", (secondPaused) => {
@@ -190,6 +263,8 @@ class GameScene extends Phaser.Scene {
             this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {fontSize: '32px',fill: '#fff'});
         })
     }
+
+    // ************************************* FONCTIONS ************************************************
 
     compteARebours = (resolve) => {
         var duree = 3;
@@ -296,18 +371,16 @@ class GameScene extends Phaser.Scene {
         this.scene.start('EndScene');
     }
 
-    generateNewClient() {
+    generateNewClient = async () => {
         // Choisir une image aléatoire du tableau
         const randomImageKey = Phaser.Math.RND.pick(this.imageClientKey);
-        // const randomImageKey = this.goldBottle()
-        console.log(randomImageKey);
 
-        const emotion = this.game.registry.get('emotions')[Math.floor(Math.random() * this.game.registry.get('emotions').length)];
-        const cocktail = this.game.registry.get('cocktails')[Math.floor(Math.random() * this.game.registry.get('cocktails').length)];
+        const emotion = this.emotions[Math.floor(Math.random() * this.game.registry.get('emotions').length)];
+        const cocktail = this.cocktails[Math.floor(Math.random() * this.game.registry.get('cocktails').length)];
 
-        this.currentCustomer = new Customer(this, 300, 300, emotion, cocktail, randomImageKey);
+        this.dataCustomer = [emotion.id, cocktail.id, randomImageKey];
 
-        this.game.registry.set('nbrCustomers', this.game.registry.get('nbrCustomers') - 1);
+        //this.currentCustomer = new Customer(this, 300, 300, emotion, cocktail, randomImageKey);
     }
 
     getBottleImg(cocktailBottleId){
@@ -342,23 +415,17 @@ class GameScene extends Phaser.Scene {
 
     serveCustomer() {
         this.currentCustomer.succeed = this.playerChoiceCorrect();
-        this.showFinalDialogue().then(() => {
-            if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
-                this.canva.remove();
-                this.generateNewClient();
-                this.canva.customer = this.currentCustomer;
+        console.log("Fonction serveCustomer(), la valeur de succeed est a ", this.currentCustomer.succeed);
 
-                this.wait(2000).then(() => {
-                    this.canva.draw();
-                    this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
-                        this.game.registry.set('customerData', this.currentCustomer);
-                        this.showCabinetButton();
-                    });
-                })
-            } else {
-                this.endGame();
-            }
+        this.readyText = this.add.text(gameScale.width * 0.15, gameScale.height * 0.15, "Le joueur " + this.rolePlayer + " est prêt", {
+            fontSize: '32px',
+            fill: '#fff'
         })
+
+        socket.emit("SET_PLAYER_READY", {
+            playerId: this.partie.player.playerId,
+            roomId: this.partie.roomId
+        });
     }
 
     showCabinetButton() {
@@ -375,16 +442,18 @@ class GameScene extends Phaser.Scene {
 
     showNextDialogue = async (dialogue) => {
         this.canva.isTalking = true;
-        this.canva.customer.dialogueIndex = 0;
     
         for (let i = 0; i < dialogue.length; i++) {
             let currentDialogue = dialogue[i];
             this.canva.isTalking = "talk"
             for (let j = 0; j < currentDialogue.length; j++) {
-                if (dialogue === this.currentCustomer.firstDialogues && currentDialogue == dialogue[dialogue.length -1]) {
+                if (dialogue === this.currentCustomer.firstDialogues && currentDialogue == dialogue[dialogue.length - 1]) {
+                    console.log("Je dois écrire le nom de la boisson à la fin de ce dialogue")
                     currentDialogue += this.currentCustomer.drink.name; // Ajouter le nom de la commande
                 }
                 let displayedDialogue = currentDialogue.substring(0, j + 1);
+
+                console.log("Je dois écrire la lettre '"+ displayedDialogue + "'")
                 this.canva.updateDialogue(displayedDialogue); // Afficher les dialogues lettre par lettre
 
                 // Attendre un court laps de temps avant d'afficher la prochaine lettre
@@ -399,18 +468,36 @@ class GameScene extends Phaser.Scene {
         // this.canva.isTalking = "stop"
         // console.log("stop ?", this.canva.isTalking)
     }
-    
+
 
     showFinalDialogue = async () => {
-        this.canva.finalDialogue(this.game);
+        const dialogue = this.currentCustomer.succeed ? this.currentCustomer.successDialogue : this.currentCustomer.failureDialogue;
 
-        // Attendre 3 secondes avant le prochain dialogue
-        await new Promise(resolve => this.time.delayedCall(3000, resolve));
+        for (let i = 0; i < dialogue.length; i++) {
+            let currentDialogue = dialogue[i];
+
+            for (let j = 0; j < currentDialogue.length; j++) {
+                let displayedDialogue = currentDialogue.substring(0, j + 1);
+
+                this.canva.updateDialogue(displayedDialogue); // Afficher les dialogues lettre par lettre
+
+                // Attendre un court laps de temps avant d'afficher la prochaine lettre
+                await new Promise(resolve => this.time.delayedCall(50, resolve));
+            }
+
+            // Attendre 3 secondes après l'affichage complet du dialogue
+            await new Promise(resolve => this.time.delayedCall(3000, resolve));
+        }
     }
 
     wait = async (amount) => {
         await new Promise(resolve => this.time.delayedCall(amount, resolve));
     }
-}
 
+    findObjectById(objects, id) {
+        const foundObject = objects.find(object => object.id == id);
+        return foundObject;
+    }
+
+}
 export default GameScene;
