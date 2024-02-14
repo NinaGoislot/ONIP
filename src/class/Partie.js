@@ -15,6 +15,7 @@ class Partie extends Phaser.Scene {
         this.roomId = roomId;
         this.scene = scene;
 
+
         // switch (mode) {
         //     case "solo", "libre":
         //         this.players.push(player);

@@ -6,7 +6,6 @@ import {
 
 class GameCanva {
     constructor(scene, customer = {}, score = "0") {
-        //super(scene);
         scene.add.existing(this);
 
         // ATTRIBUTS
@@ -14,7 +13,6 @@ class GameCanva {
         this.scene = scene;
         this.score = score;
         this.resizeListeners = [];
-        // this.isTalking = false;
         this.isTalking = "null"
         this.draw();
     }
@@ -48,8 +46,6 @@ class GameCanva {
         };
 
         window.addEventListener('resize', resizeListener);
-
-        // Stocker la référence vers l'écouteur d'événement de redimensionnement
         this.resizeListeners.push(resizeListener);
     }
 
@@ -59,9 +55,7 @@ class GameCanva {
         this.bubble = this.scene.add.text(gameScale.width * 0.25, gameScale.height * 0.2, "", {
             fontSize: fontSize + 'px',
             fill: '#fff',
-            wordWrap: {
-                width: bubbleWrap
-            },
+            wordWrap: {width: bubbleWrap},
             lineSpacing: 10
         });
 
@@ -77,8 +71,6 @@ class GameCanva {
         };
 
         window.addEventListener('resize', resizeListener);
-
-        // Stocker la référence vers l'écouteur d'événement de redimensionnement
         this.resizeListeners.push(resizeListener);
     }
 
@@ -107,50 +99,18 @@ class GameCanva {
         })
         this.clientImage.anims.create({
             key: 'blink',
-            frames: [{
-                    key: this.customer.picture,
-                    frame: 6,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 6,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 6,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 6,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 7,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 8,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 8,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 8,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 8,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 8,
-                },
-                {
-                    key: this.customer.picture,
-                    frame: 8,
-                }
+            frames: [                
+                { key: this.customer.picture, frame: 6, },
+                { key: this.customer.picture, frame: 6, },
+                { key: this.customer.picture, frame: 6, },
+                { key: this.customer.picture, frame: 6, },
+                { key: this.customer.picture, frame: 7, },
+                { key: this.customer.picture, frame: 8, },
+                { key: this.customer.picture, frame: 8, },
+                { key: this.customer.picture, frame: 8, },
+                { key: this.customer.picture, frame: 8, },
+                { key: this.customer.picture, frame: 8, },
+                { key: this.customer.picture, frame: 8, }
             ],
             frameRate: 6,
             repeat: -1
@@ -180,25 +140,6 @@ class GameCanva {
     removeResizeListeners() {
         this.resizeListeners.forEach(listener => {
             window.removeEventListener('resize', listener);
-        });
-    }
-
-    responsiveEvents() {
-        window.addEventListener('resize', () => {
-            //Bulle de dialogue
-            fontSize = gameScale.width * 0.02;
-            bubbleWrap = gameScale.width * 0.25;
-            this.bubble.setFontSize(fontSize);
-            this.bubble.setWordWrapWidth(bubbleWrap);
-            this.bubble.wordWrap = {
-                width: gameScale.width * 0.25
-            };
-            this.bubble.setPosition(gameScale.width * 0.25, gameScale.height * 0.2);
-
-            //Client
-            this.clientImage.displayWidth = gameScale.width * 0.3;
-            this.clientImage.scaleY = this.clientImage.scaleX;
-            this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height);
         });
     }
 
