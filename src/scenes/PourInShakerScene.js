@@ -36,7 +36,7 @@ class PourInShakerScene extends Phaser.Scene {
         this.currentCustomer = this.game.registry.get('customerData');
         this.nbrBoucle = this.currentCustomer.drink.ingredients.length;
         this.partie = this.game.registry.get('partie');
-        this.nbrBottleChoose = this.partie.player.nbrBottleChoosed;
+        this.nbrBottleChoose = this.currentCustomer.indexNbrBottleChoosed;
 
         this.btnPlaySolo = this.add.text(200, 100, "Verser la boisson", { fontSize: '24px', fill: '#fff' })
         .setInteractive({ cursor: 'pointer' })

@@ -63,13 +63,6 @@ class GameScene extends Phaser.Scene {
 
         this.currentCustomer = this.game.registry.get('customerData') || null;
 
-        /*this.imageKeys = [];
-        this.load.path = URL_PORTRAITS_CUSTOMERS;
-        for (let i = 1; i <= NBR_PORTRAITS_CUSTOMERS; i++) {
-            this.load.image(`portrait${i}`, `${i}.jpg`);
-            this.imageKeys.push(`portrait${i}`);
-        }*/
-
         //Chargement des images du jeu    
         this.load.path = URL_BOTTLES_CARTE;
         for (let i = 1; i <= this.bottlesData.length; i++) {
@@ -292,6 +285,7 @@ class GameScene extends Phaser.Scene {
 
     openCabinet() {
         // Changement de scène vers la sélection des jus
+        this.canva.removeResizeListeners();
         this.scene.start('CabinetScene');
     }
 
@@ -331,14 +325,14 @@ class GameScene extends Phaser.Scene {
                         });
                     }
 
-                    this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotions, this.dataCustomer[0]), this.findObjectById(this.cocktails, this.dataCustomer[1]), this.dataCustomer[2]);
+                    this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, this.dataCustomer[0]), this.findObjectById(this.cocktailsData, this.dataCustomer[1]), this.dataCustomer[2]);
                     this.canva.customer = this.currentCustomer;
 
                     setTimeout(() => {
                         console.log("Voici le client : ", this.currentCustomer);
                         console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
-                        this.canva.draw();
+                        this.drawGame();
                         this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
                             this.showCabinetButton();
                         });
@@ -351,8 +345,6 @@ class GameScene extends Phaser.Scene {
                 }
             })
         }
-
-        this.drawBottleCocktail();
     }
 
     showCabinetButton() {
@@ -390,7 +382,6 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-
     showFinalDialogue = async () => {
         const dialogue = this.currentCustomer.succeed ? this.currentCustomer.successDialogue : this.currentCustomer.failureDialogue;
         for (let i = 0; i < dialogue.length; i++) {
@@ -411,7 +402,6 @@ class GameScene extends Phaser.Scene {
     }
 
 
-
     // ************************************* DRAW ************************************************
     // ---- Dessine tous les visuels du jeu
     drawGame() {
@@ -419,41 +409,62 @@ class GameScene extends Phaser.Scene {
         this.canva.draw();
         this.drawBarCounter();
         this.drawShaker();
-        this.responsiveEvents();
+        // this.responsiveEvents();
     }
     // ------------------------------------
 
-    drawBottle(posX, posY, imageKey) {
-        this.bottleImg = this.add.image(posX, posY, imageKey)
-        this.bottleImg.scaleX = 1;
-        this.bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
-        this.bottleImg.scaleY = this.bottleImg.scaleX
-        this.bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
-    }
+    // drawBottle(posX, posY, imageKey) {
+    //     this.bottleImg = this.add.image(posX, posY, imageKey)
+    //     this.bottleImg.scaleX = 1;
+    //     this.bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
+    //     this.bottleImg.scaleY = this.bottleImg.scaleX
+    //     this.bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
+    // }
 
     drawBackground() {
         this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-service');
         this.background.displayWidth = gameScale.width;
         this.background.displayHeight = gameScale.width / this.background.width * this.background.height;
+        window.addEventListener('resize', () => {
+            this.background.displayWidth = gameScale.width;
+            this.background.displayHeight = gameScale.width / this.background.width * this.background.height;
+            this.background.setPosition(gameScale.width / 2, gameScale.height / 2);
+        });
     }
 
     drawBarCounter() {
         this.backgroundBar = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bar-service');
         this.backgroundBar.displayWidth = gameScale.width;
         this.backgroundBar.displayHeight = gameScale.width / this.backgroundBar.width * this.backgroundBar.height;
+        window.addEventListener('resize', () => {
+            this.backgroundBar.displayWidth = gameScale.width;
+            this.backgroundBar.displayHeight = gameScale.width / this.backgroundBar.width * this.backgroundBar.height;
+            this.backgroundBar.setPosition(gameScale.width / 2, gameScale.height / 2);
+        });
     }
 
     drawcard() {
         this.backgroundCard = this.add.image(gameScale.width, 0, 'carte-service').setOrigin(1, 0);
         this.backgroundCard.displayHeight = gameScale.height;
         this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;
+        window.addEventListener('resize', () => {
+            this.backgroundCard.displayHeight = gameScale.height;
+            this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;
+            this.backgroundCard.setPosition(gameScale.width, 0);
+        });
     }
 
     drawShaker() {
-        let shakerService = this.add.image(gameScale.width * 0.32, gameScale.height * 0.83, 'shaker-service');
-        shakerService.setScale(0.1);
-        shakerService.displayWidth = gameScale.width * 0.17;
-        shakerService.scaleY = shakerService.scaleX;
+        this.shakerService = this.add.image(gameScale.width * 0.32, gameScale.height * 0.83, 'shaker-service');
+        this.shakerService.setScale(0.1);
+        this.shakerService.displayWidth = gameScale.width * 0.17;
+        this.shakerService.scaleY = this.shakerService.scaleX;
+        this.responsiveEvents();
+        window.addEventListener('resize', () => {
+            this.shakerService.displayWidth = gameScale.width * 0.17;
+            this.shakerService.scaleY = this.shakerService.scaleX;
+            this.shakerService.setPosition(gameScale.width * 0.32, gameScale.height * 0.83);
+        });
     }
 
     drawBottleCocktail() {
@@ -469,7 +480,11 @@ class GameScene extends Phaser.Scene {
                 let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId)
                 cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
 
-                this.drawBottle(posX, posY, imageKey);
+                let bottleImg = this.add.image(posX, posY, imageKey)
+                bottleImg.scaleX = 1;
+                bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
+                bottleImg.scaleY = bottleImg.scaleX
+                bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
 
                 //pour le responsive et la suite des boucles
                 let bottleGapXSecondRow = 0;
@@ -480,10 +495,10 @@ class GameScene extends Phaser.Scene {
                 }
 
                 window.addEventListener('resize', () => {
-                    this.bottleImg.scaleX = 1;
-                    this.bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
-                    this.bottleImg.scaleY = this.bottleImg.scaleX
-                    this.bottleImg.setPosition(gameScale.width * BOTTLE_CARD_IMG_XSCALE + gameScale.width * BOTTLE_CARD_IMG_GAP_Y_BETWEEN * (j - 1) - gameScale.width * bottleGapXSecondRow, gameScale.height * BOTTLE_CARD_IMG_YSCALE * (i + 1) + gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER * i + (gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER / BOTTLE_CARD_IMG_YSCALEAFTER_HEIGHT) * (j - 1))
+                    bottleImg.scaleX = 1;
+                    bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
+                    bottleImg.scaleY = bottleImg.scaleX
+                    bottleImg.setPosition(gameScale.width * BOTTLE_CARD_IMG_XSCALE + gameScale.width * BOTTLE_CARD_IMG_GAP_Y_BETWEEN * (j - 1) - gameScale.width * bottleGapXSecondRow, gameScale.height * BOTTLE_CARD_IMG_YSCALE * (i + 1) + gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER * i + (gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER / BOTTLE_CARD_IMG_YSCALEAFTER_HEIGHT) * (j - 1))
                 });
 
                 //pour la prochaine boucle
@@ -498,6 +513,7 @@ class GameScene extends Phaser.Scene {
             posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE * 2 + gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER;
             posX = gameScale.width * BOTTLE_CARD_IMG_XSCALE - gameScale.width * BOTTLE_CARD_IMG_GAP_X_SECOND_ROW;
         }
+        // this.responsiveEvents();
     }
 
     drawCocktailFinal() {
@@ -514,9 +530,9 @@ class GameScene extends Phaser.Scene {
     responsiveEvents() {
         window.addEventListener('resize', () => {
             //Card boissons
-            this.backgroundCard.displayHeight = gameScale.height;
-            this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;
-            this.backgroundCard.setPosition(gameScale.width, 0);
+            // this.backgroundCard.displayHeight = gameScale.height;
+            // this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;
+            // this.backgroundCard.setPosition(gameScale.width, 0);
 
             //Background
             this.background.displayWidth = gameScale.width;
@@ -529,9 +545,9 @@ class GameScene extends Phaser.Scene {
             this.backgroundBar.setPosition(gameScale.width / 2, gameScale.height / 2);
 
             //Shaker
-            shakerService.displayWidth = gameScale.width * 0.17;
-            shakerService.scaleY = shakerService.scaleX;
-            shakerService.setPosition(gameScale.width * 0.32, gameScale.height * 0.83);
+            this.shakerService.displayWidth = gameScale.width * 0.17;
+            this.shakerService.scaleY = this.shakerService.scaleX;
+            this.shakerService.setPosition(gameScale.width * 0.32, gameScale.height * 0.83);
         });
     }
 }
