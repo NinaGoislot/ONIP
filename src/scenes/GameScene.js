@@ -284,6 +284,7 @@ class GameScene extends Phaser.Scene {
 
     openCabinet() {
         // Changement de scène vers la sélection des jus
+        this.canva.removeResizeListeners();
         this.scene.start('CabinetScene');
     }
 
@@ -422,10 +423,10 @@ class GameScene extends Phaser.Scene {
     }
 
     drawShaker() {
-        let shakerService = this.add.image(gameScale.width * 0.32, gameScale.height * 0.83, 'shaker-service');
-        shakerService.setScale(0.1);
-        shakerService.displayWidth = gameScale.width * 0.17;
-        shakerService.scaleY = shakerService.scaleX;
+        this.shakerService = this.add.image(gameScale.width * 0.32, gameScale.height * 0.83, 'shaker-service');
+        this.shakerService.setScale(0.1);
+        this.shakerService.displayWidth = gameScale.width * 0.17;
+        this.shakerService.scaleY = this.shakerService.scaleX;
     }
 
     drawBottleCocktail() {
@@ -501,9 +502,9 @@ class GameScene extends Phaser.Scene {
             this.backgroundBar.setPosition(gameScale.width / 2, gameScale.height / 2);
 
             //Shaker
-            shakerService.displayWidth = gameScale.width * 0.17;
-            shakerService.scaleY = shakerService.scaleX;
-            shakerService.setPosition(gameScale.width * 0.32, gameScale.height * 0.83);
+            this.shakerService.displayWidth = gameScale.width * 0.17;
+            this.shakerService.scaleY = this.shakerService.scaleX;
+            this.shakerService.setPosition(gameScale.width * 0.32, gameScale.height * 0.83);
         });
     }
 }

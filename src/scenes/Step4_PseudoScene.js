@@ -32,7 +32,6 @@ class Step4_PseudoScene extends Phaser.Scene {
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
             background.setPosition(gameScale.width / 2, gameScale.height / 2);
-            this.infos.setPosition(gameScale.width * 0.1, gameScale.height * 0.25);
         });
 
         // ****** Actions ******

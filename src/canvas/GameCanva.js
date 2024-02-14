@@ -4,15 +4,16 @@ import {
     socket
 } from '../main.js';
 
-class GameCanva extends Phaser.GameObjects.Graphics {
+class GameCanva {
     constructor(scene, customer = {}, score = "0") {
-        super(scene);
+        //super(scene);
         scene.add.existing(this);
 
         // ATTRIBUTS
         this.customer = customer;
         this.scene = scene;
         this.score = score;
+        this.resizeListeners = [];
         // this.isTalking = false;
         this.isTalking = "null"
         this.draw();
@@ -39,6 +40,17 @@ class GameCanva extends Phaser.GameObjects.Graphics {
         this.clientImage = this.scene.add.sprite(gameScale.width * 0.15, gameScale.height, this.customer.picture).setOrigin(0.5, 1);
         this.clientImage.displayWidth = gameScale.width * 0.3;
         this.clientImage.scaleY = this.clientImage.scaleX;
+
+        const resizeListener = () => {
+            this.clientImage.displayWidth = gameScale.width * 0.3;
+            this.clientImage.scaleY = this.clientImage.scaleX;
+            this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height);
+        };
+
+        window.addEventListener('resize', resizeListener);
+
+        // Stocker la référence vers l'écouteur d'événement de redimensionnement
+        this.resizeListeners.push(resizeListener);
     }
 
     drawDialogue() {
@@ -52,6 +64,22 @@ class GameCanva extends Phaser.GameObjects.Graphics {
             },
             lineSpacing: 10
         });
+
+        const resizeListener = () => {
+            let newFontSize = gameScale.width * 0.02;
+            let newBubbleWrap = gameScale.width * 0.25;
+            this.bubble.setFontSize(newFontSize);
+            this.bubble.setWordWrapWidth(newBubbleWrap);
+            this.bubble.wordWrap = {
+                width: gameScale.width * 0.25
+            };
+            this.bubble.setPosition(gameScale.width * 0.25, gameScale.height * 0.2);
+        };
+
+        window.addEventListener('resize', resizeListener);
+
+        // Stocker la référence vers l'écouteur d'événement de redimensionnement
+        this.resizeListeners.push(resizeListener);
     }
 
     // --------------------------- FONCTIONS SECONDAIRES ---------------------------
@@ -148,6 +176,13 @@ class GameCanva extends Phaser.GameObjects.Graphics {
         this.displayScore.setVisible(false);
     }
 
+    // Fonction pour arrêter tous les écouteurs d'événements de redimensionnement
+    removeResizeListeners() {
+        this.resizeListeners.forEach(listener => {
+            window.removeEventListener('resize', listener);
+        });
+    }
+
     responsiveEvents() {
         window.addEventListener('resize', () => {
             //Bulle de dialogue
@@ -165,7 +200,6 @@ class GameCanva extends Phaser.GameObjects.Graphics {
             this.clientImage.scaleY = this.clientImage.scaleX;
             this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height);
         });
-
     }
 
     startPause(scene, secondPaused) {
