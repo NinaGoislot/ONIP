@@ -470,6 +470,7 @@ class GameScene extends Phaser.Scene {
         this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-service');
         this.background.displayWidth = gameScale.width;
         this.background.displayHeight = gameScale.width / this.background.width * this.background.height;
+
         window.addEventListener('resize', () => {
             this.background.displayWidth = gameScale.width;
             this.background.displayHeight = gameScale.width / this.background.width * this.background.height;
@@ -481,6 +482,7 @@ class GameScene extends Phaser.Scene {
         this.backgroundBar = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bar-service');
         this.backgroundBar.displayWidth = gameScale.width;
         this.backgroundBar.displayHeight = gameScale.width / this.backgroundBar.width * this.backgroundBar.height;
+
         window.addEventListener('resize', () => {
             this.backgroundBar.displayWidth = gameScale.width;
             this.backgroundBar.displayHeight = gameScale.width / this.backgroundBar.width * this.backgroundBar.height;
@@ -492,6 +494,7 @@ class GameScene extends Phaser.Scene {
         this.backgroundCard = this.add.image(gameScale.width, 0, 'carte-service').setOrigin(1, 0);
         this.backgroundCard.displayHeight = gameScale.height;
         this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;
+
         window.addEventListener('resize', () => {
             this.backgroundCard.displayHeight = gameScale.height;
             this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;

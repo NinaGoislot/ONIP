@@ -46,7 +46,6 @@ class GameCanva {
         };
 
         window.addEventListener('resize', resizeListener);
-        // Stocker la référence vers l'écouteur d'événement de redimensionnement
         this.resizeListeners.push(resizeListener);
     }
 
@@ -72,8 +71,6 @@ class GameCanva {
         };
 
         window.addEventListener('resize', resizeListener);
-
-        // Stocker la référence vers l'écouteur d'événement de redimensionnement
         this.resizeListeners.push(resizeListener);
     }
 
@@ -139,30 +136,11 @@ class GameCanva {
         this.displayScore.setVisible(false);
     }
 
+    // Fonction pour arrêter tous les écouteurs d'événements de redimensionnement
     removeResizeListeners() {
         this.resizeListeners.forEach(listener => {
             window.removeEventListener('resize', listener);
         });
-    }
-
-    responsiveEvents() {
-        window.addEventListener('resize', () => {
-            //Bulle de dialogue
-            fontSize = gameScale.width * 0.02;
-            bubbleWrap = gameScale.width * 0.25;
-            this.bubble.setFontSize(fontSize);
-            this.bubble.setWordWrapWidth(bubbleWrap);
-            this.bubble.wordWrap = {
-                width: gameScale.width * 0.25
-            };
-            this.bubble.setPosition(gameScale.width * 0.25, gameScale.height * 0.2);
-
-            //Client
-            this.clientImage.displayWidth = gameScale.width * 0.3;
-            this.clientImage.scaleY = this.clientImage.scaleX;
-            this.clientImage.setPosition(gameScale.width * 0.15, gameScale.height);
-        });
-
     }
 
     startPause(scene, secondPaused) {
