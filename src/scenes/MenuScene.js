@@ -91,8 +91,9 @@ class MenuScene extends Phaser.Scene {
 
     startGame() {
         // Lancer la scène de jeu
+        //faire créer une room et rejoindre quand même donc euh système connexion tel aussi
         this.player = new Player(this, "this.pseudo", 1, "12341");
-        this.partie = new Partie(this, "multi", "1234", this.player);
+        this.partie = new Partie(this, "solo", "1234", this.player);
         this.game.registry.set('rolePlayer', 1);
         this.game.registry.set('partie', this.partie);
         // this.scene.start('GameScene');
@@ -101,19 +102,24 @@ class MenuScene extends Phaser.Scene {
     }
 
     //Obsolète
-    startConnexion(solo){
-        this.game.registry.set('isSolo', solo);
-        //this.scene.start('ConnexionScene');
-        if(solo){
-            this.scene.start('Step3_ConnectPhoneScene');
+    // startConnexion(solo){
+    //     this.game.registry.set('isSolo', solo);
+    //     //this.scene.start('ConnexionScene');
+    //     if(solo){
+    //         this.scene.start('Step3_ConnectPhoneScene');
+    //     } else {
+    //         this.scene.start('Step1_CreateJoinLobbyScene');
+    //     }
+    // }
+
+    goToLobby(mode){
+        if(mode == "solo"){
+            this.scene.start('Step3_ConnectPhoneScene', {
+                'mode' : true,
+            });
         } else {
             this.scene.start('Step1_CreateJoinLobbyScene');
         }
-    }
-
-    goToLobby(mode){
-        this.startConnexion(mode == "solo");
-        // this.scene.start('Step1_CreateJoinLobbyScene');
     }
 
     startOptions(){

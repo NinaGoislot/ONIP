@@ -100,7 +100,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
             this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.player);
             this.game.registry.set('partie', this.partie);
-            
+            socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.scene.start('GameScene');
             this.scene.remove('Step4_PseudoScene');
         });

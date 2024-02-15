@@ -61,8 +61,6 @@ class GameScene extends Phaser.Scene {
         this.imageClientKey.push(`client-1`);
         this.imageClientKey.push(`client-2`);
 
-        this.currentCustomer = this.game.registry.get('customerData') || null;
-
         //Chargement des images du jeu    
         this.load.path = URL_BOTTLES_CARTE;
         for (let i = 1; i <= this.bottlesData.length; i++) {
@@ -75,7 +73,7 @@ class GameScene extends Phaser.Scene {
             this.bottleGoldImgKeys.push(`carte-luxe-bouteille${i}`);
         }
         this.load.path = URL_COCKTAIL;
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= this.cocktailsData.length; i++) {
             this.load.image(`cocktail${i}`, `cocktail${i}.webp`);
             this.cocktailImgKeys.push(`cocktail${i}`);
         }
@@ -90,15 +88,15 @@ class GameScene extends Phaser.Scene {
         this.rolePlayer = this.game.registry.get('rolePlayer');
         this.partie = this.game.registry.get('partie');
         this.emotionsData = this.game.registry.get('emotions');
-        this.ajoutClient = true;
+        // this.bottlesData = this.game.registry.get('ingredients');
         this.dataCustomer = [];
-        this.isSolo = this.game.registry.get('isSolo');
+        this.isSolo = this.partie.mode == "solo";
 
         if (this.currentCustomer === null) {
 
             // Création du canva 
             this.canva = new GameCanva(this, this.game.registry.get('score'));
-            this.drawGame();
+            // this.drawGame();
             this.canva.menuPauseButton(this.scene, this);
 
             //COMPTE A REBOURS
@@ -124,7 +122,7 @@ class GameScene extends Phaser.Scene {
                     console.log("J'ai créé un client : ", this.dataCustomer)
                     socket.emit("CREATE_FIRST_CUSTOMER", {
                         currentCustomer: this.dataCustomer,
-                        idRoom: this.partie.roomId
+                        idRoom: this.partie.roomId,
                     });
                 });
             }
@@ -139,7 +137,13 @@ class GameScene extends Phaser.Scene {
                 this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, currentCustomer[0]), this.findObjectById(this.cocktailsData, currentCustomer[1]), currentCustomer[2]);
 
                 this.canva.customer = this.currentCustomer;
+
+                this.partie.goldBottleId = currentCustomer[4];
+                this.partie.tabBottles = currentCustomer[3];
+                this.game.registry.set('partie', this.partie);
+
                 this.drawGame();
+                this.resetPickedJuices();
 
                 // Fonction asynchrone pour afficher les dialogues successifs et ce qui se passe après
                 this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
@@ -157,6 +161,7 @@ class GameScene extends Phaser.Scene {
         } else {
             this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
             this.drawGame();
+            this.removeShaker();
 
             console.log("GAME_SCENE : Score actuel dans le dataManager : ", this.game.registry.get('score'))
             this.canva.menuPauseButton(this.scene);
@@ -178,8 +183,9 @@ class GameScene extends Phaser.Scene {
             socket.on("ALL_PLAYERS_READY_TO_SERVE", () => {
                 this.readyText.setVisible(false);
                 this.showFinalDialogue().then(() => {
-                    if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
+                    if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
                         this.canva.remove();
+                        this.removeCocktailFinal();
                         if (this.rolePlayer == 1) {
                             this.generateNewClient().then(() => {
                                 console.log("J'ai créé un client : ", this.dataCustomer)
@@ -201,11 +207,17 @@ class GameScene extends Phaser.Scene {
                 this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, currentCustomer[0]), this.findObjectById(this.cocktailsData, currentCustomer[1]), currentCustomer[2]);
                 this.canva.customer = this.currentCustomer;
 
+                this.partie.goldBottleId = currentCustomer[4];
+                this.partie.tabBottles = currentCustomer[3];
+                console.log('test tabbottle',this.partie.tabBottles);
+                this.game.registry.set('partie', this.partie);
+
                 setTimeout(() => {
                     console.log("Voici le client : ", this.currentCustomer);
                     console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                     this.drawGame();
+                    this.resetPickedJuices();
                     this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
                         this.showCabinetButton();
                     });
@@ -216,12 +228,22 @@ class GameScene extends Phaser.Scene {
             });
         }
 
+        socket.on('JUICE_TAKEN', (bottleId, bottlesData)=>{
+            this.game.registry.set('ingredients', bottlesData);
+            this.bottlesData = this.game.registry.get('ingredients');
+        })
+
+        socket.on('A_JUICE_IS_RETURNED', (bottlesData)=>{
+            this.game.registry.set('ingredients', bottlesData);
+            this.bottlesData = this.game.registry.get('ingredients');
+        })
+
         socket.on("GAME_PAUSED", (secondPaused) => {
             this.canva.startPause(this.scene, this, secondPaused);
         })
 
         socket.on("NOMORE_CLIENT", (peutPlus) => {
-            this.ajoutClient = peutPlus;
+            this.partie.addCustomer = peutPlus;
             this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
                 fontSize: '32px',
                 fill: '#fff'
@@ -264,23 +286,39 @@ class GameScene extends Phaser.Scene {
         const emotion = this.emotionsData[Math.floor(Math.random() * this.emotionsData.length)];
         const cocktail = this.cocktailsData[Math.floor(Math.random() * this.cocktailsData.length)];
 
-        this.dataCustomer = [emotion.id, cocktail.id, randomImageKey];
+        const currentCocktail = this.findObjectById(this.cocktailsData, cocktail.id)
+        const goldBottle = this.goldBottle(currentCocktail);
+
+        const indicesTabBottle = this.generateRandomIndices(this.bottlesData.length);
+
+        this.dataCustomer = [emotion.id, cocktail.id, randomImageKey, indicesTabBottle, goldBottle];
 
         //this.currentCustomer = new Customer(this, 300, 300, emotion, cocktail, randomImageKey);
     }
 
-    getBottleImg(cocktailBottleId) {
-        let allBottles = this.game.registry.get('ingredients');
-        if (cocktailBottleId == 666) {
-            return allBottles[0]
+    generateRandomIndices(tabLength) {
+        var indices = Array.from({
+            length: tabLength
+        }, (_, index) => index + 1);
+        // Mélanger le tableau de manière aléatoire
+        for (var i = indices.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
         }
-        return allBottles.find(bottle => bottle.id == cocktailBottleId)
+        return indices;
     }
 
-    goldBottle() {
-        let allIdBottleCocktail = this.currentCustomer.drink.ingredients
-        let GoldBottleId = Phaser.Math.RND.pick(allIdBottleCocktail)
-        return GoldBottleId.alcoholId
+    getBottleImg(cocktailBottleId) {
+        if (cocktailBottleId == 666) {
+            return this.bottlesData[0]
+        }
+        return this.bottlesData.find(bottle => bottle.id == cocktailBottleId)
+    }
+
+    goldBottle(currentCocktail) {
+        let allIdBottleCocktail = currentCocktail.ingredients
+        let goldBottleId = Phaser.Math.RND.pick(allIdBottleCocktail)
+        return goldBottleId.alcoholId
     }
 
     openCabinet() {
@@ -298,6 +336,13 @@ class GameScene extends Phaser.Scene {
         return isCorrect;
     }
 
+    resetPickedJuices(){
+        for(let i=0; i<this.bottlesData.length;i++){
+            this.bottlesData[i].picked = false
+        }
+        this.game.registry.set('ingredients', this.bottlesData);
+    }
+
     serveCustomer() {
         this.currentCustomer.succeed = this.playerChoiceCorrect();
         console.log("Fonction serveCustomer(), la valeur de succeed est a ", this.currentCustomer.succeed);
@@ -306,6 +351,8 @@ class GameScene extends Phaser.Scene {
                 fontSize: '32px',
                 fill: '#fff'
             })
+            console.log("clique pour servir", this.isSolo);
+            console.log("clique pour servir", this.partie.player.playerId, this.partie.roomId);
 
             socket.emit("SET_PLAYER_READY", {
                 playerId: this.partie.player.playerId,
@@ -313,8 +360,9 @@ class GameScene extends Phaser.Scene {
             });
         } else {
             this.showFinalDialogue().then(() => {
-                if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
+                if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
                     this.canva.remove();
+                    this.removeCocktailFinal();
                     if (this.rolePlayer == 1) {
                         this.generateNewClient().then(() => {
                             console.log("J'ai créé un client : ", this.dataCustomer)
@@ -328,11 +376,17 @@ class GameScene extends Phaser.Scene {
                     this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, this.dataCustomer[0]), this.findObjectById(this.cocktailsData, this.dataCustomer[1]), this.dataCustomer[2]);
                     this.canva.customer = this.currentCustomer;
 
+                    this.partie.goldBottleId = this.currentCustomer[4];
+                    this.partie.tabBottles = this.currentCustomer[3];
+                    console.log('test tabbottle',this.partie.tabBottles);
+                    this.game.registry.set('partie', this.partie);
+
                     setTimeout(() => {
                         console.log("Voici le client : ", this.currentCustomer);
                         console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                         this.drawGame();
+                        this.resetPickedJuices();
                         this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
                             this.showCabinetButton();
                         });
@@ -409,17 +463,8 @@ class GameScene extends Phaser.Scene {
         this.canva.draw();
         this.drawBarCounter();
         this.drawShaker();
-        // this.responsiveEvents();
     }
     // ------------------------------------
-
-    // drawBottle(posX, posY, imageKey) {
-    //     this.bottleImg = this.add.image(posX, posY, imageKey)
-    //     this.bottleImg.scaleX = 1;
-    //     this.bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
-    //     this.bottleImg.scaleY = this.bottleImg.scaleX
-    //     this.bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
-    // }
 
     drawBackground() {
         this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-service');
@@ -459,7 +504,6 @@ class GameScene extends Phaser.Scene {
         this.shakerService.setScale(0.1);
         this.shakerService.displayWidth = gameScale.width * 0.17;
         this.shakerService.scaleY = this.shakerService.scaleX;
-        this.responsiveEvents();
         window.addEventListener('resize', () => {
             this.shakerService.displayWidth = gameScale.width * 0.17;
             this.shakerService.scaleY = this.shakerService.scaleX;
@@ -467,8 +511,12 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    removeShaker(){
+        this.shakerService.visible = false;
+    }
+
     drawBottleCocktail() {
-        let goldenBottle = this.goldBottle()
+        let goldenBottle = this.partie.goldBottleId;
         let posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE;
         let posX = gameScale.width * BOTTLE_CARD_IMG_XSCALE;
         let k = 0; //index
@@ -513,42 +561,26 @@ class GameScene extends Phaser.Scene {
             posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE * 2 + gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER;
             posX = gameScale.width * BOTTLE_CARD_IMG_XSCALE - gameScale.width * BOTTLE_CARD_IMG_GAP_X_SECOND_ROW;
         }
-        // this.responsiveEvents();
     }
 
     drawCocktailFinal() {
         let cocktailKey = this.currentCustomer.drink;
         let imgKeyCocktail = this.cocktailImgKeys.find(image => image == `cocktail` + cocktailKey.id);
-        let posX = gameScale.width * 0.75
-        let posY = gameScale.height * 0.5
-        let imgCocktail = this.add.image(posX, posY, imgKeyCocktail)
-        imgCocktail.scaleX = 1;
-        imgCocktail.displayWidth = gameScale.width * 0.5;
-        imgCocktail.scaleY = imgCocktail.scaleX
+        this.imgCocktail = this.add.image(gameScale.width * 0.32, gameScale.height * 0.8, imgKeyCocktail)
+        this.imgCocktail.scaleX = 1;
+        this.imgCocktail.displayWidth = gameScale.width * 0.13;
+        this.imgCocktail.scaleY = this.imgCocktail.scaleX
+
+        window.addEventListener('resize', () => {
+            this.imgCocktail.scaleX = 1;
+            this.imgCocktail.displayWidth = gameScale.width * 0.13;
+            this.imgCocktail.scaleY = this.imgCocktail.scaleX
+            this.imgCocktail.setPosition(gameScale.width * 0.32, gameScale.height * 0.8);
+        });
     }
 
-    responsiveEvents() {
-        window.addEventListener('resize', () => {
-            //Card boissons
-            // this.backgroundCard.displayHeight = gameScale.height;
-            // this.backgroundCard.displayWidth = gameScale.height / this.backgroundCard.height * this.backgroundCard.width;
-            // this.backgroundCard.setPosition(gameScale.width, 0);
-
-            //Background
-            this.background.displayWidth = gameScale.width;
-            this.background.displayHeight = gameScale.width / this.background.width * this.background.height;
-            this.background.setPosition(gameScale.width / 2, gameScale.height / 2);
-
-            //Comptoir du bar
-            this.backgroundBar.displayWidth = gameScale.width;
-            this.backgroundBar.displayHeight = gameScale.width / this.backgroundBar.width * this.backgroundBar.height;
-            this.backgroundBar.setPosition(gameScale.width / 2, gameScale.height / 2);
-
-            //Shaker
-            this.shakerService.displayWidth = gameScale.width * 0.17;
-            this.shakerService.scaleY = this.shakerService.scaleX;
-            this.shakerService.setPosition(gameScale.width * 0.32, gameScale.height * 0.83);
-        });
+    removeCocktailFinal() {
+        this.imgCocktail.setVisible(false);
     }
 }
 export default GameScene;

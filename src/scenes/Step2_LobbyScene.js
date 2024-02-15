@@ -23,16 +23,17 @@ class Step2_LobbyScene extends Phaser.Scene {
         let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'background');
         background.displayWidth = gameScale.width;
         background.displayHeight = gameScale.width / background.width * background.height;
+
+        this.infos = this.add.text(gameScale.width * 0.1, gameScale.height * 0.25, "", {
+            fontSize: '24px',
+            fill: '#fff'
+        });
+
         window.addEventListener('resize', () => {
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
             background.setPosition(gameScale.width / 2, gameScale.height / 2)
             this.infos.setPosition(gameScale.width * 0.1, gameScale.height * 0.25);
-        });
-
-        this.infos = this.add.text(gameScale.width * 0.1, gameScale.height * 0.25, "", {
-            fontSize: '24px',
-            fill: '#fff'
         });
 
         switch (this.numeroPlayer) {
@@ -57,10 +58,14 @@ class Step2_LobbyScene extends Phaser.Scene {
                 // ******************************* event click ************************************************s
                 joinRoom.addEventListener('click', () => {
                     if (inputRoomId.value == null || inputRoomId.value == "") {
-                        this.infoReady.innerText = "Veuillez entrer un code de partie."
+                        this.infos.text = "Veuillez entrer un code de partie."
                     } else {
                         socket.emit("JOIN_GAME", inputRoomId.value);
                     }
+                })
+
+                socket.on("BAD_GAME_ID", ()=>{
+                    this.infos.text = "Mauvais code. Veuillez réessayer."
                 })
                 break;
             default:

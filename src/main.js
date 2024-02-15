@@ -13,7 +13,8 @@ import OptionsScene from '@/scenes/OptionsScene';
 import PauseScene from '@/scenes/PauseScene';
 import PourInShakerScene from '@/scenes/PourInShakerScene';
 import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
-const socket = io("https://10.1.180.121:3006"); //connexion au serveur socket.io
+// const socket = io("https://10.1.180.121:3006"); //connexion au serveur socket.io
+const socket = io("https://127.0.0.1:3006"); //connexion au serveur socket.io
 
 const VALUES = {
   width: 1920,

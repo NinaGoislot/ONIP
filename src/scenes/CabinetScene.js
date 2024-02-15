@@ -29,6 +29,12 @@ class CabinetScene extends Phaser.Scene {
   }
 
   create() {
+    this.partie = this.game.registry.get('partie');
+    this.currentCustomer = this.game.registry.get('customerData');
+    this.drinkBottles = this.currentCustomer.drink.ingredients;
+    this.bottlesData = this.game.registry.get('ingredients');
+    console.log('ingredientsData', this.bottlesData);
+
     // add background to scene
     let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'armoireBouteilles');
     background.displayWidth = gameScale.width;
@@ -41,26 +47,49 @@ class CabinetScene extends Phaser.Scene {
 
     // Récupérer les données de bottles depuis le registre
     // Utiliser la fonction pour obtenir le tableau d'indices aléatoires
-    this.randomIndices = this.generateRandomIndices(20);
+    this.randomIndices = this.partie.tabBottles;
     this.createBoxBottle(GRID_NBR_ROW, GRID_NBR_COL);
     this.aJuiceTaken = false;
-    this.currentCustomer = this.game.registry.get('customerData');
 
     // ***************************************** SOCKET *****************************************
+    socket.on("GAME_PAUSED", (secondPaused) => {
+      this.canva.startPause(this.scene, this, secondPaused);
+    })
+
+    socket.on("NOMORE_CLIENT", (peutPlus) => {
+      this.partie.addCustomer = peutPlus;
+      this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
+          fontSize: '32px',
+          fill: '#fff'
+      });
+    })
 
     // fonctionnalité du multijoueur avec la bouteille prise 
-    socket.on('JUICE_TAKEN', (bottleId)=>{
-      if(!this.game.registry.get('isSolo') && !this.aJuiceTaken){
+    socket.on('JUICE_TAKEN', (bottleId, bottlesData)=>{
+      if(!(this.partie.mode === "solo") && !this.aJuiceTaken){
         let takenBottleImg = this.getBottleImg(bottleId);
         takenBottleImg.setInteractive(false);
         takenBottleImg.visible = false;
-        let roomIdJoueur = this.game.registry.get('roomIdJoueur');
-        socket.emit('A_JUICE_IS_TAKEN', this.aJuiceTaken, roomIdJoueur);
+        this.game.registry.set('ingredients', bottlesData);
+        this.bottlesData = this.game.registry.get('ingredients');
+        socket.emit('A_JUICE_IS_TAKEN', this.aJuiceTaken, this.partie.roomId);
+        console.log("on t'a pris un jus");
       }
     })
 
+    socket.on('A_JUICE_IS_RETURNED', (bottlesData, bottleChoosed)=>{
+      this.game.registry.set('ingredients', bottlesData);
+      this.bottlesData = this.game.registry.get('ingredients');
+      let returnBottleImg = this.getBottleImg(bottleChoosed.id);
+      returnBottleImg.setInteractive(true);
+      returnBottleImg.visible = true;
+      console.log('image de la bouteille retournée',returnBottleImg)
+    })
+
+
     //pour éviter de redéclencher la fonction de disparition de bouteille
     socket.on('A_JUICE_TAKEN', (isAJuiceTaken)=>{
+      console.log("est-ce que ça sert ?????????????????????????")
       this.aJuiceTaken = isAJuiceTaken;
     })
   }
@@ -84,6 +113,11 @@ class CabinetScene extends Phaser.Scene {
           let bottleAssocie = this.getBottleById(this.randomIndices[k]);
           const imageKey = this.bottleImgKeys.find(image => image == `bouteille`+bottleAssocie.id);
           let bottleImg = this.add.image(posX,posY, imageKey)
+          bottleImg.visible = true;
+          if(this.bottlesData[bottleAssocie.id-1].picked == true){
+            console.log('déjà pris', this.bottlesData[bottleAssocie.id-1].name )
+            bottleImg.visible = false;
+          }
           bottleImg.displayWidth = gameScale.width*BOTTLE_IMG_TAILLE
           bottleImg.displayHeight = gameScale.width*BOTTLE_IMG_TAILLE
           // pour le responsive
@@ -106,16 +140,6 @@ class CabinetScene extends Phaser.Scene {
     }
   }
 
-  generateRandomIndices(tabLength) {
-    var indices = Array.from({ length: tabLength }, (_, index) => index + 1);
-    // Mélanger le tableau de manière aléatoire
-    for (var i = indices.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-    return indices;
-  }  
-
   getBottleById(id) {
     return this.bottlesData.find(bottle => bottle.id == id);
   }
@@ -125,29 +149,47 @@ class CabinetScene extends Phaser.Scene {
   }
 
   selectJuice(juiceType) {
-    console.log(`Vous avez sélectionné ${juiceType.name}.`);
-    this.juicePicked(juiceType);
-    this.game.registry.set('playerJuiceChoice', juiceType.name);
-    let roomIdJoueur = this.game.registry.get('roomIdJoueur');
-    socket.emit("SELECT_JUICE", juiceType.id, roomIdJoueur);
-    this.currentCustomer.indexNbrBottleChoosed += 1;
-    // this.scene.start('GameScene');
-    this.scene.start('PourInShakerScene');
-  }
-
-  juicePicked(juice){
-    let juices = this.game.registry.get('ingredients');
-    juices[juice.id].picked = true
-    this.game.registry.set('ingredients', juices);
-  }
-
-  unPickedJuices(){
-    let juices = this.game.registry.get('ingredients');
-    for(let i=0; i<juices.length;i++){
-      juices[i].picked = false
+    // console.log(`Vous avez sélectionné ${juiceType.name}.`);
+    this.goodOrBad = this.goodOrBadBottle(juiceType);
+    if(this.goodOrBad){
+      this.juicePicked(juiceType);
+      socket.emit("SELECT_JUICE", juiceType.id, this.partie.roomId, this.bottlesData);
+      console.log("je prends un jus");
+      if(juiceType.id == this.partie.goldBottleId){
+        //************************** ICI SCORE GOLD BOTTLE ****************************** */
+        // console.log("CONGRATS that's a gold bottle");
+      }
+      this.currentCustomer.indexNbrBottleChoosed += 1;
+      // this.scene.start('GameScene');
+      this.scene.start('PourInShakerScene', {
+        'bottleChoosed': juiceType
+    });
+    } else {
+      //************************** ICI FAIRE PERDRE DU TEMPS ****************************** */
+      // console.log('FAIRE PERDRE DU TEMPS')
     }
   }
 
+  goodOrBadBottle(juice) {
+    const drinkBottle = this.drinkBottles.find(bottle => bottle.alcoholId == juice.id);
+    if (drinkBottle) {
+        const alreadyChosen = this.partie.tabBottlesChoosed.find(id => id == juice.id);
+        if (alreadyChosen) {
+            return false;
+        }
+        this.partie.tabBottlesChoosed.push(juice.id);
+        return true;
+    }
+    return false;
+  }
+
+  juicePicked(juice){
+    this.bottlesData = this.game.registry.get('ingredients');
+    this.bottlesData[juice.id-1].picked = true
+    console.log(this.bottlesData[juice.id-1])
+    // console.log(this.bottlesData[juice.id-1].picked)
+    this.game.registry.set('ingredients', this.bottlesData);
+  }
 
 }
 

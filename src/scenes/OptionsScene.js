@@ -6,14 +6,7 @@ class OptionsScene extends Phaser.Scene {
             key: 'OptionsScene'
         });
     }
-    init(startData) {
-        if (startData.isSolo) {
-            this.isSolo = startData.isSolo;
-            console.log(this.isSolo);
-        } else {
-            this.isSolo = false;
-        }
-    }
+
     preload() {
         this.load.html('volumeOp', './html/volumeOp.html');
     }
