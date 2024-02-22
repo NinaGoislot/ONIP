@@ -11,29 +11,39 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', './media/img/background.png');
+        this.load.image('bg-step1', './media/img/lancement-partie/step1.webp');
     }
 
     create() {
         // add background to scene
-        let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'background');
+        let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-step1');
         background.displayWidth = gameScale.width;
         background.displayHeight = gameScale.width / background.width * background.height;
-        window.addEventListener('resize', () => {
+
+        this.btnBack = this.add.rectangle(gameScale.width*0.06, gameScale.height*0.105, gameScale.width*0.072, gameScale.width*0.072, 0x6666ff, 0);
+        this.btnBack.setInteractive({cursor: 'pointer'});
+        this.btnBack.on('pointerdown', ()=> this.back());
+        //faire la fonction retour
+        this.btnCreer = this.add.rectangle(gameScale.width*0.495, gameScale.height*0.275, gameScale.width*0.755, gameScale.height*0.445, 0x78FFD6, 0);
+        this.btnCreer.setInteractive({cursor: 'pointer'});
+        this.btnCreer.on('pointerdown', ()=> this.createGame());
+        this.btnJoin = this.add.rectangle(gameScale.width*0.495, gameScale.height*0.722, gameScale.width*0.755, gameScale.height*0.44, 0x6666ff, 0);
+        this.btnJoin.setInteractive({cursor: 'pointer'});
+        this.btnJoin.on('pointerdown', ()=> this.joinGame());
+
+        window.addEventListener('resize',()=>{
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
             background.setPosition(gameScale.width / 2, gameScale.height / 2)
-        });
-
-        // Afficher les textes
-        let menuTxt = this.add.text(gameScale.width * 0.1, gameScale.height * 0.1, 'Choix de la partie', {
-            fontSize: '32px',
-            fill: '#fff'
-        });
-
-        //Créer les boutons de l'écran
-        this.btnCreer = this.createButton(gameScale.width * 0.1, gameScale.height * 0.35, 'Créer une partie', () => this.createGame());
-        this.btnJoin = this.createButton(gameScale.width * 0.1, gameScale.height * 0.6, 'Rejoindre une partie', () => this.joinGame());
+            this.btnBack.displayWidth = this.btnBack.displayHeight = gameScale.width*0.072;
+            this.btnBack.setPosition(gameScale.width*0.06, gameScale.height*0.105);
+            this.btnCreer.displayWidth = gameScale.width*0.755;
+            this.btnCreer.displayHeight = gameScale.height*0.445;
+            this.btnCreer.setPosition(gameScale.width*0.495, gameScale.height*0.275);
+            this.btnJoin.displayWidth = gameScale.width*0.755;
+            this.btnJoin.displayHeight = gameScale.height*0.445;
+            this.btnJoin.setPosition(gameScale.width*0.495, gameScale.height*0.722);
+        })
 
         // ******************************* SOCKET ************************************************
         socket.on("GAME_MULTI_CREATED", (roomId) => {
@@ -42,22 +52,6 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
     }
 
     // ************************************* FONCTIONS ************************************************
-
-    createButton(x, y, text, onClick, isVisible = true, isEnable = true) {
-        let button = this.add.text(x, y, text, {
-                fontSize: '24px',
-                fill: '#fff'
-            })
-            .setInteractive({
-                cursor: 'pointer'
-            })
-            .on('pointerdown', onClick)
-            .on('pointerover', () => button.setTint(0x90ee90))
-            .on('pointerout', () => button.setTint(0xffffff))
-            .setVisible(isVisible);
-        button.input.enabled = isEnable;
-        return button;
-    }
 
     createGame() {
         socket.emit("CREATE_GAME_MULTI");

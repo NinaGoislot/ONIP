@@ -17,15 +17,20 @@ class MenuScene extends Phaser.Scene {
         //place la taille de l'image en fonction de la taille du jeu
         background.displayWidth = gameScale.width;
         background.displayHeight = gameScale.width / background.width * background.height;
-        //lorsque la page change de taille, on ajuste la taille de l'image et sa position centrée
+
+        let rectangle = this.add.rectangle(gameScale.width*1, gameScale.height*0, 100, 100, 0x6666ff, 0.5).setOrigin(1,0);
+        rectangle.setInteractive({cursor: 'pointer'})
+        rectangle.on('pointerdown', ()=> this.fullScreen())
+        //resize
         window.addEventListener('resize', () => {
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
-            background.setPosition(gameScale.width/2, gameScale.height/2)
+            background.setPosition(gameScale.width/2, gameScale.height/2);
+            rectangle.setPosition(gameScale.width*1, gameScale.height*0);
         });
 
         // Afficher le menu
-        let menuTxt = this.add.text(gameScale.width*0.1, gameScale.height * 0.1, 'Menu', { fontSize: '32px', fill: '#fff' });
+        let menuTxt = this.add.text(gameScale.width*0.1, gameScale.height * 0.1, 'One Night In Paradoxe', { fill: '#252422', fontFamily:'soria', fontSize:  gameScale.width*0.05 + 'px',});
 
         // Utilisation de la fonction pour créer les boutons
         let btnJouer = this.createButton(gameScale.width * 0.1, gameScale.height * 0.2, 'Jouer', () => this.jouerBtn(), true, false);
@@ -37,7 +42,8 @@ class MenuScene extends Phaser.Scene {
         let btnCredits = this.createButton(gameScale.width * 0.1, gameScale.height * 0.48, 'Crédits', () => {});
 
         //responsive des boutons
-        window.addEventListener('resize', () => {
+        this.resizeListeners = [];
+        const resizeListener = () => {
             menuTxt.setPosition(gameScale.width*0.1, gameScale.height * 0.1)
             btnJouer.setPosition(gameScale.width*0.1, gameScale.height * 0.2)
             this.btnJouerSolo.setPosition(gameScale.width * 0.25, gameScale.height * 0.17)
@@ -46,7 +52,18 @@ class MenuScene extends Phaser.Scene {
             btnLeaderboard.setPosition(gameScale.width*0.1, gameScale.height * 0.34)
             btnOptions.setPosition(gameScale.width*0.1, gameScale.height * 0.41)
             btnCredits.setPosition(gameScale.width*0.1, gameScale.height * 0.48)
-        });
+
+            menuTxt.setFontSize(gameScale.width*0.05);
+            btnJouer.setFontSize(gameScale.width*0.03);
+            this.btnJouerSolo.setFontSize(gameScale.width*0.03);
+            this.btnJouerMulti.setFontSize(gameScale.width*0.03);
+            btnModeLibre.setFontSize(gameScale.width*0.03);
+            btnLeaderboard.setFontSize(gameScale.width*0.03);
+            btnOptions.setFontSize(gameScale.width*0.03);
+            btnCredits.setFontSize(gameScale.width*0.03);
+        };
+        window.addEventListener('resize', resizeListener);
+        this.resizeListeners.push(resizeListener);
 
         if(this.game.registry.get('connected')){
             btnJouer.input.enabled = true;
@@ -69,7 +86,7 @@ class MenuScene extends Phaser.Scene {
     }
 
     createButton(x, y, text, onClick, isVisible = true, isEnable = true) {
-        let button = this.add.text(x, y, text, { fontSize: '24px', fill: '#fff' })
+        let button = this.add.text(x, y, text, { fill: '#252422', fontFamily:'soria', fontSize:  gameScale.width*0.03 + 'px'})
             .setInteractive({ cursor: 'pointer' })
             .on('pointerdown', onClick)
             .on('pointerover', () => button.setTint(0x90ee90))
@@ -77,6 +94,16 @@ class MenuScene extends Phaser.Scene {
             .setVisible(isVisible);
             button.input.enabled = isEnable;
         return button;
+    }
+
+    fullScreen(){
+        if (this.scale.isFullscreen) {
+            this.scale.stopFullscreen();
+            // On stop fulll screen
+        } else {
+            this.scale.startFullscreen();
+            // On start fulll screen
+        }
     }
 
     jouerBtn(){
@@ -89,30 +116,28 @@ class MenuScene extends Phaser.Scene {
         }
     }
 
+    removeResizeListeners() {
+        this.resizeListeners.forEach(listener => {
+            window.removeEventListener('resize', listener);
+        });
+    }
+
     startGame() {
-        // Lancer la scène de jeu
         //faire créer une room et rejoindre quand même donc euh système connexion tel aussi
         this.player = new Player(this, "this.pseudo", 1, "12341");
         this.partie = new Partie(this, "solo", "1234", this.player);
         this.game.registry.set('rolePlayer', 1);
         this.game.registry.set('partie', this.partie);
         // this.scene.start('GameScene');
-        this.scene.start('PourInShakerScene');
+
+        this.scene.start('EndScene');
+
+        console.log('il ne se passe rien.')
         // socket.emit('START_SOLO');
     }
 
-    //Obsolète
-    // startConnexion(solo){
-    //     this.game.registry.set('isSolo', solo);
-    //     //this.scene.start('ConnexionScene');
-    //     if(solo){
-    //         this.scene.start('Step3_ConnectPhoneScene');
-    //     } else {
-    //         this.scene.start('Step1_CreateJoinLobbyScene');
-    //     }
-    // }
-
     goToLobby(mode){
+        this.removeResizeListeners();
         if(mode == "solo"){
             this.scene.start('Step3_ConnectPhoneScene', {
                 'mode' : true,

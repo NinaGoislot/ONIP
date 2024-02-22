@@ -8,6 +8,9 @@ const URL_BOTTLES = "./media/img/bouteilles/",
     BOTTLE_GAP_Y_BETWEEN = 0.225,
     BOTTLE_GAP_X = 0.125,
     BOTTLE_IMG_TAILLE = 0.122;
+const POSITION_BOTTLE = [[-3,1],[-2,1],[-1,1],[0,1],[1,1],[2,1],[3,1],
+[-3,0],[-2,0],[-1,0],[1,0],[2,0],[3,0],
+[-3,-1],[-2,-1],[-1,-1],[0,-1],[1,-1],[2,-1],[3,-1]]
 
 class CabinetScene extends Phaser.Scene {
   constructor() {
@@ -18,6 +21,7 @@ class CabinetScene extends Phaser.Scene {
 
   preload(){
     this.load.image('armoireBouteilles', './media/img/armoire-deco.webp');
+    this.load.image('curseur', 'media/img/curseur.webp');
 
     this.bottlesData = this.game.registry.get('ingredients');
     this.bottleImgKeys = [];
@@ -33,7 +37,6 @@ class CabinetScene extends Phaser.Scene {
     this.currentCustomer = this.game.registry.get('customerData');
     this.drinkBottles = this.currentCustomer.drink.ingredients;
     this.bottlesData = this.game.registry.get('ingredients');
-    console.log('ingredientsData', this.bottlesData);
 
     // add background to scene
     let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'armoireBouteilles');
@@ -45,11 +48,43 @@ class CabinetScene extends Phaser.Scene {
         background.setPosition(gameScale.width/2, gameScale.height/2)
     });
 
+    this.curseur = this.add.image(gameScale.width*0.5, gameScale.height*0.445, 'curseur');
+    this.curseur.displayWidth = gameScale.width * 0.244;
+    this.curseur.scaleY = this.curseur.scaleX;
+    let droite = this.add.rectangle(gameScale.width*0.1, gameScale.height*0.1, 50, 50, 0x6666ff, 0.5).setInteractive({cursor: 'pointer'}).on('pointerdown', ()=> this.droite());
+    let gauche = this.add.rectangle(gameScale.width*0.2, gameScale.height*0.1, 50, 50, 0x6666ff, 0.5).setInteractive({cursor: 'pointer'}).on('pointerdown', ()=> this.gauche());
+    let haut = this.add.rectangle(gameScale.width*0.3, gameScale.height*0.1, 50, 50, 0x6666ff, 0.5).setInteractive({cursor: 'pointer'}).on('pointerdown', ()=> this.haut());
+    let bas = this.add.rectangle(gameScale.width*0.4, gameScale.height*0.1, 50, 50, 0x6666ff, 0.5).setInteractive({cursor: 'pointer'}).on('pointerdown', ()=> this.bas());
+    let getBottleByCurseur = this.add.rectangle(gameScale.width*0.5, gameScale.height*0.1, 50, 50, 0x6666ff, 0.5).setInteractive({cursor: 'pointer'}).on('pointerdown', ()=> this.getSelectBottle());
+
+    this.curseurX = 0;
+    this.curseurY = 0;
+
     // Récupérer les données de bottles depuis le registre
     // Utiliser la fonction pour obtenir le tableau d'indices aléatoires
     this.randomIndices = this.partie.tabBottles;
     this.createBoxBottle(GRID_NBR_ROW, GRID_NBR_COL);
     this.aJuiceTaken = false;
+
+    let rectangle = this.add.rectangle(gameScale.width*0.9, gameScale.height*0.9, 100, 100, 0x6666ff, 0.5);
+    rectangle.setInteractive({cursor: 'pointer'});
+    rectangle.on('pointerdown', ()=> this.test());
+
+
+    this.cameras.main.on('camerashakestart', function () {
+      console.log("debut")
+        for(let i=0; i<this.tabBottle.length; i++){
+          this.tabBottle[i][0].disableInteractive();
+        }
+    }.bind(this));
+  
+    this.cameras.main.on('camerashakecomplete', function () {
+      console.log("fini")
+      for(let i=0; i<this.tabBottle.length; i++){
+        this.tabBottle[i][0].setInteractive();
+      }
+    }.bind(this));
+
 
     // ***************************************** SOCKET *****************************************
     socket.on("GAME_PAUSED", (secondPaused) => {
@@ -58,17 +93,25 @@ class CabinetScene extends Phaser.Scene {
 
     socket.on("NOMORE_CLIENT", (peutPlus) => {
       this.partie.addCustomer = peutPlus;
+      this.game.registry.set('partie', this.partie);
       this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
-          fontSize: '32px',
-          fill: '#fff'
+        fill: '#EFECEA', fontFamily:'soria', fontSize:  gameScale.width*0.03 + 'px'
       });
     })
+
+    if(!this.partie.addCustomer){
+      this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
+          fill: '#EFECEA', 
+          fontFamily:'soria', 
+          fontSize:  gameScale.width*0.03 + 'px'
+      });
+  }
 
     // fonctionnalité du multijoueur avec la bouteille prise 
     socket.on('JUICE_TAKEN', (bottleId, bottlesData)=>{
       if(!(this.partie.mode === "solo") && !this.aJuiceTaken){
         let takenBottleImg = this.getBottleImg(bottleId);
-        takenBottleImg.setInteractive(false);
+        takenBottleImg.disableInteractive();
         takenBottleImg.visible = false;
         this.game.registry.set('ingredients', bottlesData);
         this.bottlesData = this.game.registry.get('ingredients');
@@ -81,7 +124,7 @@ class CabinetScene extends Phaser.Scene {
       this.game.registry.set('ingredients', bottlesData);
       this.bottlesData = this.game.registry.get('ingredients');
       let returnBottleImg = this.getBottleImg(bottleChoosed.id);
-      returnBottleImg.setInteractive(true);
+      returnBottleImg.setInteractive();
       returnBottleImg.visible = true;
       console.log('image de la bouteille retournée',returnBottleImg)
     })
@@ -131,8 +174,8 @@ class CabinetScene extends Phaser.Scene {
           bottleImg.setInteractive().on('pointerdown', () => this.selectJuice(bottleAssocie));
           posXScale += BOTTLE_GAP_X
           posX = gameScale.width*posXScale;
+          this.tabBottle.push([bottleImg,POSITION_BOTTLE[k]]);
           k += 1;
-          this.tabBottle.push(bottleImg);
         }
       }
       posYScale += BOTTLE_GAP_Y_BETWEEN
@@ -140,12 +183,70 @@ class CabinetScene extends Phaser.Scene {
     }
   }
 
+  droite(){
+    this.curseurX += 1;
+    if(this.curseurX >= 4){
+      this.curseurX -= 1;
+      return;
+    }
+    this.curseur.setPosition(this.curseur.x+gameScale.width*BOTTLE_GAP_X, this.curseur.y);
+  }
+
+  gauche(){
+    this.curseurX -= 1;
+    if(this.curseurX <= -4){
+      this.curseurX += 1;
+      return;
+    }
+    this.curseur.setPosition(this.curseur.x-gameScale.width*BOTTLE_GAP_X, this.curseur.y);
+  }
+
+  haut(){
+    this.curseurY += 1;
+    if(this.curseurY >= 2){
+      this.curseurY -= 1;
+      return;
+    }
+    this.curseur.setPosition(this.curseur.x, this.curseur.y-gameScale.height*BOTTLE_GAP_Y_BETWEEN);
+  }
+
+  bas(){
+    this.curseurY -= 1;
+    if(this.curseurY <= -2){
+      this.curseurY += 1;
+      return;
+    }
+    this.curseur.setPosition(this.curseur.x, this.curseur.y+gameScale.height*BOTTLE_GAP_Y_BETWEEN);
+  }
+
+  getBottleAtCursor() {
+    const [cursorX, cursorY] = [this.curseurX, this.curseurY];
+    return this.tabBottle.find(([bottleImg, [bottleX, bottleY]]) => {
+        return bottleX === cursorX && bottleY === cursorY;
+    });
+  }
+
+  getSelectBottle(){
+    this.bottleAtCursor = this.getBottleAtCursor();
+    if (this.bottleAtCursor && this.bottleAtCursor[0] && this.bottleAtCursor[0].texture) {
+        const textureKey = this.bottleAtCursor[0].texture.key;
+        this.bottleAtCursorData = this.getBottleByName(textureKey);
+        this.selectJuice(this.bottleAtCursorData)
+    } else {
+        console.log("La bouteille à la position du curseur n'est pas valide.");
+    }
+  }
+
+  getBottleByName(name) {
+    return this.bottlesData.find(bottle => bottle.image.slice(0, -5) == name);
+  }
+
   getBottleById(id) {
     return this.bottlesData.find(bottle => bottle.id == id);
   }
 
   getBottleImg(bottleId){
-    return this.tabBottle.find(image => image.texture.key == `bouteille`+bottleId)
+    return this.tabBottle.find(([image, position]) => image.texture.key == `bouteille`+bottleId)
   }
 
   selectJuice(juiceType) {
@@ -156,8 +257,9 @@ class CabinetScene extends Phaser.Scene {
       socket.emit("SELECT_JUICE", juiceType.id, this.partie.roomId, this.bottlesData);
       console.log("je prends un jus");
       if(juiceType.id == this.partie.goldBottleId){
-        //************************** ICI SCORE GOLD BOTTLE ****************************** */
-        // console.log("CONGRATS that's a gold bottle");
+        this.partie.player.score += 500;
+        this.partie.player.nbGoldenBottles += 1;
+        this.game.registry.set('partie', this.partie);
       }
       this.currentCustomer.indexNbrBottleChoosed += 1;
       // this.scene.start('GameScene');
@@ -165,8 +267,7 @@ class CabinetScene extends Phaser.Scene {
         'bottleChoosed': juiceType
     });
     } else {
-      //************************** ICI FAIRE PERDRE DU TEMPS ****************************** */
-      // console.log('FAIRE PERDRE DU TEMPS')
+        this.shakeScene();
     }
   }
 
@@ -191,6 +292,18 @@ class CabinetScene extends Phaser.Scene {
     this.game.registry.set('ingredients', this.bottlesData);
   }
 
+  test(){
+    this.scene.start('FictiveGameScene')
+  }
+
+  shakeScene() {
+    console.log("déclenche la fonction");
+    this.cameras.main.shake(1250);
+    //puis pas possible de bouger pdt 2 secondes --> voir PWA
+    //si bouge pdt interdiction = mini shake
+    this.partie.player.nbBadBottles += 1;
+    this.game.registry.set('partie', this.partie);
+  }
 }
 
 export default CabinetScene;

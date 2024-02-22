@@ -1,0 +1,27 @@
+<style>
+    #shakerCanvas{
+        position:absolute;
+        z-index:1;
+    }
+    #shakerCache{
+        position:relative;
+        z-index:5;
+        width:100%;
+    }
+    #shakerDivLigne{
+        position: relative;
+        z-index: 10;
+        top:0;
+    }
+    #shakerDivLigne img{
+        position:absolute;
+    }
+</style>
+
+<div>
+    <div id="shakerDivLigne">
+        <img src="../media/img/shaker/lignes/ligne-min.webp" id="shakerLigneMoy">
+    </div>
+    <canvas id="shakerCanvas" width="400" height="400"></canvas>
+    <img src="../media/img/shaker/shaker-cache.webp" id="shakerCache">
+</div>
