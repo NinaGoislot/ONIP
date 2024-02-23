@@ -13,7 +13,11 @@ import OptionsScene from '@/scenes/OptionsScene';
 import PauseScene from '@/scenes/PauseScene';
 import PourInShakerScene from '@/scenes/PourInShakerScene';
 import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
-const socket = io("https://10.1.180.121:3006"); //connexion au serveur socket.io
+// Maëlle : const socket = io("https://10.1.180.121:3006");
+// Nina Cégep : const socket = io("https://10.1.180.126:3006");
+// Nina Bloc: 
+const socket = io("https://192.168.30.233:3006");
+// Local : const socket = io("http://127.0.0.1:3006"); 
 
 const VALUES = {
   width: 1920,

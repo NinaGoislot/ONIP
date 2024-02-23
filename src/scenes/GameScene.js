@@ -93,11 +93,12 @@ class GameScene extends Phaser.Scene {
         this.ajoutClient = true;
         this.dataCustomer = [];
         this.isSolo = this.game.registry.get('isSolo');
+        this.score = this.game.registry.get('score');
 
         if (this.currentCustomer === null) {
 
             // Création du canva 
-            this.canva = new GameCanva(this, this.game.registry.get('score'));
+            this.canva = new GameCanva(this, this.score);
             this.drawGame();
             this.canva.menuPauseButton(this.scene, this);
 
@@ -143,7 +144,7 @@ class GameScene extends Phaser.Scene {
 
                 // Fonction asynchrone pour afficher les dialogues successifs et ce qui se passe après
                 this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
-                    this.showCabinetButton()
+                    this.showCabinetButton();
                 });
 
                 this.game.registry.set('nbrCustomers', this.game.registry.get('nbrCustomers') - 1);
@@ -155,23 +156,56 @@ class GameScene extends Phaser.Scene {
             // });
 
         } else {
-            this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
+            this.canva = new GameCanva(this, this.currentCustomer, this.score);
+            this.canva.menuPauseButton(this.scene);
             this.drawGame();
 
-            console.log("GAME_SCENE : Score actuel dans le dataManager : ", this.game.registry.get('score'))
-            this.canva.menuPauseButton(this.scene);
             this.showNextDialogue(this.currentCustomer.secondaryDialogues).then(() => {
-                this.drawCocktailFinal();
-                const serviceButton = this.add.text(400, 400, 'Servir le client', {
-                    fontSize: '20px',
-                    fill: '#fff'
-                });
+                console.log("Les dialogues du client sont terminés.")
+            });
 
-                serviceButton.setInteractive();
-                serviceButton.on('pointerdown', () => {
-                    serviceButton.destroy();
-                    this.serveCustomer();
-                });
+            //Demander de faire le premier mouvement
+            this.indexMove = 0;
+            this.infoMovement = this.add.text(350, 350, "Mouvement attendu : n° " + this.currentCustomer.drink.movements[this.indexMove], {
+                fontSize: '20px',
+                fill: '#fff'
+            });
+            // let button = this.add.text(gameScale.width * 0.1, gameScale.height * 0.48, 'Démarrer les mouvements', {
+            //         fontSize: '24px',
+            //         fill: '#fff'
+            //     })
+            //     .setInteractive({
+            //         cursor: 'pointer'
+            //     })
+            //     .on('pointerdown', () => this.startMouvement())
+            //     .on('pointerover', () => button.setTint(0x90ee90))
+            //     .on('pointerout', () => button.setTint(0xffffff));
+
+            //this.startMouvement();
+
+
+            // ************************************* SOCKET ************************************************
+            socket.on("MOBILE_READY", () => {
+                this.startMouvement();
+            });
+
+            //Demander de faire les mouvements du cocktail
+            socket.on("MOVEMENT_DONE", (score) => {
+                console.log("Je rentre dans 'MOUVEMENT_DONE'");
+                this.score = this.score + score;
+                this.score = this.game.registry.set('score', this.score);
+
+                this.indexMove++;
+                if (this.indexMove < this.currentCustomer.drink.movements.length) {
+                    this.infoMovement.setText("Nouveau mouvement attendu : n°  " + this.currentCustomer.drink.movements[this.indexMove]);
+                    socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer);
+                } else {
+                    socket.emit("MOVEMENTS_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
+                }
+            })
+
+            socket.on("START_MOVEMENT", (movement, roomId, numeroPlayer) => {
+                console.log("PHASER ► J'ai reçu le mouvement : ", movement);
             });
 
             //Tous les joueurs ont cliqués sur "Servir le client"
@@ -214,7 +248,25 @@ class GameScene extends Phaser.Scene {
                     this.game.registry.set('customerData', this.currentCustomer);
                 }, 2000);
             });
+
+            socket.on("SERVE_CUSTOMER", () => {
+                this.drawCocktailFinal();
+                const serviceButton = this.add.text(400, 400, 'Servir le client', {
+                    fontSize: '20px',
+                    fill: '#fff'
+                });
+                this.serveCustomer();
+                // serviceButton.setInteractive();
+                // serviceButton.on('pointerdown', () => {
+                //     serviceButton.destroy();
+                //     this.serveCustomer();
+                // });
+            });
         }
+
+        socket.on("SWIPE_CABINET", () => {
+            this.openCabinet();
+        });
 
         socket.on("GAME_PAUSED", (secondPaused) => {
             this.canva.startPause(this.scene, this, secondPaused);
@@ -227,6 +279,7 @@ class GameScene extends Phaser.Scene {
                 fill: '#fff'
             });
         })
+        // *********************************************************************************************
     }
 
     // ************************************* FONCTIONS ************************************************
@@ -349,15 +402,20 @@ class GameScene extends Phaser.Scene {
 
     showCabinetButton() {
         // Affichage du bouton pour ouvrir l'armoire à jus / alcool
-        const openCabinetButton = this.add.text(400, 400, 'Ouvrir l\'armoire à jus', {
-            fontSize: '20px',
-            fill: '#fff'
-        });
-        openCabinetButton.setInteractive();
-        openCabinetButton.on('pointerdown', () => this.openCabinet());
+
+        // const openCabinetButton = this.add.text(400, 400, 'Ouvrir l\'armoire à jus', {
+        //     fontSize: '20px',
+        //     fill: '#fff'
+        // });
+        // openCabinetButton.setInteractive();
+        // openCabinetButton.on('pointerdown', () => this.openCabinet());
+
         //afficher les boissons nécessaires
         this.drawcard();
-        this.drawBottleCocktail()
+        this.drawBottleCocktail();
+        console.log("Je dois faire l'emit du cabinet bouton");
+
+        socket.emit("CABINET_SWIPE_ON", this.partie.roomId, this.partie.player.numeroPlayer);
     }
 
     showNextDialogue = async (dialogue) => {
@@ -395,6 +453,11 @@ class GameScene extends Phaser.Scene {
             // Attendre 3 secondes après l'affichage complet du dialogue
             await new Promise(resolve => this.time.delayedCall(3000, resolve));
         }
+    }
+
+    startMouvement() {
+        console.log("Je rentre dans le start du mouvement");
+        socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[0], this.partie.roomId, this.partie.player.numeroPlayer); //Premier mouvement
     }
 
     wait = async (amount) => {

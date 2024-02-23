@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import Customer from '@/class/Customer'
 import GameCanva from '@/canvas/GameCanva'
-import {gameScale,socket} from '../main.js';
+import {
+    gameScale,
+    socket
+} from '../main.js';
 
 class PourInShakerScene extends Phaser.Scene {
 
@@ -25,7 +28,7 @@ class PourInShakerScene extends Phaser.Scene {
         window.addEventListener('resize', () => {
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
-            background.setPosition(gameScale.width/2, gameScale.height/2)
+            background.setPosition(gameScale.width / 2, gameScale.height / 2)
         });
 
         let shakerService = this.add.image(gameScale.width * 0.32, gameScale.height * 0.48, 'shaker-servir');
@@ -38,15 +41,20 @@ class PourInShakerScene extends Phaser.Scene {
         this.partie = this.game.registry.get('partie');
         this.nbrBottleChoose = this.currentCustomer.indexNbrBottleChoosed;
 
-        this.btnPlaySolo = this.add.text(200, 100, "Verser la boisson", { fontSize: '24px', fill: '#fff' })
-        .setInteractive({ cursor: 'pointer' })
-        .on('pointerover', () => this.btnPlaySolo.setTint(0x90ee90))
-        .on('pointerout', () => this.btnPlaySolo.setTint(0xffffff));
+        this.btnPlaySolo = this.add.text(200, 100, "Verser la boisson", {
+                fontSize: '24px',
+                fill: '#fff'
+            })
+            .setInteractive({
+                cursor: 'pointer'
+            })
+            .on('pointerover', () => this.btnPlaySolo.setTint(0x90ee90))
+            .on('pointerout', () => this.btnPlaySolo.setTint(0xffffff));
 
-        if(this.nbrBottleChoose == this.nbrBoucle){
-            this.btnPlaySolo.on('pointerdown', () => this.openGameScene())
-        } else{
-            this.btnPlaySolo.on('pointerdown', () => this.openCabinet())
+        if (this.nbrBottleChoose == this.nbrBoucle) {
+            this.btnPlaySolo.on('pointerdown', () => this.openGameScene());
+        } else {
+            this.btnPlaySolo.on('pointerdown', () => this.openCabinet());
         }
 
         socket.on("GAME_PAUSED", (secondPaused) => {
@@ -55,15 +63,22 @@ class PourInShakerScene extends Phaser.Scene {
 
         socket.on("NOMORE_CLIENT", (peutPlus) => {
             this.ajoutClient = peutPlus;
-            this.add.text(gameScale.width*0.8, gameScale.height*0.1, 'Dernier client', {fontSize: '32px',fill: '#fff'});
+            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
+                fontSize: '32px',
+                fill: '#fff'
+            });
         })
     }
 
-    openCabinet(){
+    openCabinet() {
+        console.log("Je dois emit au serveur GO_TO_CABINET");
+        socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
         this.scene.start("CabinetScene");
     }
 
-    openGameScene(){
+    openGameScene() {
+        console.log("POUR_IN_SHAKER_SCENE ► c'est le dernier mouvement");
+        socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
         this.scene.start("GameScene");
     }
 }

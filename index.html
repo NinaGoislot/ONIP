@@ -8,7 +8,21 @@
     <title>One night in paradoxe</title>
   </head>
   <body>
-    <div id="parentDiv"></div>
+    <div id="parentDiv" style="display: none;"></div>
+    <script>
+      // Fonction pour détecter la largeur de l'écran et rediriger vers la PWA si on est en format mobile
+      function redirectIfMobile() {
+        if (window.innerWidth < 768) { // Si la largeur de l'écran est inférieure à 768px (tablette ou moins)
+          window.location.href = '/PWA/'; // Rediriger vers la page d'accueil de la PWA
+        } else { // Sinon, si la largeur de l'écran est supérieure ou égale à 768px (format tablette ou ordinateur)
+            document.getElementById('parentDiv').style.display = 'block'; // Afficher la div parentDiv
+        }
+      }
+      
+      // Appeler la fonction au chargement de la page et au changement de taille de fenêtre
+      window.onload = redirectIfMobile;
+      // window.addEventListener('resize', redirectIfMobile);
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -45,6 +45,7 @@ class CabinetScene extends Phaser.Scene {
     this.createBoxBottle(GRID_NBR_ROW, GRID_NBR_COL);
     this.aJuiceTaken = false;
     this.currentCustomer = this.game.registry.get('customerData');
+    this.partie = this.game.registry.get('partie');
 
     // ***************************************** SOCKET *****************************************
 
@@ -132,6 +133,8 @@ class CabinetScene extends Phaser.Scene {
     socket.emit("SELECT_JUICE", juiceType.id, roomIdJoueur);
     this.currentCustomer.indexNbrBottleChoosed += 1;
     // this.scene.start('GameScene');
+    console.log("Je dois emit au serveur GO_TO_POUR");
+    socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
     this.scene.start('PourInShakerScene');
   }
 
@@ -144,7 +147,7 @@ class CabinetScene extends Phaser.Scene {
   unPickedJuices(){
     let juices = this.game.registry.get('ingredients');
     for(let i=0; i<juices.length;i++){
-      juices[i].picked = false
+      juices[i].picked = false;
     }
   }
 

@@ -21,6 +21,8 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.rolePlayer = data;
         this.game.registry.set('rolePlayer', this.rolePlayer);
         this.roomIdPlayer = this.game.registry.get('roomIdJoueur');
+        this.partie = this.game.registry.get('partie');
+
 
         // ****** Background ******
         let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'background');
@@ -49,7 +51,6 @@ class Step4_PseudoScene extends Phaser.Scene {
         const btnReady = document.querySelector("#btnReady");
         this.btnPlay = document.querySelector("#btnPlay");
         const idRoom = document.querySelector("#idRoom");
-        this.partie = document.querySelector("#partie");
 
         this.divJoin.setAttribute('hidden', true);
         this.putPseudo.removeAttribute('hidden');
@@ -62,6 +63,12 @@ class Step4_PseudoScene extends Phaser.Scene {
             btnReady.removeAttribute('hidden');
         }
 
+        console.log(this.partie.mode);
+        if (this.partie.mode == "solo") {
+            console.log("Je rentre dans le console.log");
+            this.btnPlay.disabled = false;
+        }
+
         // ******************************* event click ************************************************
         btnReady.addEventListener('click', () => {
             this.pseudo = inputPseudo.value.trim();
@@ -72,7 +79,7 @@ class Step4_PseudoScene extends Phaser.Scene {
                 this.infoReady.innerText = "Le pseudo ne peut pas dépasser 25 caractères";
             } else {
                 this.infoReady.innerText = "En attente de l'autre joueur...";
-                socket.emit("PSEUDO_READY", this.pseudo,  this.roomIdPlayer );
+                socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer, this.partie.mode);
             }
         });
 
@@ -84,7 +91,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             } else if (this.pseudo.length > 25) {
                 this.infoReady.innerText = "Le pseudo ne peut pas dépasser 25 caractères";
             } else {
-                socket.emit("PSEUDO_READY", this.pseudo,  this.roomIdPlayer );
+                socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer);
             }
         });
 
@@ -97,10 +104,11 @@ class Step4_PseudoScene extends Phaser.Scene {
         socket.on("GO_PLAY", () => {
             putPseudo.setAttribute('hidden', '');
             partie.removeAttribute('hidden');
-            this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
-            this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.player);
-            this.game.registry.set('partie', this.partie);
-            
+            if (this.partie.mode != "solo") {
+                this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
+                this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.player);
+                this.game.registry.set('partie', this.partie);
+            }
             this.scene.start('GameScene');
             this.scene.remove('Step4_PseudoScene');
         });

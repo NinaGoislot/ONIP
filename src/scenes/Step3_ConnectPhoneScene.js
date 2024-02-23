@@ -58,13 +58,12 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         // ******************************* SOCKET ************************************************
         socket.on("READY_TO_PLAY", (roleJoueur) => {
             if(this.isSolo){
-            this.rolePlayer = this.game.registry.set('rolePlayer', 1);
-            this.player = new Player(this, "joueurSolo", this.rolePlayer, this.playerId);
+            //this.rolePlayer = this.game.registry.set('rolePlayer', 1);
+            this.player = new Player(this, "joueurSolo", 1, this.playerId);
             this.partie = new Partie(this, "solo", this.playerId.slice(0, -1), this.player);
-            console.log('test', this.playerId)
-            console.log('test2', this.playerId.slice(0, -1))
             this.game.registry.set('partie', this.partie);
             this.btnPlaySolo.input.enabled = true;
+            this.scene.start('Step4_PseudoScene', roleJoueur);
             } else {
                 this.scene.start('Step4_PseudoScene', roleJoueur);
                 this.scene.remove('Step3_ConnectPhoneScene');
