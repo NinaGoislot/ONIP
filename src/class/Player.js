@@ -14,7 +14,10 @@ class Player extends Phaser.Scene {
 
         this.nbGamePlayed = 0;
         this.nbGoldenBottles = 0;
+        this.nbBadBottles = 0;
+        this.perfectPourring = 0;
         this.nbFirstCustomersServed = 0;
+        this.win = "";
     }
 
     updateRequest(addPoints) {

@@ -49,8 +49,9 @@ class PauseScene extends Phaser.Scene {
 
     createButton(x, y, text, onClick, isVisible = true, isEnable = true) {
         let button = this.add.text(x, y, text, {
-                fontSize: '24px',
-                fill: '#fff'
+                fill: '#252422',
+                fontFamily:'soria', 
+                fontSize: gameScale.width*0.03 + 'px'
             })
             .setInteractive({
                 cursor: 'pointer'

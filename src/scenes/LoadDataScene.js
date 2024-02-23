@@ -9,6 +9,7 @@ class LoadDataScene extends Phaser.Scene {
             console.log("je suis connectée")
             this.game.registry.set('connected', true);
         });
+        this.loadFont("soria", "./media/font/soria-font.ttf");
     }
 
     create() {
@@ -31,8 +32,18 @@ class LoadDataScene extends Phaser.Scene {
         //juste pour pas que la musique dérange pendant les tests..
         this.game.registry.get('music').pause();
 
+        // this.scale.startFullscreen();
         // Lancer la scène suivante (MenuScene dans cet exemple)
         this.scene.start('MenuScene');
+    }
+
+    loadFont(name, url) {
+        var newFont = new FontFace(name, `url(${url})`);
+        newFont.load().then(function (loaded) {
+            document.fonts.add(loaded);
+        }).catch(function (error) {
+            return error;
+        });
     }
 }
 

@@ -27,10 +27,10 @@ class GameCanva {
 
         this.drawDialogue();
 
-        this.displayScore = this.scene.add.text(20, 20, this.score, {
-            fontSize: '16px',
-            fill: '#fff'
-        });
+        // this.displayScore = this.scene.add.text(20, 20, this.score, {
+        //     fontSize: '16px',
+        //     fill: '#fff'
+        // });
     }
 
     // --------------------------- FONCTIONS DRAW ---------------------------
@@ -54,9 +54,10 @@ class GameCanva {
         let bubbleWrap = gameScale.width * 0.25
         this.bubble = this.scene.add.text(gameScale.width * 0.25, gameScale.height * 0.2, "", {
             fontSize: fontSize + 'px',
-            fill: '#fff',
+            fill: '#EFECEA',
             wordWrap: {width: bubbleWrap},
-            lineSpacing: 10
+            lineSpacing: 10,
+            fontFamily:'soria'
         });
 
         const resizeListener = () => {
@@ -64,9 +65,7 @@ class GameCanva {
             let newBubbleWrap = gameScale.width * 0.25;
             this.bubble.setFontSize(newFontSize);
             this.bubble.setWordWrapWidth(newBubbleWrap);
-            this.bubble.wordWrap = {
-                width: gameScale.width * 0.25
-            };
+            // this.bubble.wordWrap = {width: gameScale.width * 0.25};
             this.bubble.setPosition(gameScale.width * 0.25, gameScale.height * 0.2);
         };
 
@@ -133,7 +132,7 @@ class GameCanva {
     remove() {
         this.customer != {} ? this.clientImage.setVisible(false) : "";
         this.bubble.setVisible(false);
-        this.displayScore.setVisible(false);
+        // this.displayScore.setVisible(false);
     }
 
     // Fonction pour arrêter tous les écouteurs d'événements de redimensionnement
@@ -162,7 +161,7 @@ class GameCanva {
 
     updateScore(score) {
         this.score = score;
-        this.displayScore.setText(this.score)
+        // this.displayScore.setText(this.score)
     }
 }
 

@@ -12,7 +12,9 @@ import LoadDataScene from '@/scenes/LoadDataScene';
 import OptionsScene from '@/scenes/OptionsScene';
 import PauseScene from '@/scenes/PauseScene';
 import PourInShakerScene from '@/scenes/PourInShakerScene';
+import FictiveGameScene from '@/scenes/FictiveGameScene';
 import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
+
 // Maëlle : const socket = io("https://10.1.180.121:3006");
 // Nina Cégep : const socket = io("https://10.1.180.126:3006");
 // Nina Bloc: 
@@ -32,6 +34,7 @@ const config = {
   type: Phaser.AUTO,
   scale: {
     parent: "parentDiv",
+    // fullscreenTarget: "parentDiv",
     width: VALUES.width,
     height: VALUES.height
   },
@@ -48,7 +51,7 @@ const config = {
   audio: {
     disableWebAudio: true //pour ajouter du son
   },
-  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene, PourInShakerScene], // Ajouter toutes les scènes ici
+  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene, PourInShakerScene, FictiveGameScene], // Ajouter toutes les scènes ici
 };
 
 var game = new Phaser.Game(config);
@@ -68,18 +71,19 @@ function resize() {
   responsive.width = window.innerWidth;
   responsive.height = window.innerHeight;
   // Calcul de la nouvelle hauteur en fonction du facteur de redimensionnement de la largeur
-  const newHeight = responsive.width / game.config.width * game.config.height;
+  const newHeight = responsive.width / VALUES.width * VALUES.height;
   if (newHeight > responsive.height) {
-    // Si oui, ajustez la hauteur à la hauteur de la fenêtre et ajustez la largeur en conséquence
-    game.scale.resize(responsive.width, responsive.height);
-    gameScale.width = responsive.width;
+    // Si oui, ajustez la hauteur à la hauteur de l'écran et ajustez la largeur en conséquence
     gameScale.height = responsive.height;
+    gameScale.width = responsive.height / VALUES.height * VALUES.width;
   } else {
     // Sinon, utilisez la hauteur calculée normalement
-    game.scale.resize(responsive.width / game.config.width * game.config.width, newHeight);
-    gameScale.width = responsive.width / game.config.width * game.config.width;
+    gameScale.width = responsive.width;
     gameScale.height = newHeight;
   }
+  
+  // Redimensionnez le jeu en fonction des nouvelles dimensions calculées
+  game.scale.resize(gameScale.width, gameScale.height);
   parentDiv.style.width = gameScale.width + 'px';
   parentDiv.style.height = gameScale.height + 'px';
 }

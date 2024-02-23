@@ -19,6 +19,7 @@ class Customer extends Phaser.GameObjects.Graphics {
         this.failureDialogue = emotion.failureText;
 
         this.succeed = null ;
+
     }
 
     // ACCESSEURS

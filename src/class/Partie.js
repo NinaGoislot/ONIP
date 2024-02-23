@@ -14,7 +14,11 @@ class Partie extends Phaser.Scene {
         this.errorMessage = "Tout est okay";
         this.roomId = roomId;
         this.scene = scene;
-
+        this.tabBottles = []
+        this.tabBottlesChoosed = [];
+        this.goldBottleId = null;
+        this.addCustomer = true;
+        this.liquids = [];
 
         // switch (mode) {
         //     case "solo", "libre":

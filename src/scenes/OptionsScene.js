@@ -6,14 +6,7 @@ class OptionsScene extends Phaser.Scene {
             key: 'OptionsScene'
         });
     }
-    init(startData) {
-        if (startData.isSolo) {
-            this.isSolo = startData.isSolo;
-            console.log(this.isSolo);
-        } else {
-            this.isSolo = false;
-        }
-    }
+
     preload() {
         this.load.html('volumeOp', './html/volumeOp.html');
     }
@@ -30,7 +23,7 @@ class OptionsScene extends Phaser.Scene {
         });
 
         // Afficher les textes
-        let menuTxt = this.add.text(gameScale.width * 0.1, gameScale.height * 0.1, 'Options', {fontSize: '32px',fill: '#fff'});
+        let menuTxt = this.add.text(gameScale.width * 0.1, gameScale.height * 0.1, 'Options', { fill: '#252422', fontFamily:'soria', fontSize:  gameScale.width*0.03 + 'px'});
         this.volumeOptions = this.add.dom(gameScale.width * 0.35, gameScale.height * 0.6).createFromCache('volumeOp');
         this.volumeOptions.addListener('click');
         this.volumeRange = document.querySelector('#volume');
@@ -51,8 +44,9 @@ class OptionsScene extends Phaser.Scene {
 
     createButton(x, y, text, onClick, isVisible = true, isEnable = true) {
         let button = this.add.text(x, y, text, {
-                fontSize: '24px',
-                fill: '#fff'
+                fill: '#252422',
+                fontFamily:'soria', 
+                fontSize: gameScale.width*0.03 + 'px'
             })
             .setInteractive({
                 cursor: 'pointer'

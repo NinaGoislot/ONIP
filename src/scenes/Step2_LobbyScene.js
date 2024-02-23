@@ -11,56 +11,118 @@ class Step2_LobbyScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', './media/img/background.png');
+        this.load.image('bg-step2', './media/img/lancement-partie/step2.webp');
+        this.load.image('btn-copy', './media/img/lancement-partie/step2-btn-copy.webp');
+        this.load.image('btn-check', './media/img/lancement-partie/step2-btn-check.webp');
         this.load.html('joinRoom', './html/joinGame.html');
     }
 
     create(data) {
         this.roomId = data.roomId;
         this.numeroPlayer = data.player;
+        this.resizeListeners = [];
 
-        // add background to scene
-        let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'background');
+        // background to scene
+        let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-step2');
         background.displayWidth = gameScale.width;
         background.displayHeight = gameScale.width / background.width * background.height;
+
+        let copy = this.add.image(gameScale.width*0.82, gameScale.height*0.5, 'btn-copy');
+        copy.displayWidth = gameScale.width * 0.06;
+        copy.scaleY = copy.scaleX;
+        copy.setInteractive({cursor: 'pointer'});
+        copy.visible = false;
+
+        let check = this.add.image(gameScale.width*0.82, gameScale.height*0.5, 'btn-check');
+        check.displayWidth = gameScale.width * 0.06;
+        check.scaleY = check.scaleX;
+        check.setInteractive({cursor: 'pointer'});
+        check.visible = false;
+
+        this.btnBack = this.add.rectangle(gameScale.width*0.06, gameScale.height*0.105, gameScale.width*0.072, gameScale.width*0.072, 0x6666ff, 0);
+        this.btnBack.setInteractive({cursor: 'pointer'});
+        this.btnBack.on('pointerdown', ()=> this.back());
+        //faire la fonction retour
+
+        this.title = this.add.text(gameScale.width * 0.535, gameScale.height * 0.335, "Partage ce code", {
+            fontFamily:'soria',
+            fontSize: gameScale.width*0.05 + 'px',
+            // fontSize:  '70px',
+            fill: '#EFECEA'
+        }).setOrigin(0.5,0.5);
+        this.codePin = this.add.text(gameScale.width * 0.535, gameScale.height * 0.5, "", {
+            fontFamily:'soria',
+            fontSize: gameScale.width*0.08 + 'px',
+            // fontSize: '120px',
+            fill: '#EFECEA'
+        }).setOrigin(0.5,0.5);
+        this.codePin.setLetterSpacing(20);
+        this.codePin.visible = false;
+        this.messageInfos = this.add.text(gameScale.width * 0.535, gameScale.height * 0.71, "", {
+            fontFamily:'soria',
+            fontSize:  gameScale.width*0.03 + 'px',
+            // fontSize: '45px',
+            fill: '#EFECEA'
+        }).setOrigin(0.5,0.5);
+        this.messageInfos.visible = false;
+
+        //faire un texte au cas où erreur -> mauvais code pin, pas de code pin etc, actuellement : this.infos.text
+
         window.addEventListener('resize', () => {
             background.displayWidth = gameScale.width;
             background.displayHeight = gameScale.width / background.width * background.height;
             background.setPosition(gameScale.width / 2, gameScale.height / 2)
-            this.infos.setPosition(gameScale.width * 0.1, gameScale.height * 0.25);
+            copy.displayWidth = gameScale.width * 0.06;
+            copy.scaleY = copy.scaleX;
+            copy.setPosition(gameScale.width*0.82, gameScale.height*0.5);
+            check.displayWidth = gameScale.width * 0.06;
+            check.scaleY = check.scaleX;
+            check.setPosition(gameScale.width*0.82, gameScale.height*0.5)
+            this.btnBack.displayWidth = this.btnBack.displayHeight = gameScale.width*0.072;
+            this.btnBack.setPosition(gameScale.width*0.06, gameScale.height*0.105);
         });
 
-        this.infos = this.add.text(gameScale.width * 0.1, gameScale.height * 0.25, "", {
-            fontSize: '24px',
-            fill: '#fff'
-        });
+        const resizeListener = () => {
+            this.title.setPosition(gameScale.width * 0.535, gameScale.height * 0.335);
+            this.title.setFontSize(gameScale.width*0.05);
+            this.codePin.setPosition(gameScale.width * 0.535, gameScale.height * 0.5);
+            this.codePin.setFontSize(gameScale.width*0.08);
+            this.messageInfos.setPosition(gameScale.width * 0.535, gameScale.height * 0.71);
+            this.messageInfos.setFontSize(gameScale.width*0.03);
+        };
+        window.addEventListener('resize', resizeListener);
+        this.resizeListeners.push(resizeListener);
 
         switch (this.numeroPlayer) {
             case "J1":
-                this.infos.text = "Id de la room : " + this.roomId;
+                this.codePin.text = this.roomId;
+                copy.visible = true;
+                this.codePin.visible = true;
+                copy.on('pointerdown', ()=> this.copy(this.roomId));
                 break;
             case "J2":
-                this.formJoin = this.add.dom(gameScale.width * 0.35, gameScale.height * 0.6).createFromCache('joinRoom');
+                this.title.text = "Entre le code";
+                check.visible = true;
+                this.messageInfos.visible = true;
+                this.formJoin = this.add.dom(gameScale.width * 0.05, gameScale.height * 0.42).createFromCache('joinRoom').setOrigin(0,0);
                 this.formJoin.addListener('click');
-                window.addEventListener('resize', () => {
-                    this.formJoin.setPosition(gameScale.width * 0.35, gameScale.height * 0.6);
-                });
-
-                //Inputs pour J2
+                //Input pour J2
                 this.divJoin = document.querySelector('#divJoin');
-                const inputRoomId = document.querySelector('#inputRoomId');
-                const joinRoom = document.querySelector('#joinRoom');
+                this.inputRoomId = document.querySelector('#inputRoomId');
+                this.inputRoomId.style.letterSpacing = gameScale.width * 0.04 + "px";
+                this.inputRoomId.style.fontSize = gameScale.width * 0.07 + "px";
+                check.on('pointerdown', ()=> this.onCheck());
 
-                //Code de la partie pour J1
-                const idRoom = document.querySelector("#idRoom");
-
-                // ******************************* event click ************************************************s
-                joinRoom.addEventListener('click', () => {
-                    if (inputRoomId.value == null || inputRoomId.value == "") {
-                        this.infoReady.innerText = "Veuillez entrer un code de partie."
-                    } else {
-                        socket.emit("JOIN_GAME", inputRoomId.value);
-                    }
+                const resizeListener2 = () => {
+                    this.formJoin.setPosition(gameScale.width * 0.05, gameScale.height * 0.42);
+                    this.inputRoomId.style.letterSpacing = gameScale.width * 0.04 + "px";
+                    this.inputRoomId.style.fontSize = gameScale.width * 0.07 + "px";
+                };
+                window.addEventListener('resize', resizeListener2);
+                this.resizeListeners.push(resizeListener2);
+    
+                socket.on("BAD_GAME_ID", ()=>{
+                    this.messageInfos.text = "Mauvais code. Réessaie."
                 })
                 break;
             default:
@@ -71,8 +133,8 @@ class Step2_LobbyScene extends Phaser.Scene {
         // ******************************* SOCKET ************************************************
         socket.on("READY_TO_CONNECT", () => {
             socket.on("WAITING_FOR_SHAKERS", (roomIdJoueur) => {
-                //this.infos.text = "En attente des shakers : " + roomIdJoueur;
                 this.game.registry.set('roomIdJoueur', roomIdJoueur);
+                this.removeResizeListeners();
                 this.scene.start('Step3_ConnectPhoneScene');
                 this.scene.remove('Step2_LobbyScene');
             });
@@ -81,20 +143,29 @@ class Step2_LobbyScene extends Phaser.Scene {
 
     // ************************************* FONCTIONS ************************************************
 
-    createButton(x, y, text, onClick, isVisible = true, isEnable = true) {
-        let button = this.add.text(x, y, text, {
-                fontSize: '24px',
-                fill: '#fff'
-            })
-            .setInteractive({
-                cursor: 'pointer'
-            })
-            .on('pointerdown', onClick)
-            .on('pointerover', () => button.setTint(0x90ee90))
-            .on('pointerout', () => button.setTint(0xffffff))
-            .setVisible(isVisible);
-        button.input.enabled = isEnable;
-        return button;
+    copy(texteARecopier){
+        navigator.clipboard.writeText(texteARecopier)
+        .then(() => {
+            console.log('Contenu copié avec succès !', texteARecopier);
+        })
+        .catch(err => {
+            console.error('Erreur lors de la copie du contenu :', err);
+        });
+    }
+
+    onCheck(){
+        if (this.inputRoomId.value == null || this.inputRoomId.value == "") {
+            this.messageInfos.text = "Entre un code de partie."
+        } else {
+            this.inputRoomId.value = this.inputRoomId.value.replace(/O/g, '0');
+            socket.emit("JOIN_GAME", this.inputRoomId.value);
+        }
+    }
+
+    removeResizeListeners() {
+        this.resizeListeners.forEach(listener => {
+            window.removeEventListener('resize', listener);
+        });
     }
 }
 

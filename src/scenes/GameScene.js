@@ -61,7 +61,13 @@ class GameScene extends Phaser.Scene {
         this.imageClientKey.push(`client-1`);
         this.imageClientKey.push(`client-2`);
 
-        this.currentCustomer = this.game.registry.get('customerData') || null;
+        //mouvements "prépare toi"
+        this.load.spritesheet('prepare-toi', './media/img/mouvements/preparez-vous.webp', {
+            frameWidth: 480,
+            frameHeight: 270,
+            startFrame: 0,
+            endFrame: 21
+        });
 
         //Chargement des images du jeu    
         this.load.path = URL_BOTTLES_CARTE;
@@ -69,13 +75,15 @@ class GameScene extends Phaser.Scene {
             this.load.image(`carte-bouteille${i}`, `carte-bouteille${i}.webp`);
             this.bottleImgKeys.push(`carte-bouteille${i}`);
         }
+        this.game.registry.set('bottleImgKeys', this.bottleImgKeys);
         this.load.path = URL_BOTTLES_CARTE_GOLD;
         for (let i = 1; i <= this.bottlesData.length; i++) {
             this.load.image(`carte-luxe-bouteille${i}`, `carte-luxe-bouteille${i}.webp`);
             this.bottleGoldImgKeys.push(`carte-luxe-bouteille${i}`);
         }
+        this.game.registry.set('bottleGoldImgKeys', this.bottleGoldImgKeys);
         this.load.path = URL_COCKTAIL;
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= this.cocktailsData.length; i++) {
             this.load.image(`cocktail${i}`, `cocktail${i}.webp`);
             this.cocktailImgKeys.push(`cocktail${i}`);
         }
@@ -90,49 +98,59 @@ class GameScene extends Phaser.Scene {
         this.rolePlayer = this.game.registry.get('rolePlayer');
         this.partie = this.game.registry.get('partie');
         this.emotionsData = this.game.registry.get('emotions');
-        this.ajoutClient = true;
-        this.dataCustomer = [];
-        this.isSolo = this.game.registry.get('isSolo');
         this.score = this.game.registry.get('score');
+        // this.bottlesData = this.game.registry.get('ingredients');
+        this.dataCustomer = [];
+        this.isSolo = this.partie.mode == "solo";
+        this.aReadyText = false;
 
         if (this.currentCustomer === null) {
 
             // Création du canva 
-            this.canva = new GameCanva(this, this.score);
-            this.drawGame();
-            this.canva.menuPauseButton(this.scene, this);
-
+            this.canva = new GameCanva(this, this.game.registry.get('score'));
+            // this.drawGame();
+            // this.canva.menuPauseButton(this.scene, this);
+            //préparation affichage compte à rebours
+            this.drawBackground();
+            this.drawBarCounter();
+            this.drawShaker();
+            this.cameras.main.fadeIn(1000);
+            this.shade = this.add.rectangle(gameScale.width / 2, gameScale.height / 2, gameScale.width, gameScale.height, 0x252422, 0.8).setOrigin(0.5, 0.5);
             //COMPTE A REBOURS
             this.rebours = this.add.text(gameScale.width * 0.5, gameScale.height * 0.5, "", {
-                fontSize: '32px',
-                fill: '#fff'
-            })
+                fill: '#EFECEA',
+                fontFamily: 'soria',
+                fontSize: gameScale.width * 0.1 + 'px'
+            }).setOrigin(0.5, 0.5);
 
             //afficher compte à rebours
-            // const countdownPromise = new Promise((resolve) => {
-            //     this.compteARebours(resolve);
-            // });
+            const countdownPromise = new Promise((resolve) => {
+                this.compteARebours(resolve);
+            });
+
+
 
             // Exécuter les autres fonctions une fois que la promesse est résolue
-            // countdownPromise.then(() => {
-            console.log("Le compte à rebours est terminé !");
-            //Set un nombre de client pour la partie
-            this.game.registry.set('nbrCustomers', 5);
+            countdownPromise.then(() => {
+                console.log("Le compte à rebours est terminé !", this.partie.player.pseudo, this.rolePlayer);
+                //Set un nombre de client pour la partie
+                this.game.registry.set('nbrCustomers', 5);
 
-            // Création du client
-            if (this.rolePlayer == 1) {
-                this.generateNewClient().then(() => {
-                    console.log("J'ai créé un client : ", this.dataCustomer)
-                    socket.emit("CREATE_FIRST_CUSTOMER", {
-                        currentCustomer: this.dataCustomer,
-                        idRoom: this.partie.roomId
+                // Création du client
+                if (this.rolePlayer == 1) {
+                    this.generateNewClient().then(() => {
+                        console.log("J'ai créé un client : ", this.dataCustomer)
+                        socket.emit("CREATE_FIRST_CUSTOMER", {
+                            currentCustomer: this.dataCustomer,
+                            idRoom: this.partie.roomId,
+                        });
                     });
-                });
-            }
+                }
+            });
 
             socket.on("RECEIVE_FIRST_CUSTOMER", (currentCustomer) => {
                 console.log("Je rentre dans le emit du client")
-
+                console.log(this.partie.player.pseudo, this.rolePlayer);
                 if (this.rolePlayer == 2) {
                     console.log("J2 reçoit bient l'info du socket");
                 }
@@ -140,7 +158,14 @@ class GameScene extends Phaser.Scene {
                 this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, currentCustomer[0]), this.findObjectById(this.cocktailsData, currentCustomer[1]), currentCustomer[2]);
 
                 this.canva.customer = this.currentCustomer;
+
+                this.partie.goldBottleId = currentCustomer[4];
+                this.partie.tabBottles = currentCustomer[3];
+                this.partie.liquids = [];
+                this.game.registry.set('partie', this.partie);
+
                 this.drawGame();
+                this.resetPickedJuices();
 
                 // Fonction asynchrone pour afficher les dialogues successifs et ce qui se passe après
                 this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
@@ -153,12 +178,11 @@ class GameScene extends Phaser.Scene {
 
             });
 
-            // });
-
         } else {
             this.canva = new GameCanva(this, this.currentCustomer, this.score);
             this.canva.menuPauseButton(this.scene);
             this.drawGame();
+            this.removeShaker();
 
             this.showNextDialogue(this.currentCustomer.secondaryDialogues).then(() => {
                 console.log("Les dialogues du client sont terminés.")
@@ -210,10 +234,13 @@ class GameScene extends Phaser.Scene {
 
             //Tous les joueurs ont cliqués sur "Servir le client"
             socket.on("ALL_PLAYERS_READY_TO_SERVE", () => {
-                this.readyText.setVisible(false);
+                if (this.aReadyText) {
+                    this.readyText.setVisible(false);
+                }
                 this.showFinalDialogue().then(() => {
-                    if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
+                    if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
                         this.canva.remove();
+                        this.removeCocktailFinal();
                         if (this.rolePlayer == 1) {
                             this.generateNewClient().then(() => {
                                 console.log("J'ai créé un client : ", this.dataCustomer)
@@ -235,11 +262,18 @@ class GameScene extends Phaser.Scene {
                 this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, currentCustomer[0]), this.findObjectById(this.cocktailsData, currentCustomer[1]), currentCustomer[2]);
                 this.canva.customer = this.currentCustomer;
 
+                this.partie.goldBottleId = currentCustomer[4];
+                this.partie.tabBottles = currentCustomer[3];
+                console.log('test tabbottle', this.partie.tabBottles);
+                this.partie.liquids = [];
+                this.game.registry.set('partie', this.partie);
+
                 setTimeout(() => {
                     console.log("Voici le client : ", this.currentCustomer);
                     console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                     this.drawGame();
+                    this.resetPickedJuices();
                     this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
                         this.showCabinetButton();
                     });
@@ -268,37 +302,96 @@ class GameScene extends Phaser.Scene {
             this.openCabinet();
         });
 
+        if (!this.partie.addCustomer) {
+            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
+                fill: '#EFECEA',
+                fontFamily: 'soria',
+                fontSize: gameScale.width * 0.03 + 'px'
+            });
+        }
+
+        socket.on('JUICE_TAKEN', (bottleId, bottlesData) => {
+            this.game.registry.set('ingredients', bottlesData);
+            this.bottlesData = this.game.registry.get('ingredients');
+        });
+
+        socket.on('A_JUICE_IS_RETURNED', (bottlesData) => {
+            this.game.registry.set('ingredients', bottlesData);
+            this.bottlesData = this.game.registry.get('ingredients');
+        });
+
         socket.on("GAME_PAUSED", (secondPaused) => {
             this.canva.startPause(this.scene, this, secondPaused);
-        })
+        });
 
         socket.on("NOMORE_CLIENT", (peutPlus) => {
-            this.ajoutClient = peutPlus;
+            this.partie.addCustomer = peutPlus;
+            this.game.registry.set('partie', this.partie);
             this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
-                fontSize: '32px',
-                fill: '#fff'
+                fill: '#EFECEA',
+                fontFamily: 'soria',
+                fontSize: gameScale.width * 0.03 + 'px'
             });
-        })
-        // *********************************************************************************************
+        });
+
+        socket.on("FIRST_TO_SERVE", () => {
+            this.partie.player.score += 1000;
+            this.game.registry.set('partie', this.partie);
+        });
+
+        socket.on("A_PLAYER_READY", () => {
+            if (this.rolePlayer == 1) {
+                this.readyText = this.add.text(gameScale.width * 0.05, gameScale.height * 0.1, "Le joueur 2 est prêt", {
+                    fill: '#EFECEA',
+                    fontFamily: 'soria',
+                    fontSize: gameScale.width * 0.03 + 'px'
+                });
+                this.aReadyText = true;
+            } else {
+                this.readyText = this.add.text(gameScale.width * 0.05, gameScale.height * 0.1, "Le joueur 1 est prêt", {
+                    fill: '#EFECEA',
+                    fontFamily: 'soria',
+                    fontSize: gameScale.width * 0.03 + 'px'
+                });
+                this.aReadyText = true;
+            }
+        });
     }
 
     // ************************************* FONCTIONS ************************************************
 
     compteARebours = (resolve) => {
-        var duree = 3;
+        var duree = 5;
         var intervalId = setInterval(() => {
+            this.rebours.text = duree - 2;
             if (duree <= 0) {
                 clearInterval(intervalId);
                 this.rebours.visible = false;
+                this.rebours.text = "";
                 resolve();
                 return;
             }
-            this.rebours.text = duree;
+            if (duree == 1) {
+                this.rebours.text = "";
+            }
+            if (duree == 2) {
+                this.tweens.add({
+                    targets: this.shade,
+                    alpha: 0,
+                    duration: 2000,
+                    onComplete: function () {
+                        this.shade.destroy();
+                    }.bind(this),
+                    onCompleteScope: this
+                });
+                this.rebours.text = "";
+            }
             duree--;
         }, 1000);
     }
 
     endGame() {
+        console.log("fin du jeu");
         socket.emit("GAME_OVER");
         this.game.registry.remove('customerData');
         this.game.registry.remove('nbrCustomers');
@@ -317,23 +410,39 @@ class GameScene extends Phaser.Scene {
         const emotion = this.emotionsData[Math.floor(Math.random() * this.emotionsData.length)];
         const cocktail = this.cocktailsData[Math.floor(Math.random() * this.cocktailsData.length)];
 
-        this.dataCustomer = [emotion.id, cocktail.id, randomImageKey];
+        const currentCocktail = this.findObjectById(this.cocktailsData, cocktail.id)
+        const goldBottle = this.goldBottle(currentCocktail);
+
+        const indicesTabBottle = this.generateRandomIndices(this.bottlesData.length);
+
+        this.dataCustomer = [emotion.id, cocktail.id, randomImageKey, indicesTabBottle, goldBottle];
 
         //this.currentCustomer = new Customer(this, 300, 300, emotion, cocktail, randomImageKey);
     }
 
-    getBottleImg(cocktailBottleId) {
-        let allBottles = this.game.registry.get('ingredients');
-        if (cocktailBottleId == 666) {
-            return allBottles[0]
+    generateRandomIndices(tabLength) {
+        var indices = Array.from({
+            length: tabLength
+        }, (_, index) => index + 1);
+        // Mélanger le tableau de manière aléatoire
+        for (var i = indices.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
         }
-        return allBottles.find(bottle => bottle.id == cocktailBottleId)
+        return indices;
     }
 
-    goldBottle() {
-        let allIdBottleCocktail = this.currentCustomer.drink.ingredients
-        let GoldBottleId = Phaser.Math.RND.pick(allIdBottleCocktail)
-        return GoldBottleId.alcoholId
+    getBottleImg(cocktailBottleId) {
+        if (cocktailBottleId == 666) {
+            return this.bottlesData[0]
+        }
+        return this.bottlesData.find(bottle => bottle.id == cocktailBottleId)
+    }
+
+    goldBottle(currentCocktail) {
+        let allIdBottleCocktail = currentCocktail.ingredients
+        let goldBottleId = Phaser.Math.RND.pick(allIdBottleCocktail)
+        return goldBottleId.alcoholId
     }
 
     openCabinet() {
@@ -351,14 +460,20 @@ class GameScene extends Phaser.Scene {
         return isCorrect;
     }
 
+    resetPickedJuices() {
+        for (let i = 0; i < this.bottlesData.length; i++) {
+            this.bottlesData[i].picked = false
+        }
+        this.game.registry.set('ingredients', this.bottlesData);
+    }
+
     serveCustomer() {
-        this.currentCustomer.succeed = this.playerChoiceCorrect();
+        // this.currentCustomer.succeed = this.playerChoiceCorrect();
+        this.currentCustomer.succeed = true;
         console.log("Fonction serveCustomer(), la valeur de succeed est a ", this.currentCustomer.succeed);
         if (!this.isSolo) {
-            this.readyText = this.add.text(gameScale.width * 0.15, gameScale.height * 0.15, "Le joueur " + this.rolePlayer + " est prêt", {
-                fontSize: '32px',
-                fill: '#fff'
-            })
+
+            console.log("clique pour servir", this.partie.player.playerId, this.partie.roomId);
 
             socket.emit("SET_PLAYER_READY", {
                 playerId: this.partie.player.playerId,
@@ -366,8 +481,9 @@ class GameScene extends Phaser.Scene {
             });
         } else {
             this.showFinalDialogue().then(() => {
-                if (this.game.registry.get('nbrCustomers') > 0 && this.ajoutClient == true) {
+                if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
                     this.canva.remove();
+                    this.removeCocktailFinal();
                     if (this.rolePlayer == 1) {
                         this.generateNewClient().then(() => {
                             console.log("J'ai créé un client : ", this.dataCustomer)
@@ -381,11 +497,18 @@ class GameScene extends Phaser.Scene {
                     this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, this.dataCustomer[0]), this.findObjectById(this.cocktailsData, this.dataCustomer[1]), this.dataCustomer[2]);
                     this.canva.customer = this.currentCustomer;
 
+                    this.partie.goldBottleId = this.currentCustomer[4];
+                    this.partie.tabBottles = this.currentCustomer[3];
+                    console.log('test tabbottle', this.partie.tabBottles);
+                    this.partie.liquids = [];
+                    this.game.registry.set('partie', this.partie);
+
                     setTimeout(() => {
                         console.log("Voici le client : ", this.currentCustomer);
                         console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                         this.drawGame();
+                        this.resetPickedJuices();
                         this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
                             this.showCabinetButton();
                         });
@@ -475,14 +598,6 @@ class GameScene extends Phaser.Scene {
     }
     // ------------------------------------
 
-    // drawBottle(posX, posY, imageKey) {
-    //     this.bottleImg = this.add.image(posX, posY, imageKey)
-    //     this.bottleImg.scaleX = 1;
-    //     this.bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
-    //     this.bottleImg.scaleY = this.bottleImg.scaleX
-    //     this.bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
-    // }
-
     drawBackground() {
         this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-service');
         this.background.displayWidth = gameScale.width;
@@ -524,7 +639,6 @@ class GameScene extends Phaser.Scene {
         this.shakerService.setScale(0.1);
         this.shakerService.displayWidth = gameScale.width * 0.17;
         this.shakerService.scaleY = this.shakerService.scaleX;
-
         window.addEventListener('resize', () => {
             this.shakerService.displayWidth = gameScale.width * 0.17;
             this.shakerService.scaleY = this.shakerService.scaleX;
@@ -532,8 +646,12 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    removeShaker() {
+        this.shakerService.visible = false;
+    }
+
     drawBottleCocktail() {
-        let goldenBottle = this.goldBottle()
+        let goldenBottle = this.partie.goldBottleId;
         let posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE;
         let posX = gameScale.width * BOTTLE_CARD_IMG_XSCALE;
         let k = 0; //index
@@ -583,12 +701,155 @@ class GameScene extends Phaser.Scene {
     drawCocktailFinal() {
         let cocktailKey = this.currentCustomer.drink;
         let imgKeyCocktail = this.cocktailImgKeys.find(image => image == `cocktail` + cocktailKey.id);
-        let posX = gameScale.width * 0.75
-        let posY = gameScale.height * 0.5
-        let imgCocktail = this.add.image(posX, posY, imgKeyCocktail)
-        imgCocktail.scaleX = 1;
-        imgCocktail.displayWidth = gameScale.width * 0.5;
-        imgCocktail.scaleY = imgCocktail.scaleX
+        this.imgCocktail = this.add.image(gameScale.width * 0.32, gameScale.height * 0.8, imgKeyCocktail)
+        this.imgCocktail.scaleX = 1;
+        this.imgCocktail.displayWidth = gameScale.width * 0.13;
+        this.imgCocktail.scaleY = this.imgCocktail.scaleX
+
+        window.addEventListener('resize', () => {
+            this.imgCocktail.scaleX = 1;
+            this.imgCocktail.displayWidth = gameScale.width * 0.13;
+            this.imgCocktail.scaleY = this.imgCocktail.scaleX
+            this.imgCocktail.setPosition(gameScale.width * 0.32, gameScale.height * 0.8);
+        });
+    }
+
+    removeCocktailFinal() {
+        this.imgCocktail.setVisible(false);
+    }
+
+    //pour le premier spriteSheet de préparez vous / prépare toi
+    mouvementFirst() {
+        this.getReady = this.add.sprite(gameScale.width * 0.5, gameScale.height * 0.5, "prepare-toi").setOrigin(0.5, 0.5);
+        this.getReady.displayWidth = gameScale.width * 0.3;
+        this.getReady.scaleY = this.getReady.scaleX;
+        this.getReady.anims.create({
+            key: 'getReady',
+            frames: [{
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 0,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 1,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 2,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 3,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 4,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 5,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 6,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 7,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 8,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 9,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 10,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 11,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 12,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 13,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 14,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 15,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 16,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 17,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 18,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 19,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 20,
+                },
+                {
+                    key: "prepare-toi",
+                    frame: 21,
+                },
+            ],
+            frameRate: 30,
+            repeat: -1
+        })
+        this.getReady.play('getReady');
     }
 }
 export default GameScene;

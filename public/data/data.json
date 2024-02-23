@@ -127,121 +127,141 @@
         "id": 1,
         "name": "Soda Droite",
         "image": "bouteille1.webp",
-        "picked": false
+        "picked": false,
+        "color": "#40C8BF"
       },
       {
         "id": 2,
         "name": "Orange Bas",
         "image": "bouteille2.webp",
-        "picked": false
+        "picked": false,
+        "color": "#F8DC6C"
       },
       {
         "id": 3,
         "name": "Brun Gauche",
         "image": "bouteille3.webp",
-        "picked": false
+        "picked": false,
+        "color": "#B16A55"
       },
       {
         "id": 4,
         "name": "Gel Douche Dop Haut",
         "image": "bouteille4.webp",
-        "picked": false
+        "picked": false,
+        "color": "#22A7CA"
       },
       {
         "id": 5,
         "name": "Champi Gauche",
         "image": "bouteille5.webp",
-        "picked": false
+        "picked": false,
+        "color": "#B85558"
       },
       {
         "id": 6,
         "name": "Coeur Violet",
         "image": "bouteille6.webp",
-        "picked": false
+        "picked": false,
+        "color": "#533667"
       },
       {
         "id": 7,
         "name": "Soleil Haut",
         "image": "bouteille7.webp",
-        "picked": false
+        "picked": false,
+        "color": "#CBBF85"
       },
       {
         "id": 8,
         "name": "Rose",
         "image": "bouteille8.webp",
-        "picked": false
+        "picked": false,
+        "color": "#BF0D73"
       },
       {
         "id": 9,
         "name": "Ecailles Gauche",
         "image": "bouteille9.webp",
-        "picked": false
+        "picked": false,
+        "color": "#BD9E70"
       },
       {
         "id": 10,
         "name": "Bleu Marine Bas",
         "image": "bouteille10.webp",
-        "picked": false
+        "picked": false,
+        "color": "#B6CBFF"
       },
       {
         "id": 11,
-        "name": "Soda Droite",
+        "name": "Caramel Gauche",
         "image": "bouteille11.webp",
-        "picked": false
+        "picked": false,
+        "color": "#D76D27"
       },
       {
         "id": 12,
-        "name": "Orange Bas",
+        "name": "Cire rouge Droite",
         "image": "bouteille12.webp",
-        "picked": false
+        "picked": false,
+        "color": "#600C02"
       },
       {
         "id": 13,
-        "name": "Brun Gauche",
+        "name": "Carotte Haut",
         "image": "bouteille13.webp",
-        "picked": false
+        "picked": false,
+        "color": "#E6602E"
       },
       {
         "id": 14,
-        "name": "Gel Douche Dop Haut",
+        "name": "Carrelage bleu Gauche",
         "image": "bouteille14.webp",
-        "picked": false
+        "picked": false,
+        "color": "#3E37A4"
       },
       {
         "id": 15,
-        "name": "Champi Gauche",
+        "name": "Vert vers Bas",
         "image": "bouteille15.webp",
-        "picked": false
+        "picked": false,
+        "color": "#00D990"
       },
       {
         "id": 16,
-        "name": "Coeur Violet",
+        "name": "Boule rose",
         "image": "bouteille16.webp",
-        "picked": false
+        "picked": false,
+        "color": "#CB69D5"
       },
       {
         "id": 17,
-        "name": "Soleil Haut",
+        "name": "Feuille Droite",
         "image": "bouteille17.webp",
-        "picked": false
+        "picked": false,
+        "color": "#002C0B"
       },
       {
         "id": 18,
-        "name": "Rose",
+        "name": "Vigne verte Bas",
         "image": "bouteille18.webp",
-        "picked": false
+        "picked": false,
+        "color": "#91DA65"
       },
       {
         "id": 19,
-        "name": "Ecailles Gauche",
+        "name": "YouTube Haut",
         "image": "bouteille19.webp",
-        "picked": false
+        "picked": false,
+        "color": "#C40000"
       },
       {
         "id": 20,
-        "name": "Bleu Marine Bas",
+        "name": "Damier",
         "image": "bouteille20.webp",
-        "picked": false
+        "picked": false,
+        "color": "#050505"
       }
     ],
 
@@ -267,7 +287,7 @@
         "id": 2,
         "name": "Enjôleur",
         "firstDialogues": ["Hey ! C'est la première fois que je viens ici, je compte sur vous.", "Huuuum, je pense que je vais prendre un "],
-        "secondaryDialogues": ["Cet endroit à l'air sympa", "Je pense que je viendrais avec ma petite amie la prochaine fois.", "Ce bar dégage quelque chose de romantique un peu, ca ferait un beau rancard."],
+        "secondaryDialogues": ["Cet endroit à l'air sympa.", "Je pense que je viendrais avec ma petite amie la prochaine fois.", "Ce bar dégage quelque chose de romantique un peu, ca ferait un beau rencard."],
         "successText": ["Vous avez refait ma journée !"],
         "failureText": ["Oh, c'est assez... inattendu."],
         "favoriteExtra": 1
@@ -285,9 +305,9 @@
         "id": 4,
         "name": "Méprisant",
         "firstDialogues": ["Hey toi, je voudrais un "],
-        "secondaryDialogues": ["Il est plutot petit ce bar. J'espère que la qualité sera au rendez vous au moins.", "Vous ne semblez pas vraiment savoir ce que vous faites.", "A ce stade j'aurais pu le faire moi même ce coktail."],
-        "successText": ["C'est pas trop tôt. Hum.. Il y a un service correct ici, c'est déjà ça."],
-        "failureText": ["Tss, vous n'êtes même pas capable de suivre une simple commande. Une telle incompétence c'est désolant."],
+        "secondaryDialogues": ["Il est plutot petit ce bar. J'espère que la qualité sera au rendez vous au moins.", "Vous ne semblez pas vraiment savoir ce que vous faites.", "À ce stade, j'aurais pu le faire moi-même ce coktail."],
+        "successText": ["C'est pas trop tôt. Hum... Il y a un service correct ici, c'est déjà ça."],
+        "failureText": ["Tss, vous n'êtes même pas capable de suivre une simple commande. Une telle incompétence, c'est désolant."],
         "favoriteExtra": 1
       },
       {
