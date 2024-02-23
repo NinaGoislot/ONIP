@@ -63,17 +63,19 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         console.log('solo?', this.isSolo)
         if (this.isSolo) {
             socket.emit("CREATE_GAME_SOLO");
-            this.btnPlaySolo = this.add.text(200, 100, "Start game solo", {
-                    fontSize: '24px',
-                    fill: '#fff'
-                })
-                .setInteractive({
-                    cursor: 'pointer'
-                })
-                .on('pointerdown', () => this.startGameSolo())
-                .on('pointerover', () => this.btnPlaySolo.setTint(0x90ee90))
-                .on('pointerout', () => this.btnPlaySolo.setTint(0xffffff));
-            this.btnPlaySolo.input.enabled = false;
+
+            //ENELEVER CA
+            // this.btnPlaySolo = this.add.text(200, 100, "Start game solo", {
+            //         fontSize: '24px',
+            //         fill: '#fff'
+            //     })
+            //     .setInteractive({
+            //         cursor: 'pointer'
+            //     })
+            //     .on('pointerdown', () => this.startGameSolo())
+            //     .on('pointerover', () => this.btnPlaySolo.setTint(0x90ee90))
+            //     .on('pointerout', () => this.btnPlaySolo.setTint(0xffffff));
+            // this.btnPlaySolo.input.enabled = false;
         } else {
             this.playerId = this.game.registry.get('roomIdJoueur');
             this.infos.text = this.playerId;
@@ -88,7 +90,9 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
                 this.partie = new Partie(this, "solo", this.playerId.slice(0, -1), this.player);
                 this.game.registry.set('partie', this.partie);
                 this.game.registry.set('isSolo', true);
-                this.btnPlaySolo.input.enabled = true;
+                // this.btnPlaySolo.input.enabled = true;
+                this.removeResizeListeners();
+
                 this.scene.start('Step4_PseudoScene', roleJoueur);
             } else {
                 this.game.registry.set('isSolo', false);
@@ -127,7 +131,6 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
     startGameSolo() {
         console.log(this.playerId.slice(0, -1), this.player.numeroPlayer)
         socket.emit("START_GAME", this.playerId.slice(0, -1), this.player.numeroPlayer);
-        this.removeResizeListeners();
         this.scene.start('GameScene');
         // this.scene.remove('Step3_ConnectPhoneScene');
     }

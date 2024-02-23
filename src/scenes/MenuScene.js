@@ -124,13 +124,13 @@ class MenuScene extends Phaser.Scene {
 
     startGame() {
         //faire créer une room et rejoindre quand même donc euh système connexion tel aussi
-        this.player = new Player(this, "this.pseudo", 1, "12341");
-        this.partie = new Partie(this, "solo", "1234", this.player);
-        this.game.registry.set('rolePlayer', 1);
-        this.game.registry.set('partie', this.partie);
+        // this.player = new Player(this, "this.pseudo", 1, "12341");
+        // this.partie = new Partie(this, "solo", "1234", this.player);
+        // this.game.registry.set('rolePlayer', 1);
+        // this.game.registry.set('partie', this.partie);
         // this.scene.start('GameScene');
 
-        this.scene.start('EndScene');
+        // this.scene.start('EndScene');
 
         console.log('il ne se passe rien.')
         // socket.emit('START_SOLO');

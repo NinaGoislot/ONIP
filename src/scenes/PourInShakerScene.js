@@ -10,13 +10,13 @@ class PourInShakerScene extends Phaser.Scene {
         });
     }
 
-    init(startData) {
-        if (startData.bottleChoosed) {
-            this.bottleChoosed = startData.bottleChoosed;
-        } else {
-            console.log("there is an error.")
-        }
-    }
+    // init(startData) {
+    //     if (startData.bottleChoosed) {
+    //         this.bottleChoosed = startData.bottleChoosed;
+    //     } else {
+    //         console.log("there is an error.")
+    //     }
+    // }
 
     preload() {
         this.load.image('bg-shaker', './media/img/shaker/ecran-shaker-bg.webp');
@@ -25,7 +25,12 @@ class PourInShakerScene extends Phaser.Scene {
         this.load.html('shakerCanvas', './html/shakerCanvas.html');
     }
 
-    create() {
+    create(startData) {
+        if (startData.bottleChoosed) {
+            this.bottleChoosed = startData.bottleChoosed;
+        } else {
+            console.log("there is an error.")
+        }
         this.currentCustomer = this.game.registry.get('customerData');
         this.bottlesData = this.game.registry.get('ingredients');
         this.nbrBoucle = this.currentCustomer.drink.ingredients.length;
@@ -283,7 +288,11 @@ class PourInShakerScene extends Phaser.Scene {
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         //console.log("je rends le jus", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
-        this.scene.start("CabinetScene");
+        // this.scene.start("CabinetScene");
+
+        this.scene.stop('PourInShakerScene');
+        this.scene.resume('CabinetScene');
+        this.scene.wake('CabinetScene');
     }
 
     openGameScene(){
@@ -293,6 +302,7 @@ class PourInShakerScene extends Phaser.Scene {
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
+        this.scene.stop('CabinetScene');
         this.scene.start("GameScene");
     }
 
