@@ -22,7 +22,7 @@
           { "alcoholId": 1, "quantity": 50 },
           { "alcoholId": 10, "quantity": 10 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD4", "BOD2", "BOD1"] 
       },
       {
         "id": 3,
@@ -34,7 +34,7 @@
           { "alcoholId": 15, "quantity": 25 },
           { "alcoholId": 18, "quantity": 25 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD2", "BOD3", "BOD2"] 
       },
       {
         "id": 4,
@@ -47,7 +47,7 @@
           { "alcoholId": 11, "quantity": 25 },
           { "alcoholId": 2, "quantity": 25 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD8", "BOD1", "BOD6"] 
       },
       {
         "id": 5,
@@ -58,7 +58,7 @@
           { "alcoholId": 7, "quantity": 10 },
           { "alcoholId": 16, "quantity": 80 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD7", "BOD6", "BOD3"] 
       },
       {
         "id": 6,
@@ -69,7 +69,7 @@
           { "alcoholId": 4, "quantity": 20 },
           { "alcoholId": 10, "quantity":10 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD5", "BOD4", "BOD8"] 
       },
       {
         "id": 7,
@@ -81,7 +81,7 @@
           { "alcoholId": 10, "quantity": 10 },
           { "alcoholId": 19, "quantity": 10 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD5", "BOD2", "BOD3"] 
       },
       {
         "id": 8,
@@ -93,7 +93,7 @@
           { "alcoholId": 7, "quantity": 30 },
           { "alcoholId": 13, "quantity": 30 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD6", "BOD8", "BOD4"] 
       },
       {
         "id": 9,
@@ -107,7 +107,7 @@
           { "alcoholId": 6, "quantity": 30 },
           { "alcoholId": 9, "quantity": 30 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD6", "BOD2", "BOD7"] 
       },
       {
         "id": 10,
@@ -118,7 +118,7 @@
           { "alcoholId": 17, "quantity": 10 },
           { "alcoholId": 15, "quantity": 10 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["BOD3", "BOD2", "BOD7"] 
       }
     ],
 
@@ -267,17 +267,77 @@
 
     "movements": [
       {
-        "id": 1,
-        "image": "",
-        "text": "Coup vers la gauche, coup vers la droite"
-      }
+        "id": "BOD1",
+        "description": "Secoue à gauche puis secoue à droite !",
+        "image": ""
+      },
+      {
+        "id": "BOD2",
+        "description": "Secoue au niveau des genoux puis élance en diagonale !",
+        "image": ""
+      },
+      {
+        "id": "BOD3",
+        "description": "Berce ton téléphone !",
+        "image": ""
+      },
+      {
+        "id": "BOD4",
+        "description": "Fais un cercle !",
+        "image": ""
+      },
+      {
+        "id": "BOD5",
+        "description": "Fais un 8 horizontal !",
+        "image": ""
+      },
+      {
+        "id": "BOD6",
+        "description": "Fais un carré !",
+        "image": ""
+      },
+      {
+        "id": "BOD7",
+        "description": "Secoue au niveau des genoux puis remonte vers le haut !",
+        "image": ""
+      },
+      {
+        "id": "BOD8",
+        "description": "Tend le téléphone devant puis ramène le en arc de cercle !",
+        "image": ""
+      },
+      {
+          "id": "HAN1",
+          "description": "Secoue en diagonale !",
+          "image": ""
+        },
+        {
+          "id": "HAN2",
+          "description": "Secoue de haut en bas",
+          "image": ""
+        },
+        {
+          "id": "HAN3",
+          "description": "Secoue de gauche à droite",
+          "image": ""
+        },
+        {
+          "id": "HAN4",
+          "description": "Fait basculer ton téléphone de haut en bas en faisant un arc de cercle",
+          "image": ""
+        },
+        {
+          "id": "HAN5",
+          "description": "Fait pivoter en rond ton téléphone",
+          "image": ""
+        }
     ],
 
     "emotions": [
       {
         "id": 1,
         "name": "Calme",
-        "firstDialogues": ["Bonjour, je voudrais un"],
+        "firstDialogues": ["Bonjour, je voudrais un "],
         "secondaryDialogues": ["...", "C'est plutôt agréable ici.", "...", "...", "Vous vous en sortez bien.", "..."],
         "successText": ["Merci."],
         "failureText": ["Merci..."],
@@ -322,7 +382,7 @@
       {
         "id": 6,
         "name": "Confiant",
-        "firstDialogues": ["Allo ! Je n'ai aucune idée de quoi prendre, tant de choix.", "Je vais tenter ton cocktail du jour ! Le "],
+        "firstDialogues": ["Allo ! Humm, tu as beaucoup de choix, je ne sais pas quoi prendre.", "Je vais tenter ton cocktail du jour ! Le "],
         "secondaryDialogues": ["J'ai hâte de gouter.", "Peut importe ce que tu prépares, ce sera tip top.", "Tu sais y faire avec un shaker dis donc !"],
         "successText": ["Tip top !"],
         "failureText": ["Ce n'est pas exactement ça, mais tu feras à coup sûr mieux la prochaine fois !"],

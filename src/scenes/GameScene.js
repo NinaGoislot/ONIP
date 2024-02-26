@@ -11,6 +11,8 @@ const
     URL_BOTTLES_CARTE = "./media/img/bouteilles-carte/normal/",
     URL_BOTTLES_CARTE_GOLD = "./media/img/bouteilles-carte/luxe/",
     URL_COCKTAIL = "./media/img/cocktails-verre/",
+    URL_MOVES = "./media/img/moves/",
+    NB_MOVEMENTS = 8,
 
     //Responsive values
     BOTTLE_CARD_IMG_YSCALE = 0.25,
@@ -37,9 +39,11 @@ class GameScene extends Phaser.Scene {
         this.bottleImgKeys = [];
         this.bottleGoldImgKeys = [];
         this.cocktailImgKeys = [];
+        this.movementsImgKeys = [];
         this.currentCustomer = this.game.registry.get('customerData') || null;
         this.bottlesData = this.game.registry.get('ingredients');
         this.cocktailsData = this.game.registry.get('cocktails');
+        this.movementsData = this.game.registry.get('movements');
 
         this.load.image('bg-service', './media/img/ecran-service/bg-service.webp');
         this.load.image('bar-service', './media/img/ecran-service/bar-service.webp');
@@ -86,6 +90,11 @@ class GameScene extends Phaser.Scene {
         for (let i = 1; i <= this.cocktailsData.length; i++) {
             this.load.image(`cocktail${i}`, `cocktail${i}.webp`);
             this.cocktailImgKeys.push(`cocktail${i}`);
+        }
+        this.load.path = URL_MOVES;
+        for (let i = 1; i <= NB_MOVEMENTS; i++) {
+            this.load.image(`BOD${i}`, `BOD${i}.png`);
+            this.movementsImgKeys.push(`BOD${i}`);
         }
 
         // Écouter l'événement de chargement complet
@@ -190,10 +199,10 @@ class GameScene extends Phaser.Scene {
 
             //Demander de faire le premier mouvement
             this.indexMove = 0;
-            this.infoMovement = this.add.text(350, 350, "Mouvement attendu : n° " + this.currentCustomer.drink.movements[this.indexMove], {
-                fontSize: '20px',
-                fill: '#fff'
-            });
+            // this.infoMovement = this.add.text(350, 350, "Mouvement attendu : n° " + this.currentCustomer.drink.movements[this.indexMove], {
+            //     fontSize: '20px',
+            //     fill: '#fff'
+            // });
             // let button = this.add.text(gameScale.width * 0.1, gameScale.height * 0.48, 'Démarrer les mouvements', {
             //         fontSize: '24px',
             //         fill: '#fff'
@@ -210,6 +219,9 @@ class GameScene extends Phaser.Scene {
 
             // ************************************* SOCKET ************************************************
             socket.on("MOBILE_READY", () => {
+                console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
+                this.drawMovement(this.currentCustomer.drink.movements[0]);
+                socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[0], this.partie.roomId, this.partie.player.numeroPlayer); //Premier mouvement
                 this.startMouvement();
             });
 
@@ -219,9 +231,13 @@ class GameScene extends Phaser.Scene {
                 this.score = this.score + score;
                 this.score = this.game.registry.set('score', this.score);
 
+                this.removeMovement();
+
                 this.indexMove++;
-                if (this.indexMove < this.currentCustomer.drink.movements.length) {
-                    this.infoMovement.setText("Nouveau mouvement attendu : n°  " + this.currentCustomer.drink.movements[this.indexMove]);
+               if (this.indexMove < this.currentCustomer.drink.movements.length) {
+                    //this.infoMovement.setText("Nouveau mouvement attendu : n°  " + this.currentCustomer.drink.movements[this.indexMove]);
+                    console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
+                    this.drawMovement(this.currentCustomer.drink.movements[this.indexMove]);
                     socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer);
                 } else {
                     socket.emit("MOVEMENTS_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
@@ -285,10 +301,10 @@ class GameScene extends Phaser.Scene {
 
             socket.on("SERVE_CUSTOMER", () => {
                 this.drawCocktailFinal();
-                const serviceButton = this.add.text(400, 400, 'Servir le client', {
-                    fontSize: '20px',
-                    fill: '#fff'
-                });
+                // const serviceButton = this.add.text(400, 400, 'Servir le client', {
+                //     fontSize: '20px',
+                //     fill: '#fff'
+                // });
                 this.serveCustomer();
                 // serviceButton.setInteractive();
                 // serviceButton.on('pointerdown', () => {
@@ -714,8 +730,72 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    drawMovement(movementId) {
+        var screenWidth = this.cameras.main.width;
+        var screenHeight = this.cameras.main.height;
+
+        const imgMovementKey = this.movementsImgKeys.find(image => image == `BOD` + movementId[movementId.length - 1]);
+        console.log("imgMovementKey : ", imgMovementKey);
+        // Ajout de l'image en spécifiant sa position à droite de l'écran
+        this.currentMovement = this.add.image(screenWidth - 200, screenHeight / 2, imgMovementKey); // Ajustez 200 à la largeur de votre image
+        this.currentMovement.setScale(2); // Ajustez la taille de l'image selon vos besoins
+        this.currentMovement.setOrigin(0.5);
+
+        const movementObject = this.movementsData.find(movement => movement.id == movementId);
+        console.log("Tableau des mouvements : ", this.movementsData);
+        console.log("Id que j'ai : ", movementId);
+        console.log("movement qui correspond : ", movementObject);
+
+        // Affichage de la description avec une animation
+        this.text = this.add.text(screenWidth / 2, screenHeight / 2, movementObject.description, {
+                fontSize: '24px',
+                fill: '#fff',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            })
+            .setOrigin(0.5)
+            .setScale(0.1); // Définir l'échelle initiale à 0.1 pour l'animation d'apparition
+
+        this.tweens.add({
+            targets: this.text,
+            scale: 1,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                //Mouvement en continu
+                this.tweens.add({
+                    targets: this.text,
+                    scaleX: 1.2,
+                    scaleY: 1.2,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Power1',
+                });
+            }
+        });
+
+    }
+
     removeCocktailFinal() {
         this.imgCocktail.setVisible(false);
+    }
+
+    removeMovement() {
+        let text = this.text;
+        this.tweens.add({
+            targets: text,
+            scaleX: 0,
+            scaleY: 0,
+            duration: 1000,
+            ease: 'Power2',
+            onComplete: () => {
+                text.destroy(); // Supprimer le texte une fois l'animation terminée
+            }
+        });
+        console.log("this.text → ", this.text);
+        this.text.setVisible(false);
+        text.setVisible(false);
+        this.currentMovement.setVisible(false);
     }
 
     //pour le premier spriteSheet de préparez vous / prépare toi
