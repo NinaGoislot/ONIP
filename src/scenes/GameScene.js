@@ -448,7 +448,14 @@ class GameScene extends Phaser.Scene {
     openCabinet() {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
+        console.log(this.scene.getStatus('GameScene'),this.scene.isActive('GameScene'))
+        console.log(this.scene.getStatus('CabinetScene'),this.scene.isActive('CabinetScene'))
+        // this.scene.stop('GameScene');
         this.scene.start('CabinetScene');
+        // this.events.on('shutdown', () => {
+        //     this.scene.stop('CabinetScene');
+        //     this.scene.start('CabinetScene');
+        // });
         // if (!this.scene.isSleeping('CabinetScene')){
         //     this.scene.start('CabinetScene');
         // } else{

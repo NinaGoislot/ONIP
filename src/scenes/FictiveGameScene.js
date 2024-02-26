@@ -94,11 +94,12 @@ class FictiveGameScene extends Phaser.Scene {
     openCabinet() {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
+        this.scene.start('CabinetScene');
         // this.scene.resume('CabinetScene');
         // this.scene.wake('CabinetScene');
-        this.scene.stop('FictiveGameScene');
-        this.scene.resume('CabinetScene');
-        this.scene.wake('CabinetScene');
+        // this.scene.stop('FictiveGameScene');
+        // this.scene.resume('CabinetScene');
+        // this.scene.wake('CabinetScene');
     }
 
     // ************************************************ DRAW ************************************************

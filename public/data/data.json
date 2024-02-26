@@ -287,7 +287,7 @@
         "id": 2,
         "name": "Enjôleur",
         "firstDialogues": ["Hey ! C'est la première fois que je viens ici, je compte sur vous.", "Huuuum, je pense que je vais prendre un "],
-        "secondaryDialogues": ["Cet endroit à l'air sympa.", "Je pense que je viendrais avec ma petite amie la prochaine fois.", "Ce bar dégage quelque chose de romantique un peu, ca ferait un beau rencard."],
+        "secondaryDialogues": ["Cet endroit a l'air sympa.", "Je pense que je viendrais avec ma petite amie la prochaine fois.", "Ce bar dégage quelque chose de romantique un peu, ça ferait un beau rencard."],
         "successText": ["Vous avez refait ma journée !"],
         "failureText": ["Oh, c'est assez... inattendu."],
         "favoriteExtra": 1
@@ -305,7 +305,7 @@
         "id": 4,
         "name": "Méprisant",
         "firstDialogues": ["Hey toi, je voudrais un "],
-        "secondaryDialogues": ["Il est plutot petit ce bar. J'espère que la qualité sera au rendez vous au moins.", "Vous ne semblez pas vraiment savoir ce que vous faites.", "À ce stade, j'aurais pu le faire moi-même ce coktail."],
+        "secondaryDialogues": ["Il est plutot petit ce bar. J'espère que la qualité sera au rendez vous au moins.", "Vous ne semblez pas vraiment savoir ce que vous faites.", "À ce stade, j'aurais pu le faire moi-même ce cocktail."],
         "successText": ["C'est pas trop tôt. Hum... Il y a un service correct ici, c'est déjà ça."],
         "failureText": ["Tss, vous n'êtes même pas capable de suivre une simple commande. Une telle incompétence, c'est désolant."],
         "favoriteExtra": 1
@@ -323,7 +323,7 @@
         "id": 6,
         "name": "Confiant",
         "firstDialogues": ["Allo ! Je n'ai aucune idée de quoi prendre, tant de choix.", "Je vais tenter ton cocktail du jour ! Le "],
-        "secondaryDialogues": ["J'ai hâte de gouter.", "Peut importe ce que tu prépares, ce sera tip top.", "Tu sais y faire avec un shaker dis donc !"],
+        "secondaryDialogues": ["J'ai hâte de goûter.", "Peu importe ce que tu prépares, ce sera tip top.", "Tu sais y faire avec un shaker dis donc !"],
         "successText": ["Tip top !"],
         "failureText": ["Ce n'est pas exactement ça, mais tu feras à coup sûr mieux la prochaine fois !"],
         "favoriteExtra": 1

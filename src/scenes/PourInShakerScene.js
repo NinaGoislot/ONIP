@@ -288,11 +288,10 @@ class PourInShakerScene extends Phaser.Scene {
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         //console.log("je rends le jus", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
-        // this.scene.start("CabinetScene");
-
-        this.scene.stop('PourInShakerScene');
-        this.scene.resume('CabinetScene');
-        this.scene.wake('CabinetScene');
+        this.scene.start("CabinetScene");
+        // this.scene.stop('PourInShakerScene');
+        // this.scene.resume('CabinetScene');
+        // this.scene.wake('CabinetScene');
     }
 
     openGameScene(){
@@ -302,7 +301,23 @@ class PourInShakerScene extends Phaser.Scene {
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
-        this.scene.stop('CabinetScene');
+        // const scenes = this.scene.getScenes(true);
+        // // Compter le nombre d'instances de GameScene
+        // let gameSceneCount = 0;
+        // scenes.forEach(scene => {
+        //     if (scene.scene.key === 'GameScene') {
+        //         gameSceneCount++;
+        //     }
+        // });
+        // // Si plus d'une instance de GameScene est active, les arrêter toutes
+        // if (gameSceneCount > 1) {
+        //     scenes.forEach(scene => {
+        //         if (scene.scene.key === 'GameScene') {
+        //             scene.scene.stop();
+        //         }
+        //     });
+        // }
+        // this.scene.stop('CabinetScene');
         this.scene.start("GameScene");
     }
 
