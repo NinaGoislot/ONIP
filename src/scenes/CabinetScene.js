@@ -88,7 +88,7 @@ class CabinetScene extends Phaser.Scene {
     this.createBoxBottle(GRID_NBR_ROW, GRID_NBR_COL);
     this.aJuiceTaken = false;
 
-    let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0.5);
+    let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0);
     rectangle.setInteractive({
       cursor: 'pointer'
     });
@@ -315,9 +315,13 @@ class CabinetScene extends Phaser.Scene {
       this.currentCustomer.indexNbrBottleChoosed += 1;
       // this.scene.start('GameScene');
       socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
-      this.scene.start('PourInShakerScene', {
+      this.scene.sleep('CabinetScene');
+      this.scene.launch('PourInShakerScene', {
         'bottleChoosed': juiceType
       });
+      // this.scene.start('PourInShakerScene', {
+      //   'bottleChoosed': juiceType
+      // });
     } else {
       this.shakeScene();
     }
@@ -345,7 +349,10 @@ class CabinetScene extends Phaser.Scene {
   }
 
   test() {
-    this.scene.start('FictiveGameScene')
+    // this.scene.sleep('CabinetScene')
+    // this.scene.start('FictiveGameScene')
+    this.scene.sleep('CabinetScene');
+    this.scene.launch('FictiveGameScene');
   }
 
   shakeScene() {

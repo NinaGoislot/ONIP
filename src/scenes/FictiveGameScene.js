@@ -40,7 +40,7 @@ class FictiveGameScene extends Phaser.Scene {
         this.canva.menuPauseButton(this.scene, this);
         this.drawGame();
 
-        let rectangle = this.add.rectangle(gameScale.width*0.9, gameScale.height*0.9, 100, 100, 0x6666ff, 0.5);
+        let rectangle = this.add.rectangle(gameScale.width*0.9, gameScale.height*0.9, 100, 100, 0x6666ff, 0);
         rectangle.setInteractive({cursor: 'pointer'})
         rectangle.on('pointerdown', ()=> this.openCabinet())
 
@@ -94,7 +94,11 @@ class FictiveGameScene extends Phaser.Scene {
     openCabinet() {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
-        this.scene.start('CabinetScene');
+        // this.scene.resume('CabinetScene');
+        // this.scene.wake('CabinetScene');
+        this.scene.stop('FictiveGameScene');
+        this.scene.resume('CabinetScene');
+        this.scene.wake('CabinetScene');
     }
 
     // ************************************************ DRAW ************************************************
