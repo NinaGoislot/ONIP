@@ -32,14 +32,15 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         });
         this.btnBack.on('pointerdown', () => this.back());
 
-        this.infos = this.add.text(gameScale.width * 0.68, gameScale.height * 0.515, "", {
+        this.infos = this.add.text(gameScale.width * 0.74, gameScale.height * 0.56, "", {
             fontFamily: 'soria',
             fontSize: gameScale.width * 0.05 + 'px',
             fill: '#252422',
             align: 'center'
         }).setInteractive({
             cursor: 'pointer'
-        });
+        }).setOrigin(0.5,0.5);
+        this.infos.setLetterSpacing(gameScale.width*0.005);
 
         // ****** Events Listeners ******
         window.addEventListener('resize', () => {
@@ -50,10 +51,10 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
             this.btnBack.setPosition(gameScale.width * 0.06, gameScale.height * 0.105);
         });
 
-
         const resizeListener = () => {
             this.infos.setFontSize(gameScale.width * 0.05);
-            this.infos.setPosition(gameScale.width * 0.685, gameScale.height * 0.515);
+            this.infos.setPosition(gameScale.width * 0.74, gameScale.height * 0.56);
+            this.infos.setLetterSpacing(gameScale.width*0.005);
         };
         window.addEventListener('resize', resizeListener);
         this.resizeListeners.push(resizeListener);

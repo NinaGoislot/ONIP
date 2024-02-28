@@ -55,9 +55,9 @@ class Step2_LobbyScene extends Phaser.Scene {
             fontFamily:'soria',
             fontSize: gameScale.width*0.08 + 'px',
             // fontSize: '120px',
-            fill: '#EFECEA'
+            fill: '#EFECEA',
         }).setOrigin(0.5,0.5);
-        this.codePin.setLetterSpacing(20);
+        this.codePin.setLetterSpacing(gameScale.width*0.025);
         this.codePin.setVisible(false);
         this.messageInfos = this.add.text(gameScale.width * 0.535, gameScale.height * 0.71, "", {
             fontFamily:'soria',
@@ -88,6 +88,7 @@ class Step2_LobbyScene extends Phaser.Scene {
             this.title.setFontSize(gameScale.width*0.05);
             this.codePin.setPosition(gameScale.width * 0.535, gameScale.height * 0.5);
             this.codePin.setFontSize(gameScale.width*0.08);
+            this.codePin.setLetterSpacing(gameScale.width*0.025);
             this.messageInfos.setPosition(gameScale.width * 0.535, gameScale.height * 0.71);
             this.messageInfos.setFontSize(gameScale.width*0.03);
         };
@@ -166,6 +167,7 @@ class Step2_LobbyScene extends Phaser.Scene {
         if (this.inputRoomId.value == null || this.inputRoomId.value == "") {
             this.messageInfos.text = "Entre un code de partie."
         } else {
+            this.inputRoomId.value = this.inputRoomId.value.toUpperCase();
             this.inputRoomId.value = this.inputRoomId.value.replace(/O/g, '0');
             socket.emit("JOIN_GAME", this.inputRoomId.value);
         }
