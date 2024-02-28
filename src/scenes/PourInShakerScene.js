@@ -110,20 +110,20 @@ class PourInShakerScene extends Phaser.Scene {
         console.log("pourcentage de la bouteille :", this.pourcentBottle)
         this.bottleChoosedData = this.getIngredientsById();
 
-        let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0.5);
-        rectangle.setInteractive({
-            cursor: 'pointer'
-        });
+        // let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0.5);
+        // rectangle.setInteractive({
+        //     cursor: 'pointer'
+        // });
 
-        rectangle.on('pointerdown', () => {
-            this.liquid.isFilling = true;
-        });
+        // rectangle.on('pointerdown', () => {
+        //     this.liquid.isFilling = true;
+        // });
 
-        rectangle.on('pointerup', () => {
-            this.liquid.isFilling = false;
-            rectangle.disableInteractive();
-            this.renduScore(this.liquid.fillPercentage);
-        })
+        // rectangle.on('pointerup', () => {
+        //     this.liquid.isFilling = false;
+        //     rectangle.disableInteractive();
+        //     this.renduScore(this.liquid.fillPercentage);
+        // })
 
         this.liquid = new LiquidShaker(this, 0, 0.05, false, this.bottleChoosedData.color, this.pourcentBottle);
         // console.log('test ligne placement :', (100-this.liquid.fillGoal)/100 * shakerService.displayHeight)
@@ -178,6 +178,11 @@ class PourInShakerScene extends Phaser.Scene {
             this.bottlesData = this.game.registry.get('ingredients');
         });
 
+        socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+            this.partie.goldBottleStatus = true;
+            this.game.registry.set('partie', this.partie);
+        });
+
         socket.on("GAME_PAUSED", (secondPaused) => {
             this.canva.startPause(this.scene, this, secondPaused);
         });
@@ -185,11 +190,6 @@ class PourInShakerScene extends Phaser.Scene {
         socket.on("NOMORE_CLIENT", (peutPlus) => {
             this.partie.addCustomer = peutPlus;
             this.game.registry.set('partie', this.partie);
-            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
-                fill: '#EFECEA',
-                fontFamily: 'soria',
-                fontSize: gameScale.width * 0.03 + 'px'
-            });
         });
 
         socket.on("POURING", (isPouring) => {
@@ -211,13 +211,16 @@ class PourInShakerScene extends Phaser.Scene {
             }
         });
 
-        if (!this.partie.addCustomer) {
-            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
-                fill: '#EFECEA',
-                fontFamily: 'soria',
-                fontSize: gameScale.width * 0.03 + 'px'
-            });
-        }
+        socket.on("A_PLAYER_READY", () => {
+            console.log('Sur PourInShakerScene, je bascule à GameScene pour nouveau client');
+            socket.emit("CHANGE_TO_NEXT_CUSTOMER", this.partie.roomId, this.partie.player.numeroPlayer);
+            this.partie.tooLateToServe = true;
+            this.game.registry.set('partie', this.partie);
+            this.removeSocket();
+            this.scene.stop("CabinetScene");
+            this.scene.stop("PourInShakerScene");
+            this.scene.run("GameScene");
+        });
     }
 
     // ******************************** FONCTIONS ********************************
@@ -324,10 +327,9 @@ class PourInShakerScene extends Phaser.Scene {
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         //console.log("je rends le jus", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
-        this.scene.start("CabinetScene");
-        // this.scene.stop('PourInShakerScene');
-        // this.scene.resume('CabinetScene');
-        // this.scene.wake('CabinetScene');
+        this.removeSocket();
+        this.scene.stop("PourInShakerScene");
+        this.scene.run("CabinetScene");
     }
 
     openGameScene() {
@@ -337,24 +339,23 @@ class PourInShakerScene extends Phaser.Scene {
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
-        // const scenes = this.scene.getScenes(true);
-        // // Compter le nombre d'instances de GameScene
-        // let gameSceneCount = 0;
-        // scenes.forEach(scene => {
-        //     if (scene.scene.key === 'GameScene') {
-        //         gameSceneCount++;
-        //     }
-        // });
-        // // Si plus d'une instance de GameScene est active, les arrêter toutes
-        // if (gameSceneCount > 1) {
-        //     scenes.forEach(scene => {
-        //         if (scene.scene.key === 'GameScene') {
-        //             scene.scene.stop();
-        //         }
-        //     });
-        // }
-        // this.scene.stop('CabinetScene');
-        this.scene.start("GameScene");
+        this.removeSocket();
+        this.scene.stop("CabinetScene");
+        this.scene.stop("PourInShakerScene");
+        this.scene.run("GameScene");
+    }
+
+    removeSocket(){
+        socket.removeAllListeners("POURING");
+        socket.removeAllListeners("NOMORE_CLIENT");
+        socket.removeAllListeners("GAME_PAUSED");
+        socket.removeAllListeners("A_JUICE_IS_RETURNED");
+        socket.removeAllListeners("JUICE_TAKEN");
+        socket.removeAllListeners("JUICE_RETURNED");
+        socket.removeAllListeners("POURING_FINISHED");
+        socket.removeAllListeners("GO_TO_CABINET");
+        socket.removeAllListeners("A_GOLD_BOTTLE_IS_TAKEN");
+        socket.removeAllListeners("A_PLAYER_READY");
     }
 
     renduScore(pourcentFill) {
@@ -370,11 +371,11 @@ class PourInShakerScene extends Phaser.Scene {
                 this.partie.player.score -= 150;
             }
         }
-
         this.game.registry.set("partie", this.partie);
     }
+
     tooMuch() {
-        this.cameras.main.shake(1000);
+        this.cameras.main.shake(200);
         this.partie.player.score -= 200;
         this.isTooMuch = true;
     }

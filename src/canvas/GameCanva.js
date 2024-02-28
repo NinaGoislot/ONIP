@@ -57,7 +57,7 @@ class GameCanva {
             fill: '#EFECEA',
             wordWrap: {width: bubbleWrap},
             lineSpacing: 10,
-            fontFamily:'soria'
+            fontFamily:'alpino'
         });
 
         const resizeListener = () => {

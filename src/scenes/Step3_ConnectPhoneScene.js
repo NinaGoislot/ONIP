@@ -98,7 +98,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
                 this.game.registry.set('isSolo', false);
                 this.removeResizeListeners();
                 this.scene.start('Step4_PseudoScene', roleJoueur);
-                this.scene.remove('Step3_ConnectPhoneScene');
+                // this.scene.remove('Step3_ConnectPhoneScene');
             }
         })
 

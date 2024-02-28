@@ -62,19 +62,23 @@ class FictiveGameScene extends Phaser.Scene {
         socket.on("NOMORE_CLIENT", (peutPlus) => {
             this.partie.addCustomer = peutPlus;
             this.game.registry.set('partie', this.partie);
-            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
-                fontSize: '32px',
-                fill: '#fff'
-            });
         })
-        
-        if(!this.partie.addCustomer){
-            this.add.text(gameScale.width * 0.8, gameScale.height * 0.1, 'Dernier client', {
-                fill: '#EFECEA', 
-                fontFamily:'soria', 
-                fontSize:  gameScale.width*0.03 + 'px'
-            });
-        }
+
+        socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+            this.partie.goldBottleStatus = true;
+            this.game.registry.set('partie', this.partie);
+        });
+
+        socket.on("A_PLAYER_READY", () => {
+            console.log('Sur PourInShakerScene, je bascule à GameScene pour nouveau client');
+            socket.emit("CHANGE_TO_NEXT_CUSTOMER", this.partie.roomId, this.partie.player.numeroPlayer);
+            this.partie.tooLateToServe = true;
+            this.game.registry.set('partie', this.partie);
+            this.removeSocket();
+            this.scene.stop("CabinetScene");
+            this.scene.stop("PourInShakerScene");
+            this.scene.run("GameScene");
+        });
     }
 
     // ************************************************ FONCTIONS ************************************************
@@ -94,12 +98,18 @@ class FictiveGameScene extends Phaser.Scene {
     openCabinet() {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
+        this.removeSocket();
+        this.scene.stop('FictiveGameScene');
         this.scene.start('CabinetScene');
-        // this.scene.resume('CabinetScene');
-        // this.scene.wake('CabinetScene');
-        // this.scene.stop('FictiveGameScene');
-        // this.scene.resume('CabinetScene');
-        // this.scene.wake('CabinetScene');
+    }
+
+    removeSocket(){
+        socket.removeAllListeners("NOMORE_CLIENT");
+        socket.removeAllListeners("GAME_PAUSED");
+        socket.removeAllListeners("A_JUICE_IS_RETURNED");
+        socket.removeAllListeners("JUICE_TAKEN");
+        socket.removeAllListeners("A_GOLD_BOTTLE_IS_TAKEN");
+        socket.removeAllListeners("A_PLAYER_READY");
     }
 
     // ************************************************ DRAW ************************************************

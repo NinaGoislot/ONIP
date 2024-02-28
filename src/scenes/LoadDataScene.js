@@ -10,6 +10,7 @@ class LoadDataScene extends Phaser.Scene {
             this.game.registry.set('connected', true);
         });
         this.loadFont("soria", "./media/font/soria-font.ttf");
+        this.loadFont("alpino", "./media/font/alpino-variable.ttf");
     }
 
     create() {

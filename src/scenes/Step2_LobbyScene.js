@@ -31,24 +31,25 @@ class Step2_LobbyScene extends Phaser.Scene {
         copy.displayWidth = gameScale.width * 0.06;
         copy.scaleY = copy.scaleX;
         copy.setInteractive({cursor: 'pointer'});
-        copy.visible = false;
+        copy.setVisible(false);
 
         let check = this.add.image(gameScale.width*0.82, gameScale.height*0.5, 'btn-check');
         check.displayWidth = gameScale.width * 0.06;
         check.scaleY = check.scaleX;
         check.setInteractive({cursor: 'pointer'});
-        check.visible = false;
+        check.setVisible(false);
 
         this.btnBack = this.add.rectangle(gameScale.width*0.06, gameScale.height*0.105, gameScale.width*0.072, gameScale.width*0.072, 0x6666ff, 0);
         this.btnBack.setInteractive({cursor: 'pointer'});
         this.btnBack.on('pointerdown', ()=> this.back());
         //faire la fonction retour
 
-        this.title = this.add.text(gameScale.width * 0.535, gameScale.height * 0.335, "Partage ce code", {
+        this.title = this.add.text(gameScale.width * 0.535, gameScale.height * 0.335, "Partage ce code à ton ami.e", {
             fontFamily:'soria',
             fontSize: gameScale.width*0.05 + 'px',
             // fontSize:  '70px',
-            fill: '#EFECEA'
+            fill: '#EFECEA',
+            align: 'center'
         }).setOrigin(0.5,0.5);
         this.codePin = this.add.text(gameScale.width * 0.535, gameScale.height * 0.5, "", {
             fontFamily:'soria',
@@ -57,14 +58,14 @@ class Step2_LobbyScene extends Phaser.Scene {
             fill: '#EFECEA'
         }).setOrigin(0.5,0.5);
         this.codePin.setLetterSpacing(20);
-        this.codePin.visible = false;
+        this.codePin.setVisible(false);
         this.messageInfos = this.add.text(gameScale.width * 0.535, gameScale.height * 0.71, "", {
             fontFamily:'soria',
             fontSize:  gameScale.width*0.03 + 'px',
             // fontSize: '45px',
             fill: '#EFECEA'
         }).setOrigin(0.5,0.5);
-        this.messageInfos.visible = false;
+        this.messageInfos.setVisible(false);
 
         //faire un texte au cas où erreur -> mauvais code pin, pas de code pin etc, actuellement : this.infos.text
 
@@ -96,14 +97,14 @@ class Step2_LobbyScene extends Phaser.Scene {
         switch (this.numeroPlayer) {
             case "J1":
                 this.codePin.text = this.roomId;
-                copy.visible = true;
-                this.codePin.visible = true;
+                copy.setVisible(true);
+                this.codePin.setVisible(true);
                 copy.on('pointerdown', ()=> this.copy(this.roomId));
                 break;
             case "J2":
-                this.title.text = "Entre le code";
-                check.visible = true;
-                this.messageInfos.visible = true;
+                this.title.text = "Entre le code pour rejoindre";
+                check.setVisible(true);
+                this.messageInfos.setVisible(true);
                 this.formJoin = this.add.dom(gameScale.width * 0.05, gameScale.height * 0.42).createFromCache('joinRoom').setOrigin(0,0);
                 this.formJoin.addListener('click');
                 //Input pour J2
@@ -136,16 +137,24 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.game.registry.set('roomIdJoueur', roomIdJoueur);
                 this.removeResizeListeners();
                 this.scene.start('Step3_ConnectPhoneScene');
-                this.scene.remove('Step2_LobbyScene');
+                // this.scene.remove('Step2_LobbyScene');
             });
         });
     }
 
     // ************************************* FONCTIONS ************************************************
 
+    back(){
+        this.scene.start('Step1_CreateJoinLobbyScene');
+        socket.emit("GO_BACK_FROM_STEP1", this.roomId);
+    }
+
+
     copy(texteARecopier){
         navigator.clipboard.writeText(texteARecopier)
         .then(() => {
+            this.messageInfos.setVisible(true);
+            this.messageInfos.text = "Code copié !"
             console.log('Contenu copié avec succès !', texteARecopier);
         })
         .catch(err => {

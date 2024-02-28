@@ -19,6 +19,8 @@ class Partie extends Phaser.Scene {
         this.goldBottleId = null;
         this.addCustomer = true;
         this.liquids = [];
+        this.goldBottleStatus = false;
+        this.tooLateToServe = false;
 
         // switch (mode) {
         //     case "solo", "libre":

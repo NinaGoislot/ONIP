@@ -81,14 +81,14 @@ class EndScene extends Phaser.Scene {
 
         let scoreText = this.add.text(gameScale.width * 0.211, gameScale.height * 0.305, this.partie.player.score, {
             fill: '#FFF4E3',
-            fontFamily: 'soria',
+            fontFamily: 'alpino',
             fontSize: gameScale.width * 0.07 + 'px',
             align: 'center'
         }).setOrigin(0.5, 0.5);
 
         let pseudoPlayer = this.add.text(gameScale.width * 0.515, gameScale.height * 0.865, this.partie.player.pseudo, {
             fill: '#252422',
-            fontFamily: 'soria',
+            fontFamily: 'alpino',
             fontSize: gameScale.width * 0.024 + 'px',
             align: 'center'
         }).setOrigin(0.5, 0.5);

@@ -40,7 +40,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             this.btnIsReady = this.add.image(gameScale.width * 1, gameScale.height * 1, 'step4-btn-active').setOrigin(1,1).setInteractive({ cursor: 'pointer' });
             this.btnIsReady.displayWidth = gameScale.width * 0.22
             this.btnIsReady.scaleY = this.btnIsReady.scaleX;
-            this.btnIsReady.visible = false;
+            this.btnIsReady.setVisible(false);
         } else {
             background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'bg-step4-j2');
         }
@@ -122,8 +122,8 @@ class Step4_PseudoScene extends Phaser.Scene {
             this.messageStatePlayer.text = "Le deuxième joueur est prêt !";
             this.aPlayerReady = true;
             if(this.j1Ready || this.isSolo){
-                this.btnPreReady.visible = false;
-                this.btnIsReady.visible = true;
+                this.btnPreReady.setVisible(false);
+                this.btnIsReady.setVisible(true);
                 this.btnIsReady.on('pointerdown', ()=> this.goPlay(this.roomId));
             }
         });
@@ -134,11 +134,14 @@ class Step4_PseudoScene extends Phaser.Scene {
                 this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
                 this.partie = new Partie(this, "multi", this.roomIdPlayer.slice(0, -1), this.player);
                 this.game.registry.set('partie', this.partie);
+            } else{
+                this.partie.player.pseudo = this.pseudo;
+                this.game.registry.set('partie',this.partie);
             }
             socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.removeResizeListeners();
             this.scene.start('GameScene');
-            this.scene.remove('Step4_PseudoScene');
+            // this.scene.remove('Step4_PseudoScene');
         });
     }
 
@@ -163,20 +166,19 @@ class Step4_PseudoScene extends Phaser.Scene {
         } else if (this.pseudo.length > 15) {
             this.messageInfos.text = "Le pseudo ne peut pas dépasser 15 caractères.";
         } else {
+            console.log('test isSolo', this.isSolo);
             if(!this.aPlayerReady && !this.isSolo){
                 this.messageStatePlayer.text = "En attente de l'autre joueur...";
             }
             if(this.aPlayerReady && this.rolePlayer == 1 || this.isSolo){
-                this.btnPreReady.visible = false;
-                this.btnIsReady.visible = true;
+                this.btnPreReady.setVisible(false);
+                this.btnIsReady.setVisible(true);
                 this.btnIsReady.on('pointerdown', ()=> this.goPlay(this.roomId));
             }
             if(this.rolePlayer == 1 ){
                 this.j1Ready = true;
-                socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer, this.isSolo ? "solo" : "multi" );
-            } else {
-                socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer);
             }
+            socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer, this.isSolo ? "solo" : "multi");
             this.messageInfos.text = "";
             //console.log(this.aPlayerReady);
             this.btnValidation.setInteractive(false);

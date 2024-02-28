@@ -52,6 +52,9 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
     }
 
     // ************************************* FONCTIONS ************************************************
+    back(){
+        this.scene.start('MenuScene');
+    }
 
     createGame() {
         socket.emit("CREATE_GAME_MULTI");
@@ -59,7 +62,7 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
 
     joinGame() {
         this.scene.start('Step2_LobbyScene', {roomId : 0, player : "J2"});
-        this.scene.remove('Step1_CreateJoinLobbyScene');
+        // this.scene.remove('Step1_CreateJoinLobbyScene');
     }
 }
 
