@@ -192,19 +192,24 @@ class PourInShakerScene extends Phaser.Scene {
             this.game.registry.set('partie', this.partie);
         });
 
-        socket.on("POURING", (isPouring) => {
+        socket.on("POURING", (isPouring, pourSpeed) => {
             console.log("isPouring : ", isPouring);
+            console.log("speed reçue du socket: ", pourSpeed);
             if (isPouring) {
                 this.liquid.isFilling = true;
+                this.liquid.fillSpeed = pourSpeed;
             } else {
                 this.liquid.isFilling = false;
                 this.renduScore(this.liquid.fillPercentage);
+                console.log("Nombre de bouteilles choisies", this.nbrBottleChoose);
+                console.log("Nombre de bouteilles attendues", this.nbrBoucle);
                 if (this.nbrBottleChoose == this.nbrBoucle) {
                     setTimeout(() => {
                         this.openGameScene();
                     }, 1000);
                 } else {
                     setTimeout(() => {
+                        console.log("Le set timeout renvoie à la CabinetScene");
                         this.openCabinet();
                     }, 1000);
                 };
@@ -265,7 +270,9 @@ class PourInShakerScene extends Phaser.Scene {
         if (this.liquid.isFilling) {
             // Limiter fillPercentage à 100%
             if (this.partie.liquids.length > 0) {
+                console.log("liquide fill speed : ", this.liquid.fillSpeed);
                 this.liquid.fillPercentage = Math.min(this.liquid.fillPercentage + this.liquid.fillSpeed, this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5);
+                console.log("PourInShaker ► % du liquide", this.liquid.fillPercentage);
                 if (this.liquid.fillPercentage == this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5) {
                     return (this.tooMuch())
                 }
@@ -317,6 +324,7 @@ class PourInShakerScene extends Phaser.Scene {
     }
 
     openCabinet() {
+        console.log("openCabinet() ► je lance CabinetScene")
         this.partie.liquids.push(this.liquid);
         this.game.registry.set('partie', this.partie);
         //console.log("je push",this.liquid, this.partie.liquids)
