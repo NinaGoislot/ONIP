@@ -254,13 +254,14 @@ class GameScene extends Phaser.Scene {
             //Demander de faire les mouvements du cocktail
             socket.on("MOVEMENT_DONE", (score) => {
                 console.log("Je rentre dans 'MOUVEMENT_DONE'");
-                this.score = this.score + score;
-                this.score = this.game.registry.set('score', this.score);
-
-                this.removeMovement();
-
-                this.indexMove++;
                 if(!this.stopMovement){
+                    console.log("Je fais 'MOUVEMENT_DONE'");
+                    this.score = this.score + score;
+                    this.score = this.game.registry.set('score', this.score);
+
+                    this.removeMovement();
+
+                    this.indexMove++;
                     if (this.indexMove < this.currentCustomer.drink.movements.length) {
                         //this.infoMovement.setText("Nouveau mouvement attendu : n°  " + this.currentCustomer.drink.movements[this.indexMove]);
                         console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
@@ -279,10 +280,12 @@ class GameScene extends Phaser.Scene {
 
             //Tous les joueurs ont cliqués sur "Servir le client"
             socket.on("ALL_PLAYERS_READY_TO_SERVE", () => {
+                console.log("ALL_PLAYERS_READY_TO_SERVE")
                 if (this.aReadyText) {
-                    this.areadyText.setVisible(false);
+                    this.aReadyText = false;
                 }
                 if(this.waitText){
+                    console.log('this.waitText', this.waitText)
                     this.waitText.setVisible(false);
                 }
                 // this.showFinalDialogue().then(() => {
@@ -337,6 +340,7 @@ class GameScene extends Phaser.Scene {
             socket.on("SERVE_CUSTOMER", () => {
                 console.log("SERVE_CUSTOMER");
                 if(this.aReadyText){
+                    console.log("SERVE_CUSTOMER après un joueur + this.reboursFinal", this.reboursFinal);
                     this.reboursFinal.text = "";
                     this.reboursFinal.setVisible(false);
                     this.updateScoreFinal(this.dureeFinal);
@@ -400,7 +404,7 @@ class GameScene extends Phaser.Scene {
         });
 
         socket.once("COUNTDOWN_TO_SERVE_FINISHED", ()=>{
-            console.log('countdwon finished this.aReadyText',this.aReadyText)
+            console.log('countdwon finished this.aReadyText', this.aReadyText)
             if(this.aReadyText){
                 console.log("countdown finished + SET_PLAYER_READY");
                 this.reboursFinal.text = "";
@@ -544,6 +548,8 @@ class GameScene extends Phaser.Scene {
         socket.removeAllListeners("NOMORE_CLIENT");
         socket.removeAllListeners("FIRST_TO_SERVE");
         socket.removeAllListeners("A_PLAYER_READY");
+        socket.removeAllListeners("COUNTDOWN_TO_SERVE");
+        socket.removeAllListeners("COUNTDOWN_TO_SERVE_FINISHED");
     }
 
     resetPickedJuices() {
@@ -558,18 +564,21 @@ class GameScene extends Phaser.Scene {
         this.currentCustomer.succeed = true;
         console.log("Fonction serveCustomer(), la valeur de succeed est a ", this.currentCustomer.succeed);
         if (!this.isSolo) {
-            console.log("clique pour servir", this.partie.player.playerId, this.partie.roomId);
+            // console.log("clique pour servir", this.partie.player.playerId, this.partie.roomId);
+            console.log("le joueur attend l'autre avec SET_PLAYER_READY")
+            socket.emit("SET_PLAYER_READY", {
+                playerId: this.partie.player.playerId,
+                roomId: this.partie.roomId
+            });
             this.showFinalDialogue().then(() => {
-                this.waitText = this.add.text(gameScale.width * 0.5, gameScale.height * 0.1, "En attente de l'autre joueur", {
-                    fill: '#EFECEA',
-                    fontFamily: 'alpino',
-                    fontSize: gameScale.width * 0.03 + 'px'
-                });
-                console.log("le joueur attend l'autre avec SET_PLAYER_READY")
-                socket.emit("SET_PLAYER_READY", {
-                    playerId: this.partie.player.playerId,
-                    roomId: this.partie.roomId
-                });
+                if(!this.aReadyText){
+                    this.waitText = this.add.text(gameScale.width * 0.5, gameScale.height * 0.1, "En attente de l'autre joueur", {
+                        fill: '#EFECEA',
+                        fontFamily: 'alpino',
+                        fontSize: gameScale.width * 0.03 + 'px'
+                    });
+                }
+
             });
         } else {
             this.showFinalDialogue().then(() => {
@@ -675,6 +684,7 @@ class GameScene extends Phaser.Scene {
     }
 
     updateScoreFinal(duree){
+        console.log('duree score', duree, this.partie.player.score);
         if(duree == 5){
             this.partie.player.score += 800;
         } else if(duree == 4){
@@ -688,6 +698,7 @@ class GameScene extends Phaser.Scene {
         } else if(duree == 0){
             this.partie.player.score -= 100;
         }
+        console.log('score', this.partie.player.score);
         this.game.registry.set('partie', this.partie);
     }
 
