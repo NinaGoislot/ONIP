@@ -30,6 +30,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.j1Ready = false;
         this.resizeListeners = [];
 
+
         // ****** Background ******
         let background;
         if(this.rolePlayer == 1){
@@ -116,7 +117,18 @@ class Step4_PseudoScene extends Phaser.Scene {
         };
         window.addEventListener('resize', resizeListener);
         this.resizeListeners.push(resizeListener);
-
+    
+        console.log('aPlayerReady', this.game.registry.get('aPlayerReady'));
+        if(this.game.registry.get('aPlayerReady')){
+            this.messageStatePlayer.text = "Le deuxième joueur est prêt !";
+            this.aPlayerReady = true;
+            if(this.j1Ready || this.isSolo){
+                this.btnPreReady.setVisible(false);
+                this.btnIsReady.setVisible(true);
+                this.btnIsReady.on('pointerdown', ()=> this.goPlay(this.roomId));
+            }
+        }
+    
         // ******************************* SOCKET ************************************************
         socket.on("JOUEUR_READY", () => {
             this.messageStatePlayer.text = "Le deuxième joueur est prêt !";

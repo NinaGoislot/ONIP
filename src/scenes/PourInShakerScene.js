@@ -52,6 +52,11 @@ class PourInShakerScene extends Phaser.Scene {
 
         this.shakerCanvas = this.add.dom().createFromCache('shakerCanvas').setOrigin(0, 0);
         this.shakerCanvas.addListener('click');
+        this.divHTML = document.getElementById("shakerHTML");
+        this.divHTML.setAttribute('hidden', '');
+        setTimeout(() => {
+            this.divHTML.removeAttribute('hidden');
+        }, 400);
         this.canvas = document.getElementById("shakerCanvas");
         this.canvas.width = shakerService.displayWidth - gameScale.width * 0.022;
         this.canvas.height = shakerService.displayHeight - gameScale.height * 0.1;

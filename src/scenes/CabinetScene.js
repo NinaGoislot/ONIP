@@ -5,6 +5,12 @@ import {
 } from '../main.js';
 
 const URL_BOTTLES = "./media/img/bouteilles/",
+  URL_CURSOR_MOVE = "./media/img/curseur/curseur_deplacement/",
+  URL_CURSOR_REFUS = "./media/img/curseur/curseur_refus/",
+  URL_TRANSITION_VERSE = "./media/img/transitions/armoire-verse/",
+  LENGTH_TRANSI_VERSE = 30,
+  LENGTH_CURSOR_MOVE = 9,
+  LENGTH_CURSOR_REFUS = 15,
   GRID_NBR_ROW = 3,
   GRID_NBR_COL = 7,
   BOTTLE_GAP_Y_BEGINNING = 0.22,
@@ -43,7 +49,7 @@ class CabinetScene extends Phaser.Scene {
 
   preload() {
     this.load.image('armoireBouteilles', './media/img/armoire-deco.webp');
-    this.load.image('curseur', 'media/img/curseur.webp');
+    this.load.image('curseur', 'media/img/curseur/curseur.webp');
 
     this.bottlesData = this.game.registry.get('ingredients');
     this.bottleImgKeys = [];
@@ -51,6 +57,19 @@ class CabinetScene extends Phaser.Scene {
     for (let i = 1; i <= this.bottlesData.length; i++) {
       this.load.image(`bouteille${i}`, `bouteille${i}.webp`);
       this.bottleImgKeys.push(`bouteille${i}`);
+    }
+
+    this.load.path = URL_CURSOR_REFUS;
+    for (let i = 0; i < LENGTH_CURSOR_REFUS; i++) {
+      this.load.image(`curseur-refus${i}`, `curseur-refus_${i}.png`);
+    }
+    this.load.path = URL_CURSOR_MOVE;
+    for (let i = 0; i < LENGTH_CURSOR_MOVE; i++) {
+      this.load.image(`move${i}`, `deplacement_${i}.png`);
+    }
+    this.load.path = URL_TRANSITION_VERSE;
+    for (let i = 0; i < LENGTH_TRANSI_VERSE; i++) {
+        this.load.image(`transi-verse${i}`, `Transi-armoire-verse_${i}.png`);
     }
   }
 
@@ -63,7 +82,7 @@ class CabinetScene extends Phaser.Scene {
 
     // console.log("Data cocktail :", this.drinkBottles);
     // console.log("Data choosed :", this.partie.tabBottlesChoosed);
-    
+
     // add background to scene
     let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'armoireBouteilles');
     background.displayWidth = gameScale.width;
@@ -79,16 +98,20 @@ class CabinetScene extends Phaser.Scene {
     this.createBoxBottle(GRID_NBR_ROW, GRID_NBR_COL);
     this.aJuiceTaken = false;
 
-    this.curseur = this.add.image(gameScale.width * 0.5, gameScale.height * 0.445, 'curseur');
-    this.curseur.displayWidth = gameScale.width * 0.244;
+    this.curseur = this.add.image(gameScale.width * 0.5, gameScale.height * 0.448, 'curseur');
+    // this.curseur.displayWidth = gameScale.width * 0.244;
+    this.curseur.displayWidth = gameScale.width * 0.22;
     this.curseur.scaleY = this.curseur.scaleX;
     window.addEventListener('resize', () => {
-      this.curseur.displayWidth = gameScale.width * 0.244;
+      this.curseur.displayWidth = gameScale.width * 0.22;
       this.curseur.scaleY = this.curseur.scaleX;
       this.curseur.setPosition(gameScale.width * 0.5 + gameScale.width * BOTTLE_GAP_X * this.curseurX, gameScale.height * 0.445 + gameScale.height * BOTTLE_GAP_Y_BETWEEN * this.curseurY);
     });
     this.curseurX = 0;
     this.curseurY = 0;
+
+    this.animeAllCursorMove();
+    this.animeCursorRefus();
 
     let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0);
     rectangle.setInteractive({
@@ -101,7 +124,7 @@ class CabinetScene extends Phaser.Scene {
       console.log("debut")
       for (let i = 0; i < this.tabBottle.length; i++) {
         this.tabBottle[i][0].disableInteractive();
-        this.canMove = false;
+        // this.canMove = false;
       }
     }.bind(this));
 
@@ -109,7 +132,7 @@ class CabinetScene extends Phaser.Scene {
       console.log("fini")
       for (let i = 0; i < this.tabBottle.length; i++) {
         this.tabBottle[i][0].setInteractive();
-        this.canMove = true;
+        // this.canMove = true;
       }
     }.bind(this));
 
@@ -117,7 +140,7 @@ class CabinetScene extends Phaser.Scene {
     // ***************************************** SOCKET *****************************************
     socket.on("MOVE_CURSOR", (cursor) => {
       console.log("Je reçois le déplacement : " + cursor);
-      if(this.canMove){
+      if (this.canMove) {
         switch (cursor) {
           case "UP":
             this.haut();
@@ -179,7 +202,7 @@ class CabinetScene extends Phaser.Scene {
       this.aJuiceTaken = isAJuiceTaken;
     });
 
-    socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+    socket.on("A_GOLD_BOTTLE_IS_TAKEN", () => {
       this.partie.goldBottleStatus = true;
       this.game.registry.set('partie', this.partie);
     });
@@ -202,6 +225,88 @@ class CabinetScene extends Phaser.Scene {
   }
 
   // ***************************************** FONCTIONS *****************************************
+  animeCursorRefus(){
+    this.anims.create({
+      key: 'cursor_refus',
+      frames: [
+        {key: 'curseur-refus0'},
+        {key: 'curseur-refus1'},
+        {key: 'curseur-refus2'},
+        {key: 'curseur-refus3'},
+        {key: 'curseur-refus4'},
+        {key: 'curseur-refus5'},
+        {key: 'curseur-refus6'},
+        {key: 'curseur-refus7'},
+        {key: 'curseur-refus8'},
+        {key: 'curseur-refus9'},
+        {key: 'curseur-refus10'},
+        {key: 'curseur-refus11'},
+        {key: 'curseur-refus12'},
+        {key: 'curseur-refus13'},
+        {key: 'curseur-refus14'}
+      ],
+      frameRate: 30,
+      repeat: 3
+    });
+  }
+
+  animCursorRefusPlay(){
+    this.cursorRefus = this.add.sprite(this.curseur.x, this.curseur.y, 'curseur-refus0');
+    this.cursorRefus.displayWidth = gameScale.width * 0.22;
+    this.cursorRefus.scaleY = this.cursorRefus.scaleX;
+    this.curseur.setVisible(false);
+    this.canMove = false;
+    this.cursorRefus.anims.play('cursor_refus');
+
+    this.cursorRefus.on('animationcomplete', function (animation) {          
+      // Si l'animation est celle que vous surveillez, détruisez le sprite
+      if (animation.key === 'cursor_refus') {
+          this.cursorRefus.destroy();
+          this.curseur.setVisible(true);
+          this.canMove = true;
+      };
+    }, this);
+  }
+
+  animeAllCursorMove(){
+    this.anims.create({
+      key: 'cursor_move',
+      frames: [
+        {key: 'move0'},
+        {key: 'move1'},
+        {key: 'move2'},
+        {key: 'move3'},
+        {key: 'move4'},
+        {key: 'move5'},
+        {key: 'move6'},
+        {key: 'move7'},
+        {key: 'move8'},
+      ],
+      frameRate: 30,
+      repeat: 0 
+    });
+  }
+
+  animCursorStopMove(){
+    this.cursorMove.on('animationcomplete', function (animation) {          
+      // Si l'animation est celle que vous surveillez, détruisez le sprite
+      if (animation.key === 'cursor_move') {
+          this.cursorMove.destroy();
+          this.curseur.setVisible(true);
+          this.canMove = true;
+      };
+    }, this);
+  }
+
+  animeCursorMove() {
+    this.cursorMove = this.add.sprite(this.curseur.x, this.curseur.y, 'move0');
+    this.cursorMove.displayWidth = gameScale.width * 0.22;
+    this.cursorMove.scaleY = this.cursorMove.scaleX;
+    this.curseur.setVisible(false);
+    this.animCursorStopMove();
+    this.canMove = false;
+    this.cursorMove.anims.play('cursor_move');
+  }
 
   createBoxBottle(nbrRow, nbrCol) {
     console.log('create bottle');
@@ -254,6 +359,7 @@ class CabinetScene extends Phaser.Scene {
       return;
     }
     this.curseur.setPosition(this.curseur.x + gameScale.width * BOTTLE_GAP_X, this.curseur.y);
+    this.animeCursorMove();
   }
 
   gauche() {
@@ -263,6 +369,7 @@ class CabinetScene extends Phaser.Scene {
       return;
     }
     this.curseur.setPosition(this.curseur.x - gameScale.width * BOTTLE_GAP_X, this.curseur.y);
+    this.animeCursorMove();
   }
 
   haut() {
@@ -272,6 +379,7 @@ class CabinetScene extends Phaser.Scene {
       return;
     }
     this.curseur.setPosition(this.curseur.x, this.curseur.y - gameScale.height * BOTTLE_GAP_Y_BETWEEN);
+    this.animeCursorMove();
   }
 
   bas() {
@@ -281,6 +389,7 @@ class CabinetScene extends Phaser.Scene {
       return;
     }
     this.curseur.setPosition(this.curseur.x, this.curseur.y + gameScale.height * BOTTLE_GAP_Y_BETWEEN);
+    this.animeCursorMove();
   }
 
   getBottleAtCursor() {
@@ -324,17 +433,22 @@ class CabinetScene extends Phaser.Scene {
         this.partie.player.score += 500;
         this.partie.player.nbGoldenBottles += 1;
         socket.emit("GOLD_BOTTLE_TAKEN", this.partie.roomId);
-      } else{
+      } else {
         this.partie.player.score += 50;
       }
       this.game.registry.set('partie', this.partie);
       this.currentCustomer.indexNbrBottleChoosed += 1;
       socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
       this.removeSocket();
-      this.scene.stop('CabinetScene');
-      this.scene.run('PourInShakerScene', {
-        'bottleChoosed': juiceType
-      });
+      this.scene.launch('ArmoireVerseScene');
+      // this.scene.bringToTop('ArmoireVerseScene');
+      setTimeout(() => {
+        this.scene.stop('CabinetScene');
+        this.scene.run('PourInShakerScene', {
+          'bottleChoosed': juiceType
+        });
+      this.scene.bringToTop('ArmoireVerseScene');
+    }, 500);
     } else {
       this.shakeScene();
     }
@@ -348,7 +462,7 @@ class CabinetScene extends Phaser.Scene {
         return false;
       }
       this.partie.tabBottlesChoosed.push(juice.id);
-      this.game.registry.set('partie',this.partie);
+      this.game.registry.set('partie', this.partie);
       return true;
     }
     return false;
@@ -368,7 +482,7 @@ class CabinetScene extends Phaser.Scene {
     this.scene.start('FictiveGameScene')
   }
 
-  removeSocket(){
+  removeSocket() {
     socket.removeAllListeners("MOVE_CURSOR");
     socket.removeAllListeners("NOMORE_CLIENT");
     socket.removeAllListeners("GAME_PAUSED");
@@ -384,7 +498,8 @@ class CabinetScene extends Phaser.Scene {
 
   shakeScene() {
     console.log("déclenche la fonction");
-    this.cameras.main.shake(200);
+    // this.cameras.main.shake(200);
+    this.animCursorRefusPlay();
     //puis pas possible de bouger pdt 2 secondes --> voir PWA
     //si bouge pdt interdiction = mini shake
     this.partie.player.nbBadBottles += 1;

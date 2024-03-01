@@ -109,6 +109,10 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
             this.infos.text = this.playerId;
             this.infos.on('pointerdown', () => this.copy(this.playerId));
         })
+
+        socket.once("JOUEUR_READY", () => {
+            this.game.registry.set('aPlayerReady', true);
+        });
     }
 
     // ************************************* FONCTIONS ************************************************
