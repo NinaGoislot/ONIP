@@ -10,9 +10,9 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
         });
     }
 
-    preload() {
-        this.load.image('bg-step1', './media/img/lancement-partie/step1.webp');
-    }
+    // preload() {
+    //     this.load.image('bg-step1', './media/img/lancement-partie/step1.webp');
+    // }
 
     create() {
         // add background to scene

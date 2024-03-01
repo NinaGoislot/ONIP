@@ -10,10 +10,10 @@ class EndScene extends Phaser.Scene {
         });
     }
 
-    preload() {
-        this.load.image('ecran-victoire', './media/img/score/score-victoire.webp');
-        this.load.image('ecran-defaite', './media/img/score/score-défaite.webp');
-    }
+    // preload() {
+    //     this.load.image('ecran-victoire', './media/img/score/score-victoire.webp');
+    //     this.load.image('ecran-defaite', './media/img/score/score-défaite.webp');
+    // }
 
     create() {
         this.partie = this.game.registry.get('partie');

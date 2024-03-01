@@ -12,13 +12,13 @@ class Step4_PseudoScene extends Phaser.Scene {
         });
     }
 
-    preload() {
-        this.load.image('bg-step4-j1', './media/img/lancement-partie/step4-j1.webp');
-        this.load.image('bg-step4-j2', './media/img/lancement-partie/step4-j2.webp');
-        this.load.image('step4-btn-noactive', './media/img/lancement-partie/step4-btn-noactive.webp');
-        this.load.image('step4-btn-active', './media/img/lancement-partie/step4-btn-active.webp');
-        this.load.html('joinRoom', './html/joinGame.html');
-    }
+    // preload() {
+    //     this.load.image('bg-step4-j1', './media/img/lancement-partie/step4-j1.webp');
+    //     this.load.image('bg-step4-j2', './media/img/lancement-partie/step4-j2.webp');
+    //     this.load.image('step4-btn-noactive', './media/img/lancement-partie/step4-btn-noactive.webp');
+    //     this.load.image('step4-btn-active', './media/img/lancement-partie/step4-btn-active.webp');
+    //     this.load.html('joinRoom', './html/joinGame.html');
+    // }
 
     create(data) {
         this.rolePlayer = data;
@@ -152,8 +152,15 @@ class Step4_PseudoScene extends Phaser.Scene {
             }
             socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.removeResizeListeners();
-            this.scene.start('GameScene');
-            // this.scene.remove('Step4_PseudoScene');
+            this.scene.launch('StartScene');
+            setTimeout(() => {
+                this.putPseudo.setAttribute('hidden', '');
+                this.formJoin.destroy();
+            }, 300);
+            // setTimeout(() => {
+            //     this.scene.start('GameScene');
+            //     this.scene.bringToTop('StartScene');
+            // }, 600);
         });
     }
 

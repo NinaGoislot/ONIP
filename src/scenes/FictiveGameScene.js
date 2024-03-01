@@ -29,7 +29,7 @@ class FictiveGameScene extends Phaser.Scene {
     preload() {;
         this.bottlesData = this.game.registry.get('ingredients');
         this.cocktailsData = this.game.registry.get('cocktails');
-        this.bottleImgKeys = this.game.registry.get('bottleImgKeys');
+        this.bottleCarteImgKeys = this.game.registry.get('bottleCarteImgKeys');
         this.bottleGoldImgKeys = this.game.registry.get('bottleGoldImgKeys');
     }
 
@@ -187,7 +187,7 @@ class FictiveGameScene extends Phaser.Scene {
             for (let j = 1; j < BOTTLE_CARD_GRID_NBR_COL_PLUS_1; j++) {
                 let imageKey;
                 let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId)
-                cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
+                cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleCarteImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
 
                 let bottleImg = this.add.image(posX, posY, imageKey)
                 bottleImg.scaleX = 1;

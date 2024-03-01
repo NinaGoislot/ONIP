@@ -10,12 +10,12 @@ class Step2_LobbyScene extends Phaser.Scene {
         });
     }
 
-    preload() {
-        this.load.image('bg-step2', './media/img/lancement-partie/step2.webp');
-        this.load.image('btn-copy', './media/img/lancement-partie/step2-btn-copy.webp');
-        this.load.image('btn-check', './media/img/lancement-partie/step2-btn-check.webp');
-        this.load.html('joinRoom', './html/joinGame.html');
-    }
+    // preload() {
+    //     this.load.image('bg-step2', './media/img/lancement-partie/step2.webp');
+    //     this.load.image('btn-copy', './media/img/lancement-partie/step2-btn-copy.webp');
+    //     this.load.image('btn-check', './media/img/lancement-partie/step2-btn-check.webp');
+    //     this.load.html('joinRoom', './html/joinGame.html');
+    // }
 
     create(data) {
         this.roomId = data.roomId;

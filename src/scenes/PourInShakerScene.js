@@ -21,12 +21,12 @@ class PourInShakerScene extends Phaser.Scene {
     //     }
     // }
 
-    preload() {
-        this.load.image('bg-shaker', './media/img/shaker/ecran-shaker-bg.webp');
-        this.load.image('shaker-servir', './media/img/shaker/shaker-servir.webp');
-        // this.load.image('shaker-cache', './media/img/shaker/shaker-cache.webp');
-        this.load.html('shakerCanvas', './html/shakerCanvas.html');
-    }
+    // preload() {
+        // this.load.image('bg-shaker', './media/img/shaker/ecran-shaker-bg.webp');
+        // this.load.image('shaker-servir', './media/img/shaker/shaker-servir.webp');
+        // // this.load.image('shaker-cache', './media/img/shaker/shaker-cache.webp');
+        // this.load.html('shakerCanvas', './html/shakerCanvas.html');
+    // }
 
     create(startData) {
         if (startData.bottleChoosed) {
@@ -56,6 +56,7 @@ class PourInShakerScene extends Phaser.Scene {
         this.divHTML.setAttribute('hidden', '');
         setTimeout(() => {
             this.divHTML.removeAttribute('hidden');
+            console.log("apparition html")
         }, 400);
         this.canvas = document.getElementById("shakerCanvas");
         this.canvas.width = shakerService.displayWidth - gameScale.width * 0.022;
@@ -377,8 +378,16 @@ class PourInShakerScene extends Phaser.Scene {
         //console.log("je rends le jus", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
         this.removeSocket();
-        this.scene.stop("PourInShakerScene");
-        this.scene.run("CabinetScene");
+
+        this.scene.launch('VerseArmoireScene');
+        setTimeout(() => {
+            this.divHTML.setAttribute('hidden', '');
+        }, 200);
+        // setTimeout(() => {
+        //     this.scene.stop("PourInShakerScene");
+        //     this.scene.run("CabinetScene");
+        //     this.scene.bringToTop('VerseArmoireScene');
+        // }, 500);
     }
 
     openGameScene() {
@@ -388,7 +397,17 @@ class PourInShakerScene extends Phaser.Scene {
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
-        this.removeSocket();
+        this.removeSocket();        
+        // this.scene.launch('VerseGameScene');
+        // setTimeout(() => {
+        //     this.divHTML.setAttribute('hidden', '');
+        // }, 200);
+        // setTimeout(() => {
+        //     this.scene.stop("CabinetScene");
+        //     this.scene.stop("PourInShakerScene");
+        //     this.scene.run("GameScene");
+        //     this.scene.bringToTop('VerseGameScene');
+        // }, 600);
         this.scene.stop("CabinetScene");
         this.scene.stop("PourInShakerScene");
         this.scene.run("GameScene");

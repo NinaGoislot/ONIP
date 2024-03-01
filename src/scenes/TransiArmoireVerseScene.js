@@ -2,15 +2,19 @@ import {
     gameScale
 } from '../main.js';
 
-class GameLoadScene extends Phaser.Scene {
+class ArmoireVerseScene extends Phaser.Scene {
     constructor() {
         super({
-            key: 'ArmoireVerse', active:true
+            key: 'ArmoireVerseScene'
         });
     }
 
-    create() {
-        console.log("Ajout Armoire Verse");
+    create(startData) {
+        if (startData.bottleChoosed) {
+            this.bottleChoosed = startData.bottleChoosed;
+        } else {
+            console.log("there is an error.")
+        }
         this.anims.create({
             key: 'transi-verse',
             frames: [
@@ -53,13 +57,23 @@ class GameLoadScene extends Phaser.Scene {
         this.transi.displayWidth = gameScale.width;
         this.transi.scaleY = this.transi.scaleX;
         this.transi.anims.play('transi-verse');
+        this.transi.on('animationupdate', function (animation, frame) {
+            if (animation.key === 'transi-verse' && frame.index === 15) { 
+                console.log('this.bottleChoosed',this.bottleChoosed);
+                this.scene.stop('CabinetScene');
+                this.scene.run('PourInShakerScene', {
+                    'bottleChoosed': this.bottleChoosed
+                });
+                this.scene.bringToTop('ArmoireVerseScene');
+            }
+        }, this);
         this.transi.on('animationcomplete', function (animation) {          
             if (animation.key === 'transi-verse') {
                 console.log("Fin Armoire Verse");
-                this.scene.stop();
+                this.scene.stop('ArmoireVerseScene');
             };
         }, this);
     }
 }
 
-export default ArmoireVerse;
+export default ArmoireVerseScene;

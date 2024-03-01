@@ -16,9 +16,9 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         startData.mode ? this.isSolo = true : this.isSolo = false;
     }
 
-    preload() {
-        this.load.image('bg-step3', './media/img/lancement-partie/step3.webp');
-    }
+    // preload() {
+    //     this.load.image('bg-step3', './media/img/lancement-partie/step3.webp');
+    // }
 
     create() {
         this.resizeListeners = [];

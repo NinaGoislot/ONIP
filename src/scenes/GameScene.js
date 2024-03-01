@@ -36,67 +36,71 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.imageClientKey = [];
-        this.bottleImgKeys = [];
-        this.bottleGoldImgKeys = [];
-        this.cocktailImgKeys = [];
-        this.movementsImgKeys = [];
+        // this.imageClientKey = [];
+        // this.bottleGoldImgKeys = [];
+        // this.cocktailImgKeys = [];
+        // this.movementsImgKeys = [];
         this.currentCustomer = this.game.registry.get('customerData') || null;
         this.bottlesData = this.game.registry.get('ingredients');
         this.cocktailsData = this.game.registry.get('cocktails');
         this.movementsData = this.game.registry.get('movements');
+        this.imageClientKey = this.game.registry.get('imageClientKey');
+        this.bottleCarteImgKeys = this.game.registry.get('bottleCarteImgKeys');
+        this.bottleGoldImgKeys = this.game.registry.get('bottleGoldImgKeys');
+        this.cocktailImgKeys = this.game.registry.get('cocktailImgKeys');
+        this.movementsImgKeys = this.game.registry.get('movementsImgKeys');
 
-        this.load.image('bg-service', './media/img/ecran-service/bg-service.webp');
-        this.load.image('bar-service', './media/img/ecran-service/bar-service.webp');
-        this.load.image('carte-service', './media/img/ecran-service/carte.webp');
-        this.load.image('shaker-service', './media/img/shaker/shaker-service.webp');
-        //spritesheet clients
-        this.load.spritesheet('client-1', './media/img/clients/gaetan.webp', {
-            frameWidth: 590,
-            frameHeight: 900,
-            startFrame: 0,
-            endFrame: 8
-        });
-        this.load.spritesheet('client-2', './media/img/clients/line.webp', {
-            frameWidth: 540,
-            frameHeight: 900,
-            startFrame: 0,
-            endFrame: 8
-        });
-        this.imageClientKey.push(`client-1`);
-        this.imageClientKey.push(`client-2`);
+        // this.load.image('bg-service', './media/img/ecran-service/bg-service.webp');
+        // this.load.image('bar-service', './media/img/ecran-service/bar-service.webp');
+        // this.load.image('carte-service', './media/img/ecran-service/carte.webp');
+        // this.load.image('shaker-service', './media/img/shaker/shaker-service.webp');
+        // //spritesheet clients
+        // this.load.spritesheet('client-1', './media/img/clients/gaetan.webp', {
+        //     frameWidth: 590,
+        //     frameHeight: 900,
+        //     startFrame: 0,
+        //     endFrame: 8
+        // });
+        // this.load.spritesheet('client-2', './media/img/clients/line.webp', {
+        //     frameWidth: 540,
+        //     frameHeight: 900,
+        //     startFrame: 0,
+        //     endFrame: 8
+        // });
+        // this.imageClientKey.push(`client-1`);
+        // this.imageClientKey.push(`client-2`);
 
-        //mouvements "prépare toi"
-        this.load.spritesheet('prepare-toi', './media/img/mouvements/preparez-vous.webp', {
-            frameWidth: 480,
-            frameHeight: 270,
-            startFrame: 0,
-            endFrame: 21
-        });
+        // //mouvements "prépare toi"
+        // this.load.spritesheet('prepare-toi', './media/img/mouvements/preparez-vous.webp', {
+        //     frameWidth: 480,
+        //     frameHeight: 270,
+        //     startFrame: 0,
+        //     endFrame: 21
+        // });
 
-        //Chargement des images du jeu    
-        this.load.path = URL_BOTTLES_CARTE;
-        for (let i = 1; i <= this.bottlesData.length; i++) {
-            this.load.image(`carte-bouteille${i}`, `carte-bouteille${i}.webp`);
-            this.bottleImgKeys.push(`carte-bouteille${i}`);
-        }
-        this.game.registry.set('bottleImgKeys', this.bottleImgKeys);
-        this.load.path = URL_BOTTLES_CARTE_GOLD;
-        for (let i = 1; i <= this.bottlesData.length; i++) {
-            this.load.image(`carte-luxe-bouteille${i}`, `carte-luxe-bouteille${i}.webp`);
-            this.bottleGoldImgKeys.push(`carte-luxe-bouteille${i}`);
-        }
-        this.game.registry.set('bottleGoldImgKeys', this.bottleGoldImgKeys);
-        this.load.path = URL_COCKTAIL;
-        for (let i = 1; i <= this.cocktailsData.length; i++) {
-            this.load.image(`cocktail${i}`, `cocktail${i}.webp`);
-            this.cocktailImgKeys.push(`cocktail${i}`);
-        }
-        this.load.path = URL_MOVES;
-        for (let i = 1; i <= NB_MOVEMENTS; i++) {
-            this.load.image(`BOD${i}`, `BOD${i}.png`);
-            this.movementsImgKeys.push(`BOD${i}`);
-        }
+        // //Chargement des images du jeu    
+        // this.load.path = URL_BOTTLES_CARTE;
+        // for (let i = 1; i <= this.bottlesData.length; i++) {
+        //     this.load.image(`carte-bouteille${i}`, `carte-bouteille${i}.webp`);
+        //     this.bottleImgKeys.push(`carte-bouteille${i}`);
+        // }
+        // this.game.registry.set('bottleImgKeys', this.bottleImgKeys);
+        // this.load.path = URL_BOTTLES_CARTE_GOLD;
+        // for (let i = 1; i <= this.bottlesData.length; i++) {
+        //     this.load.image(`carte-luxe-bouteille${i}`, `carte-luxe-bouteille${i}.webp`);
+        //     this.bottleGoldImgKeys.push(`carte-luxe-bouteille${i}`);
+        // }
+        // this.game.registry.set('bottleGoldImgKeys', this.bottleGoldImgKeys);
+        // this.load.path = URL_COCKTAIL;
+        // for (let i = 1; i <= this.cocktailsData.length; i++) {
+        //     this.load.image(`cocktail${i}`, `cocktail${i}.webp`);
+        //     this.cocktailImgKeys.push(`cocktail${i}`);
+        // }
+        // this.load.path = URL_MOVES;
+        // for (let i = 1; i <= NB_MOVEMENTS; i++) {
+        //     this.load.image(`BOD${i}`, `BOD${i}.png`);
+        //     this.movementsImgKeys.push(`BOD${i}`);
+        // }
 
         // Écouter l'événement de chargement complet
         this.load.on('complete', () => {
@@ -114,6 +118,7 @@ class GameScene extends Phaser.Scene {
         this.dataCustomer = [];
         this.isSolo = this.partie.mode == "solo";
         this.aReadyText = false;
+
 
         if (this.currentCustomer === null) {
 
@@ -780,7 +785,7 @@ class GameScene extends Phaser.Scene {
             for (let j = 1; j < BOTTLE_CARD_GRID_NBR_COL_PLUS_1; j++) {
                 let imageKey;
                 let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId)
-                cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
+                cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleCarteImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
 
                 let bottleImg = this.add.image(posX, posY, imageKey)
                 bottleImg.scaleX = 1;

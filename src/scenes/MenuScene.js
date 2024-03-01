@@ -7,9 +7,9 @@ class MenuScene extends Phaser.Scene {
         super({ key: 'MenuScene' });
     }
 
-    preload(){
-        this.load.image('background', './media/img/background.png');
-    }
+    // preload(){
+    //     this.load.image('background', './media/img/background.png');
+    // }
 
     create() {
         // add background to scene
