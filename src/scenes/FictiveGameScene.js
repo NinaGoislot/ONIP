@@ -79,6 +79,10 @@ class FictiveGameScene extends Phaser.Scene {
             this.scene.stop("PourInShakerScene");
             this.scene.run("GameScene");
         });
+
+        socket.once("NAVIGATE_CABINETSCENE", () => {
+            this.openCabinet();
+          });
     }
 
     // ************************************************ FONCTIONS ************************************************

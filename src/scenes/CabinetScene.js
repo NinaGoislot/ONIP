@@ -61,8 +61,8 @@ class CabinetScene extends Phaser.Scene {
     this.bottlesData = this.game.registry.get('ingredients');
     this.canMove = true;
 
-    console.log("Data cocktail :", this.drinkBottles);
-    console.log("Data choosed :", this.partie.tabBottlesChoosed);
+    // console.log("Data cocktail :", this.drinkBottles);
+    // console.log("Data choosed :", this.partie.tabBottlesChoosed);
     
     // add background to scene
     let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'armoireBouteilles');
@@ -182,6 +182,10 @@ class CabinetScene extends Phaser.Scene {
     socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
       this.partie.goldBottleStatus = true;
       this.game.registry.set('partie', this.partie);
+    });
+
+    socket.once("NAVIGATE_FICTIVESCENE", () => {
+      this.test();
     });
 
     socket.on("A_PLAYER_READY", () => {

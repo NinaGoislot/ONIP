@@ -178,7 +178,7 @@ class PourInShakerScene extends Phaser.Scene {
             this.bottlesData = this.game.registry.get('ingredients');
         });
 
-        socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+        socket.on("A_GOLD_BOTTLE_IS_TAKEN", () => {
             this.partie.goldBottleStatus = true;
             this.game.registry.set('partie', this.partie);
         });
@@ -192,28 +192,58 @@ class PourInShakerScene extends Phaser.Scene {
             this.game.registry.set('partie', this.partie);
         });
 
-        socket.on("POURING", (isPouring, pourSpeed) => {
-            console.log("isPouring : ", isPouring);
-            console.log("speed reçue du socket: ", pourSpeed);
-            if (isPouring) {
-                this.liquid.isFilling = true;
-                this.liquid.fillSpeed = pourSpeed;
-            } else {
-                this.liquid.isFilling = false;
-                this.renduScore(this.liquid.fillPercentage);
-                console.log("Nombre de bouteilles choisies", this.nbrBottleChoose);
-                console.log("Nombre de bouteilles attendues", this.nbrBoucle);
-                if (this.nbrBottleChoose == this.nbrBoucle) {
-                    setTimeout(() => {
-                        this.openGameScene();
-                    }, 1000);
-                } else {
-                    setTimeout(() => {
-                        console.log("Le set timeout renvoie à la CabinetScene");
-                        this.openCabinet();
-                    }, 1000);
-                };
+        // socket.on("POURING", (isPouring, pourSpeed) => {
+        //     console.log("isPouring : ", isPouring);
+        //     console.log("speed reçue du socket: ", pourSpeed);
+        //     if (isPouring) {
+        //         this.liquid.isFilling = true;
+        //         this.liquid.fillSpeed = pourSpeed;
+        //     } else {
+        //         this.liquid.isFilling = false;
+        //         this.renduScore(this.liquid.fillPercentage);
+        //         console.log("Nombre de bouteilles choisies", this.nbrBottleChoose);
+        //         console.log("Nombre de bouteilles attendues", this.nbrBoucle);
+        //         if (this.nbrBottleChoose == this.nbrBoucle) {
+        //             setTimeout(() => {
+        //                 this.openGameScene();
+        //             }, 1000);
+        //         } else {
+        //             setTimeout(() => {
+        //                 console.log("Le set timeout renvoie à la CabinetScene");
+        //                 this.openCabinet();
+        //             }, 1000);
+        //         };
+        //     }
+        // });
+
+        socket.on("POURING_SPEED", (speed) => {
+            if(this.liquid.isFilling) {
+                console.log("POURING_SPEED ► vitesse de versement : ", speed);
+                this.liquid.fillSpeed = speed;
             }
+        });
+
+        socket.once("IS_POURING_TRUE", () => {
+            console.log("IS_POURING_TRUE : true");
+            this.liquid.isFilling = true;
+        });
+
+        socket.once("IS_POURING_FALSE", () => {
+            console.log("IS_POURING_FALSE ► false");
+            this.liquid.isFilling = false;
+            this.renduScore(this.liquid.fillPercentage);
+            console.log("Nombre de bouteilles choisies", this.nbrBottleChoose);
+            console.log("Nombre de bouteilles attendues", this.nbrBoucle);
+            if (this.nbrBottleChoose == this.nbrBoucle) {
+                setTimeout(() => {
+                    this.openGameScene();
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    console.log("Le set timeout renvoie à la CabinetScene");
+                    this.openCabinet();
+                }, 1000);
+            };
         });
 
         socket.on("A_PLAYER_READY", () => {
@@ -225,6 +255,12 @@ class PourInShakerScene extends Phaser.Scene {
             this.scene.stop("CabinetScene");
             this.scene.stop("PourInShakerScene");
             this.scene.run("GameScene");
+        });
+
+        /* ----- Gestion des erreurs ----- */
+        socket.on("ERROR", (error) => {
+            console.log('1) Le serveur à rencotrer une erreur.');
+            console.log('2) ', error);
         });
     }
 
@@ -353,7 +389,7 @@ class PourInShakerScene extends Phaser.Scene {
         this.scene.run("GameScene");
     }
 
-    removeSocket(){
+    removeSocket() {
         socket.removeAllListeners("POURING");
         socket.removeAllListeners("NOMORE_CLIENT");
         socket.removeAllListeners("GAME_PAUSED");
