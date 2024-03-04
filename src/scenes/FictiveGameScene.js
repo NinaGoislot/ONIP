@@ -80,9 +80,9 @@ class FictiveGameScene extends Phaser.Scene {
             this.scene.run("GameScene");
         });
 
-        socket.once("NAVIGATE_CABINETSCENE", () => {
-            this.openCabinet();
-          });
+        socket.once("NAVIGATE_CABINETSCENE", (sens) => {
+            this.openCabinet(sens);
+        });
     }
 
     // ************************************************ FONCTIONS ************************************************
@@ -99,12 +99,16 @@ class FictiveGameScene extends Phaser.Scene {
         return this.bottlesData.find(bottle => bottle.id == cocktailBottleId)
     }
 
-    openCabinet() {
+    openCabinet(sens) {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
         this.removeSocket();
-        this.scene.stop('FictiveGameScene');
-        this.scene.start('CabinetScene');
+        this.scene.launch('ArmoireFictiveScene',{
+            'sens': sens,
+            'sceneToMove': "CabinetScene"
+        });
+        // this.scene.stop('FictiveGameScene');
+        // this.scene.start('CabinetScene');
     }
 
     removeSocket(){

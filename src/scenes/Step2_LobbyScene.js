@@ -44,14 +44,14 @@ class Step2_LobbyScene extends Phaser.Scene {
         this.btnBack.on('pointerdown', ()=> this.back());
         //faire la fonction retour
 
-        this.title = this.add.text(gameScale.width * 0.535, gameScale.height * 0.335, "Partage ce code à ton ami.e", {
+        this.title = this.add.text(gameScale.width * 0.525, gameScale.height * 0.335, "Partage ce code à ton ami.e", {
             fontFamily:'soria',
             fontSize: gameScale.width*0.05 + 'px',
             // fontSize:  '70px',
             fill: '#EFECEA',
             align: 'center'
         }).setOrigin(0.5,0.5);
-        this.codePin = this.add.text(gameScale.width * 0.535, gameScale.height * 0.5, "", {
+        this.codePin = this.add.text(gameScale.width * 0.525, gameScale.height * 0.5, "", {
             fontFamily:'soria',
             fontSize: gameScale.width*0.08 + 'px',
             // fontSize: '120px',
@@ -59,7 +59,7 @@ class Step2_LobbyScene extends Phaser.Scene {
         }).setOrigin(0.5,0.5);
         this.codePin.setLetterSpacing(gameScale.width*0.025);
         this.codePin.setVisible(false);
-        this.messageInfos = this.add.text(gameScale.width * 0.535, gameScale.height * 0.71, "", {
+        this.messageInfos = this.add.text(gameScale.width * 0.525, gameScale.height * 0.71, "", {
             fontFamily:'soria',
             fontSize:  gameScale.width*0.03 + 'px',
             // fontSize: '45px',
@@ -84,12 +84,12 @@ class Step2_LobbyScene extends Phaser.Scene {
         });
 
         const resizeListener = () => {
-            this.title.setPosition(gameScale.width * 0.535, gameScale.height * 0.335);
+            this.title.setPosition(gameScale.width * 0.525, gameScale.height * 0.335);
             this.title.setFontSize(gameScale.width*0.05);
-            this.codePin.setPosition(gameScale.width * 0.535, gameScale.height * 0.5);
+            this.codePin.setPosition(gameScale.width * 0.525, gameScale.height * 0.5);
             this.codePin.setFontSize(gameScale.width*0.08);
             this.codePin.setLetterSpacing(gameScale.width*0.025);
-            this.messageInfos.setPosition(gameScale.width * 0.535, gameScale.height * 0.71);
+            this.messageInfos.setPosition(gameScale.width * 0.525, gameScale.height * 0.71);
             this.messageInfos.setFontSize(gameScale.width*0.03);
         };
         window.addEventListener('resize', resizeListener);
@@ -113,6 +113,7 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.inputRoomId = document.querySelector('#inputRoomId');
                 this.inputRoomId.style.letterSpacing = gameScale.width * 0.04 + "px";
                 this.inputRoomId.style.fontSize = gameScale.width * 0.07 + "px";
+                check.setInteractive({cursor: 'pointer'});
                 check.on('pointerdown', ()=> this.onCheck());
 
                 const resizeListener2 = () => {

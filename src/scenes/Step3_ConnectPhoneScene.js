@@ -64,19 +64,6 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         console.log('solo?', this.isSolo)
         if (this.isSolo) {
             socket.emit("CREATE_GAME_SOLO");
-
-            //ENELEVER CA
-            // this.btnPlaySolo = this.add.text(200, 100, "Start game solo", {
-            //         fontSize: '24px',
-            //         fill: '#fff'
-            //     })
-            //     .setInteractive({
-            //         cursor: 'pointer'
-            //     })
-            //     .on('pointerdown', () => this.startGameSolo())
-            //     .on('pointerover', () => this.btnPlaySolo.setTint(0x90ee90))
-            //     .on('pointerout', () => this.btnPlaySolo.setTint(0xffffff));
-            // this.btnPlaySolo.input.enabled = false;
         } else {
             this.playerId = this.game.registry.get('roomIdJoueur');
             this.infos.text = this.playerId;
@@ -131,13 +118,6 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         this.resizeListeners.forEach(listener => {
             window.removeEventListener('resize', listener);
         });
-    }
-
-    startGameSolo() {
-        console.log(this.playerId.slice(0, -1), this.player.numeroPlayer)
-        socket.emit("START_GAME", this.playerId.slice(0, -1), this.player.numeroPlayer);
-        this.scene.start('GameScene');
-        // this.scene.remove('Step3_ConnectPhoneScene');
     }
 
     wait = async (amount) => {

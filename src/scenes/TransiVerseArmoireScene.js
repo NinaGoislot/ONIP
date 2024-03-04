@@ -1,5 +1,5 @@
 import {
-    gameScale
+    gameScale, socket
 } from '../main.js';
 
 class VerseArmoireScene extends Phaser.Scene {
@@ -10,6 +10,7 @@ class VerseArmoireScene extends Phaser.Scene {
     }
 
     create() {
+        this.partie = this.game.registry.get('partie');
         this.anims.create({
             key: 'transi-armoire',
             frames: [
@@ -56,12 +57,14 @@ class VerseArmoireScene extends Phaser.Scene {
                 this.scene.stop("PourInShakerScene");
                 this.scene.run("CabinetScene");
                 this.scene.bringToTop('VerseArmoireScene');
+                socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
             }
         }, this);
 
         this.transi.anims.play('transi-armoire');
         this.transi.on('animationcomplete', function (animation) {          
             if (animation.key === 'transi-armoire') {
+                socket.emit("CAN_SWIPE", this.partie.roomId, this.partie.player.numeroPlayer);
                 this.scene.stop('VerseArmoireScene');
             };
         }, this);

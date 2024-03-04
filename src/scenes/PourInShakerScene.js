@@ -113,7 +113,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         // ******************************** SHAKER SERVIR ********************************
         this.pourcentBottle = this.getQuantityForSelectedBottle();
-        console.log("pourcentage de la bouteille :", this.pourcentBottle)
+        // console.log("pourcentage de la bouteille :", this.pourcentBottle);
         this.bottleChoosedData = this.getIngredientsById();
 
         // let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0.5);
@@ -137,7 +137,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         if (this.partie.liquids.length > 0) {
             this.liquid.fillPercentage = this.partie.liquids[this.partie.liquids.length - 1].fillPercentage;
-            console.log(this.liquid.fillPercentage)
+            // console.log(this.liquid.fillPercentage);
             for (let i = this.partie.liquids.length - 1; i >= 0; i--) {
                 var filledHeight = this.insideShaker.height * (this.partie.liquids[i].fillPercentage / 100);
                 var emptyHeight = this.insideShaker.height - filledHeight;
@@ -376,7 +376,7 @@ class PourInShakerScene extends Phaser.Scene {
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         //console.log("je rends le jus", this.bottlesData, this.bottleChoosed, this.partie.roomId);
-        socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
+        // socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
         this.removeSocket();
 
         this.scene.launch('VerseArmoireScene');
@@ -396,21 +396,21 @@ class PourInShakerScene extends Phaser.Scene {
         this.bottlesData[this.bottleChoosed.id - 1].picked = false;
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
-        socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
+        // socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
         this.removeSocket();        
-        // this.scene.launch('VerseGameScene');
-        // setTimeout(() => {
-        //     this.divHTML.setAttribute('hidden', '');
-        // }, 200);
+        this.scene.launch('VerseGameScene');
+        setTimeout(() => {
+            this.divHTML.setAttribute('hidden', '');
+        }, 200);
         // setTimeout(() => {
         //     this.scene.stop("CabinetScene");
         //     this.scene.stop("PourInShakerScene");
         //     this.scene.run("GameScene");
         //     this.scene.bringToTop('VerseGameScene');
         // }, 600);
-        this.scene.stop("CabinetScene");
-        this.scene.stop("PourInShakerScene");
-        this.scene.run("GameScene");
+        // this.scene.stop("CabinetScene");
+        // this.scene.stop("PourInShakerScene");
+        // this.scene.run("GameScene");
     }
 
     removeSocket() {

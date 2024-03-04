@@ -109,7 +109,7 @@ class CabinetScene extends Phaser.Scene {
     rectangle.setInteractive({
       cursor: 'pointer'
     });
-    rectangle.on('pointerdown', () => this.test());
+    rectangle.on('pointerdown', () => this.openFictiveScene());
 
 
     this.cameras.main.on('camerashakestart', function () {
@@ -199,8 +199,8 @@ class CabinetScene extends Phaser.Scene {
       this.game.registry.set('partie', this.partie);
     });
 
-    socket.once("NAVIGATE_FICTIVESCENE", () => {
-      this.test();
+    socket.once("NAVIGATE_FICTIVESCENE", (sens) => {
+      this.openFictiveScene(sens);
     });
 
     socket.on("A_PLAYER_READY", () => {
@@ -430,7 +430,7 @@ class CabinetScene extends Phaser.Scene {
       }
       this.game.registry.set('partie', this.partie);
       this.currentCustomer.indexNbrBottleChoosed += 1;
-      socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
+      // socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
       this.removeSocket();
       this.scene.launch('ArmoireVerseScene',{
         'bottleChoosed': juiceType
@@ -470,10 +470,14 @@ class CabinetScene extends Phaser.Scene {
     this.game.registry.set('ingredients', this.bottlesData);
   }
 
-  test() {
+  openFictiveScene(sens) {
     this.removeSocket();
-    this.scene.stop('CabinetScene');
-    this.scene.start('FictiveGameScene')
+    this.scene.launch('ArmoireFictiveScene',{
+      'sens': sens,
+      'sceneToMove': "FictiveGameScene"
+    });
+    // this.scene.stop('CabinetScene');
+    // this.scene.start('FictiveGameScene');
   }
 
   removeSocket() {

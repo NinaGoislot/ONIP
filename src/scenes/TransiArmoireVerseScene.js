@@ -1,5 +1,5 @@
 import {
-    gameScale
+    gameScale, socket
 } from '../main.js';
 
 class ArmoireVerseScene extends Phaser.Scene {
@@ -15,6 +15,7 @@ class ArmoireVerseScene extends Phaser.Scene {
         } else {
             console.log("there is an error.")
         }
+        this.partie = this.game.registry.get('partie');
         this.anims.create({
             key: 'transi-verse',
             frames: [
@@ -65,6 +66,7 @@ class ArmoireVerseScene extends Phaser.Scene {
                     'bottleChoosed': this.bottleChoosed
                 });
                 this.scene.bringToTop('ArmoireVerseScene');
+                socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
             }
         }, this);
         this.transi.on('animationcomplete', function (animation) {          

@@ -15,13 +15,17 @@ const
     URL_BOTTLES = "./media/img/bouteilles/",
     URL_CURSOR_MOVE = "./media/img/curseur/curseur_deplacement/",
     URL_CURSOR_REFUS = "./media/img/curseur/curseur_refus/",
+    LENGTH_CURSOR_MOVE = 9,
+    LENGTH_CURSOR_REFUS = 15,
+    //TRANSI
     URL_TRANSITION_VERSE = "./media/img/transitions/armoire-verse/",
     URL_TRANSITION_ARMOIRE = "./media/img/transitions/verse-armoire/",
     URL_TRANSITION_GAMESHAKE = "./media/img/transitions/verse-shake/",
     URL_TRANSITION_START = "./media/img/transitions/start/",
-    LENGTH_TRANSI = 30,
-    LENGTH_CURSOR_MOVE = 9,
-    LENGTH_CURSOR_REFUS = 15;
+    URL_TRANSITION_SWIPE_DROITE = "./media/img/transitions/carte-armoire/droite-gauche/",
+    URL_TRANSITION_SWIPE_GAUCHE = "./media/img/transitions/carte-armoire/gauche-droite/",
+    URL_TRANSITION_CARTE = "./media/img/transitions/start-carte/",
+    LENGTH_TRANSI = 30
     ;
 
 class LoadDataScene extends Phaser.Scene {
@@ -163,6 +167,18 @@ class LoadDataScene extends Phaser.Scene {
         this.load.path = URL_TRANSITION_GAMESHAKE;
         for (let i = 0; i < LENGTH_TRANSI; i++) {
             this.load.image(`transi-verse-game${i}`, `Transi-verticale-verse-shake_${i}.png`);
+        }
+        this.load.path = URL_TRANSITION_SWIPE_DROITE;
+        for (let i = 0; i < LENGTH_TRANSI; i++) {
+            this.load.image(`transi-swipe-droite${i}`, `Transi-carte-armoire-droite_${i}.png`);
+        }
+        this.load.path = URL_TRANSITION_SWIPE_GAUCHE;
+        for (let i = 0; i < LENGTH_TRANSI; i++) {
+            this.load.image(`transi-swipe-gauche${i}`, `Transi-carte-armoire-gauche_${i}.png`);
+        }
+        this.load.path = URL_TRANSITION_CARTE;
+        for (let i = 0; i < LENGTH_TRANSI; i++) {
+            this.load.image(`transi-carte${i}`, `Transi-armoire-start-carte_${i}.png`);
         }
 
     }

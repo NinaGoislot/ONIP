@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene {
         this.dataCustomer = [];
         this.isSolo = this.partie.mode == "solo";
         this.aReadyText = false;
-
+        this.createAnimTransiCarte();
 
         if (this.currentCustomer === null) {
 
@@ -355,8 +355,8 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        socket.on("SWIPE_CABINET", () => {
-            this.openCabinet();
+        socket.on("SWIPE_CABINET", (sens) => {
+            this.openCabinet(sens);
         });
 
         socket.on('JUICE_TAKEN', (bottleId, bottlesData) => {
@@ -512,15 +512,19 @@ class GameScene extends Phaser.Scene {
         return goldBottleId.alcoholId
     }
 
-    openCabinet() {
+    openCabinet(sens) {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
         this.removeResizeListeners();
-        console.log(this.scene.getStatus('GameScene'), this.scene.isActive('GameScene'))
-        console.log(this.scene.getStatus('CabinetScene'), this.scene.isActive('CabinetScene'))
         this.removeSocket();
-        this.scene.stop('GameScene');
-        this.scene.run('CabinetScene');
+        // console.log(this.scene.getStatus('GameScene'), this.scene.isActive('GameScene'))
+        // console.log(this.scene.getStatus('CabinetScene'), this.scene.isActive('CabinetScene'))
+        // this.scene.stop('GameScene');
+        // this.scene.run('CabinetScene');
+        this.scene.launch('ArmoireFictiveScene',{
+            'sens': sens,
+            'sceneToMove': "CabinetFromGameScene"
+        });
     }
 
     playerChoiceCorrect() {
@@ -639,11 +643,11 @@ class GameScene extends Phaser.Scene {
         // openCabinetButton.on('pointerdown', () => this.openCabinet());
 
         //afficher les boissons nécessaires
-        this.drawcard();
-        this.drawBottleCocktail();
-        console.log("Je dois faire l'emit du cabinet bouton");
-
-        socket.emit("CABINET_SWIPE_ON", this.partie.roomId, this.partie.player.numeroPlayer);
+        this.drawTransiCarte();
+        // this.drawcard();
+        // this.drawBottleCocktail();
+        // console.log("Je dois faire l'emit du cabinet bouton");
+        // socket.emit("CABINET_SWIPE_ON", this.partie.roomId, this.partie.player.numeroPlayer);
     }
 
     showNextDialogue = async (dialogue) => {
@@ -906,6 +910,67 @@ class GameScene extends Phaser.Scene {
         this.text.setVisible(false);
         text.setVisible(false);
         this.currentMovement.setVisible(false);
+    }
+
+    createAnimTransiCarte(){
+        this.anims.create({
+            key: 'transi-carte',
+            frames: [
+                {key: 'transi-carte0'},
+                {key: 'transi-carte1'},
+                {key: 'transi-carte2'},
+                {key: 'transi-carte3'},
+                {key: 'transi-carte4'},
+                {key: 'transi-carte5'},
+                {key: 'transi-carte6'},
+                {key: 'transi-carte7'},
+                {key: 'transi-carte8'},
+                {key: 'transi-carte9'},
+                {key: 'transi-carte10'},
+                {key: 'transi-carte11'},
+                {key: 'transi-carte12'},
+                {key: 'transi-carte13'},
+                {key: 'transi-carte14'},
+                {key: 'transi-carte15'},
+                {key: 'transi-carte16'},
+                {key: 'transi-carte17'},
+                {key: 'transi-carte18'},
+                {key: 'transi-carte19'},
+                {key: 'transi-carte20'},
+                {key: 'transi-carte21'},
+                {key: 'transi-carte22'},
+                {key: 'transi-carte23'},
+                {key: 'transi-carte24'},
+                {key: 'transi-carte25'},
+                {key: 'transi-carte26'},
+                {key: 'transi-carte27'},
+                {key: 'transi-carte28'},
+                {key: 'transi-carte29'},
+            ],
+            frameRate: 30,
+            repeat: 0
+        });
+    }
+
+    drawTransiCarte(){
+        this.transi = this.add.sprite(gameScale.width/2, gameScale.height/2, 'transi-carte0');
+        this.transi.displayWidth = gameScale.width;
+        this.transi.scaleY = this.transi.scaleX;
+        this.transi.setDepth(1);
+        this.transi.anims.play('transi-carte');
+        this.transi.on('animationupdate', function (animation, frame) {
+            if (animation.key === 'transi-carte' && frame.index === 15) { 
+                this.drawcard();
+                this.drawBottleCocktail();
+            }
+        }, this);
+        this.transi.on('animationcomplete', function (animation) {          
+            if (animation.key === 'transi-carte') {
+                this.transi.destroy();
+                console.log("Je dois faire l'emit du cabinet bouton");
+                socket.emit("CABINET_SWIPE_ON", this.partie.roomId, this.partie.player.numeroPlayer);
+            };
+        }, this);
     }
 
     //pour le premier spriteSheet de préparez vous / prépare toi

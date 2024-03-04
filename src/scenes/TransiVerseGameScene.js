@@ -1,5 +1,5 @@
 import {
-    gameScale
+    gameScale, socket
 } from '../main.js';
 
 class VerseGameScene extends Phaser.Scene {
@@ -10,6 +10,7 @@ class VerseGameScene extends Phaser.Scene {
     }
 
     create() {
+        this.partie = this.game.registry.get('partie');
         this.anims.create({
             key: 'transi-verse-game',
             frames: [
@@ -59,6 +60,7 @@ class VerseGameScene extends Phaser.Scene {
                 this.scene.stop("PourInShakerScene");
                 this.scene.run("GameScene");
                 this.scene.bringToTop('VerseGameScene');
+                socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
             }
         }, this);
 

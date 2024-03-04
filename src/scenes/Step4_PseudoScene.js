@@ -169,6 +169,7 @@ class Step4_PseudoScene extends Phaser.Scene {
     goPlay(){
         console.log("J'envoie WANT_TO_PLAY");
         socket.emit("WANT_TO_PLAY", this.roomIdPlayer);
+        this.btnIsReady.disableInteractive();
     }
 
     removeResizeListeners() {
@@ -200,7 +201,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer, this.isSolo ? "solo" : "multi");
             this.messageInfos.text = "";
             //console.log(this.aPlayerReady);
-            this.btnValidation.setInteractive(false);
+            this.btnValidation.disableInteractive();
         }
     }
 }
