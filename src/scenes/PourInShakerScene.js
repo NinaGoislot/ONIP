@@ -113,7 +113,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         // ******************************** SHAKER SERVIR ********************************
         this.pourcentBottle = this.getQuantityForSelectedBottle();
-        // console.log("pourcentage de la bouteille :", this.pourcentBottle);
+        console.log("pourcentage de la bouteille :", this.pourcentBottle);
         this.bottleChoosedData = this.getIngredientsById();
 
         // let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0.5);
@@ -137,7 +137,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         if (this.partie.liquids.length > 0) {
             this.liquid.fillPercentage = this.partie.liquids[this.partie.liquids.length - 1].fillPercentage;
-            // console.log(this.liquid.fillPercentage);
+            console.log(this.liquid.fillPercentage);
             for (let i = this.partie.liquids.length - 1; i >= 0; i--) {
                 var filledHeight = this.insideShaker.height * (this.partie.liquids[i].fillPercentage / 100);
                 var emptyHeight = this.insideShaker.height - filledHeight;
@@ -149,9 +149,9 @@ class PourInShakerScene extends Phaser.Scene {
         this.goal = (100 - this.liquid.fillGoal - this.liquid.fillPercentage) / 100 * (shakerService.displayHeight - gameScale.height * 0.1) - gameScale.height * 0.025
         this.shakerLigneMoy.style.top = this.goal + 'px';
 
-        console.log(100 - this.liquid.fillGoal - this.liquid.fillPercentage);
-        console.log(shakerService.displayHeight - gameScale.height * 0.1);
-        console.log(gameScale.height);
+        // console.log(100 - this.liquid.fillGoal - this.liquid.fillPercentage);
+        // console.log(shakerService.displayHeight - gameScale.height * 0.1);
+        // console.log(gameScale.height);
 
 
         this.fillShaker();
@@ -224,7 +224,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         socket.on("POURING_SPEED", (speed) => {
             if(this.liquid.isFilling) {
-                console.log("POURING_SPEED ► vitesse de versement : ", speed);
+                // console.log("POURING_SPEED ► vitesse de versement : ", speed);
                 this.liquid.fillSpeed = speed;
             }
         });
@@ -312,9 +312,9 @@ class PourInShakerScene extends Phaser.Scene {
         if (this.liquid.isFilling) {
             // Limiter fillPercentage à 100%
             if (this.partie.liquids.length > 0) {
-                console.log("liquide fill speed : ", this.liquid.fillSpeed);
+                // console.log("liquide fill speed : ", this.liquid.fillSpeed);
                 this.liquid.fillPercentage = Math.min(this.liquid.fillPercentage + this.liquid.fillSpeed, this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5);
-                console.log("PourInShaker ► % du liquide", this.liquid.fillPercentage);
+                // console.log("PourInShaker ► % du liquide", this.liquid.fillPercentage);
                 if (this.liquid.fillPercentage == this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5) {
                     return (this.tooMuch())
                 }

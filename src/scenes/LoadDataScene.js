@@ -6,6 +6,10 @@ const
     //GameScene
     URL_BOTTLES_CARTE = "./media/img/bouteilles-carte/normal/",
     URL_BOTTLES_CARTE_GOLD = "./media/img/bouteilles-carte/luxe/",
+    URL_BOTTLES_CARTE_TAKEN = "./media/img/bouteilles-carte/normal-prise/",
+    URL_BOTTLES_CARTE_GOLD_TAKEN = "./media/img/bouteilles-carte/luxe-prise/",
+    URL_BOTTLES_CARTE_GOLD_STOLEN = "./media/img/bouteilles-carte/luxe-vole/",
+    URL_BOTTLES_CARTE_GOLD_STOLEN_TAKEN = "./media/img/bouteilles-carte/luxe-vole-prise/",
     URL_COCKTAIL = "./media/img/cocktails-verre/",
     URL_MOVES = "./media/img/moves/",
     NB_MOVEMENTS = 8,
@@ -83,7 +87,11 @@ class LoadDataScene extends Phaser.Scene {
         //spritesheet clients
         this.imageClientKey = [];
         this.bottleCarteImgKeys = [];
+        this.bottleCarteTakenImgKeys = [];
         this.bottleGoldImgKeys = [];
+        this.bottleGoldTakenImgKeys = [];
+        this.bottleGoldStolenImgKeys = [];
+        this.bottleGoldStolenTakenImgKeys = [];
         this.cocktailImgKeys = [];
         this.movementsImgKeys = [];
         this.load.spritesheet('client-1', './media/img/clients/gaetan.webp', {
@@ -133,6 +141,31 @@ class LoadDataScene extends Phaser.Scene {
             this.movementsImgKeys.push(`BOD${i}`);
         }
         this.game.registry.set('movementsImgKeys', this.movementsImgKeys);
+
+        this.load.path = URL_BOTTLES_CARTE_TAKEN;
+        for (let i = 1; i <= BOTTLESDATA_LENGTH; i++) {
+            this.load.image(`carte-normale-taken-bouteille${i}`, `carte-normal-bouteille${i}.webp`);
+            this.bottleCarteTakenImgKeys.push(`carte-normale-taken-bouteille${i}`);
+        }
+        this.game.registry.set('bottleCarteTakenImgKeys', this.bottleCarteTakenImgKeys);
+        this.load.path = URL_BOTTLES_CARTE_GOLD_TAKEN;
+        for (let i = 1; i <= BOTTLESDATA_LENGTH; i++) {
+            this.load.image(`carte-luxe-taken-bouteille${i}`, `carte-luxe-bouteille${i}.webp`);
+            this.bottleGoldTakenImgKeys.push(`carte-luxe-taken-bouteille${i}`);
+        }
+        this.game.registry.set('bottleGoldTakenImgKeys', this.bottleGoldTakenImgKeys);
+        this.load.path = URL_BOTTLES_CARTE_GOLD_STOLEN;
+        for (let i = 1; i <= BOTTLESDATA_LENGTH; i++) {
+            this.load.image(`carte-luxe-stolen-bouteille${i}`, `carte-luxe-bouteille${i}-prise.webp`);
+            this.bottleGoldStolenImgKeys.push(`carte-luxe-stolen-bouteille${i}`);
+        }
+        this.game.registry.set('bottleGoldStolenImgKeys', this.bottleGoldStolenImgKeys);
+        this.load.path = URL_BOTTLES_CARTE_GOLD_STOLEN_TAKEN;
+        for (let i = 1; i <= BOTTLESDATA_LENGTH; i++) {
+            this.load.image(`carte-luxe-stolen-taken-bouteille${i}`, `carte-luxe-prise-bouteille${i}.webp`);
+            this.bottleGoldStolenTakenImgKeys.push(`carte-luxe-stolen-taken-bouteille${i}`);
+        }
+        this.game.registry.set('bottleGoldStolenTakenImgKeys', this.bottleGoldStolenTakenImgKeys);
 
         // ******************* CabinetScene chemin défini *******************    
         this.bottleImgKeys = [];

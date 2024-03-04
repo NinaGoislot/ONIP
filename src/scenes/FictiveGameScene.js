@@ -31,6 +31,11 @@ class FictiveGameScene extends Phaser.Scene {
         this.cocktailsData = this.game.registry.get('cocktails');
         this.bottleCarteImgKeys = this.game.registry.get('bottleCarteImgKeys');
         this.bottleGoldImgKeys = this.game.registry.get('bottleGoldImgKeys');
+        this.bottleCarteTakenImgKeys = this.game.registry.get('bottleCarteTakenImgKeys');
+        this.bottleGoldTakenImgKeys = this.game.registry.get('bottleGoldTakenImgKeys');
+        this.bottleGoldStolenImgKeys = this.game.registry.get('bottleGoldStolenImgKeys');
+        this.bottleGoldStolenTakenImgKeys = this.game.registry.get('bottleGoldStolenTakenImgKeys');
+
     }
 
     create() {
@@ -180,6 +185,12 @@ class FictiveGameScene extends Phaser.Scene {
         });
     }
 
+    alreadyTaken(juice){
+        const alreadyChosen = this.partie.tabBottlesChoosed.find(id => id == juice.id);
+        console.log(alreadyChosen, juice.id);
+        return(alreadyChosen)
+    }
+
     drawBottleCocktail() {
         let goldenBottle = this.partie.goldBottleId;
         let posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE;
@@ -190,9 +201,22 @@ class FictiveGameScene extends Phaser.Scene {
         for (let i = 0; i < BOTTLE_CARD_GRID_NBR_ROW; i++) {
             for (let j = 1; j < BOTTLE_CARD_GRID_NBR_COL_PLUS_1; j++) {
                 let imageKey;
-                let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId)
-                cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleCarteImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
-
+                let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId);
+                let takenOrNot = this.alreadyTaken(cocktailBottleImg);
+                if (takenOrNot) {
+                    console.log('status gold bottle ', this.partie.goldBottleStatus);
+                    if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
+                        imageKey = this.bottleGoldStolenTakenImgKeys.find(image => image == `carte-luxe-stolen-taken-bouteille` + goldenBottle);
+                    } else {
+                        cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldTakenImgKeys.find(image => image == `carte-luxe-taken-bouteille` + goldenBottle) : imageKey = this.bottleCarteTakenImgKeys.find(image => image == `carte-normale-taken-bouteille` + cocktailBottleImg.id);
+                    }
+                } else {
+                    if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
+                        imageKey = this.bottleGoldStolenImgKeys.find(image => image == `carte-luxe-stolen-bouteille` + goldenBottle);
+                    } else {
+                        cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleCarteImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
+                    }
+                }
                 let bottleImg = this.add.image(posX, posY, imageKey)
                 bottleImg.scaleX = 1;
                 bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;

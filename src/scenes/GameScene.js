@@ -286,9 +286,9 @@ class GameScene extends Phaser.Scene {
             //Tous les joueurs ont cliqués sur "Servir le client"
             socket.on("ALL_PLAYERS_READY_TO_SERVE", () => {
                 console.log("ALL_PLAYERS_READY_TO_SERVE")
-                if (this.aReadyText) {
-                    this.aReadyText = false;
-                }
+                // if (this.aReadyText) {
+                //     this.aReadyText = false;
+                // }
                 if(this.waitText){
                     console.log('this.waitText', this.waitText)
                     this.waitText.setVisible(false);
@@ -384,6 +384,11 @@ class GameScene extends Phaser.Scene {
                 this.partie.player.score += 1000;
                 this.game.registry.set('partie', this.partie);
             }
+        });
+
+        socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+            this.partie.goldBottleStatus = true;
+            this.game.registry.set('partie', this.partie);
         });
 
         socket.on("A_PLAYER_READY", () => {
@@ -586,6 +591,8 @@ class GameScene extends Phaser.Scene {
                         fontFamily: 'alpino',
                         fontSize: gameScale.width * 0.03 + 'px'
                     });
+                } else{
+                    this.aReadyText = false;
                 }
 
             });
