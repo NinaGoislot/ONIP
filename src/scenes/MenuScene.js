@@ -131,7 +131,6 @@ class MenuScene extends Phaser.Scene {
         // this.scene.start('GameScene');
 
         // this.scene.start('EndScene');
-
         console.log('il ne se passe rien.')
         // socket.emit('START_SOLO');
     }

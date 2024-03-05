@@ -195,6 +195,7 @@ class CabinetScene extends Phaser.Scene {
     });
 
     socket.on("A_GOLD_BOTTLE_IS_TAKEN", () => {
+      console.log("A_GOLD_BOTTLE_IS_TAKEN cabinetScene");
       this.partie.goldBottleStatus = true;
       this.game.registry.set('partie', this.partie);
     });
@@ -424,17 +425,25 @@ class CabinetScene extends Phaser.Scene {
       if (juiceType.id == this.partie.goldBottleId && !this.partie.goldBottleStatus) {
         this.partie.player.score += 500;
         this.partie.player.nbGoldenBottles += 1;
-        socket.emit("GOLD_BOTTLE_TAKEN", this.partie.roomId);
+        if(this.partie.mode === "multi"){
+          socket.emit("GOLD_BOTTLE_TAKEN", this.partie.roomId, this.partie.player.numeroPlayer);
+        }
+        this.showScore("gold");
       } else {
+        this.showScore("normal");
         this.partie.player.score += 50;
       }
       this.game.registry.set('partie', this.partie);
       this.currentCustomer.indexNbrBottleChoosed += 1;
-      // socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
-      this.removeSocket();
-      this.scene.launch('ArmoireVerseScene',{
+      setTimeout(() => {
+        this.removeSocket();
+        this.scene.launch('ArmoireVerseScene',{
         'bottleChoosed': juiceType
-      });
+        });
+        this.scene.bringToTop('ArmoireVerseScene');
+      }, 1000);
+      
+      // socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
       // this.scene.bringToTop('ArmoireVerseScene');
     //   setTimeout(() => {
     //     this.scene.stop('CabinetScene');
@@ -449,6 +458,7 @@ class CabinetScene extends Phaser.Scene {
   }
 
   goodOrBadBottle(juice) {
+    console.log('this.partie.tabBottlesChoosed : ', this.partie.tabBottlesChoosed);
     const drinkBottle = this.drinkBottles.find(bottle => bottle.alcoholId == juice.id);
     if (drinkBottle) {
       const alreadyChosen = this.partie.tabBottlesChoosed.find(id => id == juice.id);
@@ -463,6 +473,10 @@ class CabinetScene extends Phaser.Scene {
   }
 
   juicePicked(juice) {
+    this.canMove = false;
+    // let takenBottleImg = this.getBottleImg(juice.id);
+    // console.log('test disabled pitié',juice, takenBottleImg);
+    // takenBottleImg[0].disableInteractive();
     this.bottlesData = this.game.registry.get('ingredients');
     this.bottlesData[juice.id - 1].picked = true
     console.log(this.bottlesData[juice.id - 1])
@@ -476,6 +490,7 @@ class CabinetScene extends Phaser.Scene {
       'sens': sens,
       'sceneToMove': "FictiveGameScene"
     });
+    this.scene.bringToTop('ArmoireFictiveScene');
     // this.scene.stop('CabinetScene');
     // this.scene.start('FictiveGameScene');
   }
@@ -498,10 +513,37 @@ class CabinetScene extends Phaser.Scene {
     console.log("déclenche la fonction");
     // this.cameras.main.shake(200);
     this.animCursorRefusPlay();
-    //puis pas possible de bouger pdt 2 secondes --> voir PWA
-    //si bouge pdt interdiction = mini shake
     this.partie.player.nbBadBottles += 1;
     this.game.registry.set('partie', this.partie);
+  }
+
+  showScore(status){
+    if(status == "gold"){
+      this.scoreText = this.add.text(this.curseur.x+gameScale.width*0.04, this.curseur.y-gameScale.height*0.08, "+500", {
+        fill: '#FFA364',
+        fontFamily: 'alpinoBold',
+        // fontSize: gameScale.width * 0.03 + 'px',
+        align: 'center',
+      }).setOrigin(0.5, 0.5).setAngle(15).setStroke('#252422', 7);
+    } else if(status == "normal"){
+      this.scoreText = this.add.text(this.curseur.x+gameScale.width*0.04, this.curseur.y-gameScale.height*0.08, "+50", {
+        fill: '#EFECEA',
+        fontFamily: 'alpinoBold',
+        fontSize: gameScale.width * 0.03 + 'px',
+        align: 'center',
+      }).setOrigin(0.5, 0.5).setAngle(15).setStroke('#252422', 7);
+    }
+
+    this.tweens.addCounter({
+        from: 0,
+        to: 1,
+        duration: 175,
+        yoyo: false,
+        onUpdate: (tween) => {
+            const v = tween.getValue();
+            this.scoreText.setFontSize(gameScale.width*0.01 + v * gameScale.width*0.02);
+        }
+    });
   }
 }
 

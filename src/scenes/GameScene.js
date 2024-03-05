@@ -149,6 +149,9 @@ class GameScene extends Phaser.Scene {
             window.addEventListener('resize', resizeListener);
             this.resizeListeners.push(resizeListener);
 
+            let music = this.game.registry.get('music');
+            // music.play();
+            this.game.registry.set('music', music);
 
             //afficher compte à rebours
             const countdownPromise = new Promise((resolve) => {
@@ -163,7 +166,7 @@ class GameScene extends Phaser.Scene {
                 //Set un nombre de client pour la partie
                 this.game.registry.set('nbrCustomers', 5);
                 // Ajout de TimerScene en tant que scène persistante
-                // this.scene.add('TimerScene', TimerScene, true);
+                this.scene.add('TimerScene', TimerScene, true);
                 // Création du client
                 if (this.rolePlayer == 1) {
                     this.generateNewClient().then(() => {
@@ -215,6 +218,7 @@ class GameScene extends Phaser.Scene {
             this.canva.menuPauseButton(this.scene);
             this.drawGame();
             this.removeShaker();
+            this.createAnimInterruption();
             console.log('this.partie.tooLateToServe', this.partie.tooLateToServe);
             if(!this.partie.tooLateToServe){
                 this.showNextDialogue(this.currentCustomer.secondaryDialogues).then(() => {
@@ -260,7 +264,7 @@ class GameScene extends Phaser.Scene {
             socket.on("MOVEMENT_DONE", (score) => {
                 console.log("Je rentre dans 'MOUVEMENT_DONE'");
                 if(!this.stopMovement){
-                    console.log("Je fais 'MOUVEMENT_DONE'");
+                    console.log("Je fais 'MOUVEMENT_DONE'", score);
                     this.score = this.score + score;
                     this.score = this.game.registry.set('score', this.score);
 
@@ -292,6 +296,10 @@ class GameScene extends Phaser.Scene {
                 if(this.waitText){
                     console.log('this.waitText', this.waitText)
                     this.waitText.setVisible(false);
+                    this.waitText.destroy();
+                }
+                if(this.scoreText){
+                    this.scoreText.destroy();
                 }
                 // this.showFinalDialogue().then(() => {
                     if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
@@ -349,9 +357,19 @@ class GameScene extends Phaser.Scene {
                     this.reboursFinal.text = "";
                     this.reboursFinal.setVisible(false);
                     this.updateScoreFinal(this.dureeFinal);
+                    this.drawCocktailFinal();
+                    setTimeout(() => {
+                        this.serveCustomer();
+                    }, 1000);
+                } else{
+                    this.drawCocktailFinal();
+                    this.serveCustomer();
                 }
-                this.drawCocktailFinal();
-                this.serveCustomer();
+                if(this.partie.mode == "solo"){
+                    this.partie.player.score += 1000;
+                    this.game.registry.set('partie', this.partie);
+                    this.showScore("+1000","perfect");
+                }
             });
         }
 
@@ -383,10 +401,12 @@ class GameScene extends Phaser.Scene {
                 console.log('premier à servir +1000');
                 this.partie.player.score += 1000;
                 this.game.registry.set('partie', this.partie);
+                this.showScore("+1000", "perfect");
             }
         });
 
         socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+            console.log("A_GOLD_BOTTLE_IS_TAKEN");
             this.partie.goldBottleStatus = true;
             this.game.registry.set('partie', this.partie);
         });
@@ -400,14 +420,17 @@ class GameScene extends Phaser.Scene {
             });
             this.aReadyText = true;
             this.dureeFinal = 0;
+            this.drawInterruption();
         });
 
         socket.on("COUNTDOWN_TO_SERVE", (duree)=>{
             if(this.aReadyText){
-                if(duree == 1){
-                    this.reboursFinal.text = "Il te reste " + duree + " seconde";
-                } else{
-                    this.reboursFinal.text = "Il te reste " + duree + " secondes";
+                if(duree < 6){
+                    if(duree == 1){
+                        this.reboursFinal.text = "Il te reste " + duree + " seconde";
+                    } else{
+                        this.reboursFinal.text = "Il te reste " + duree + " secondes";
+                    }
                 }
                 this.dureeFinal = duree;
             }
@@ -419,14 +442,22 @@ class GameScene extends Phaser.Scene {
                 console.log("countdown finished + SET_PLAYER_READY");
                 this.reboursFinal.text = "";
                 this.reboursFinal.setVisible(false);
-                socket.emit("SET_PLAYER_READY", {
-                    playerId: this.partie.player.playerId,
-                    roomId: this.partie.roomId
-                });
+                this.reboursFinal.destroy();
+                this.updateScoreFinal(0);
+                setTimeout(() => {
+                    socket.emit("SET_PLAYER_READY", {
+                        playerId: this.partie.player.playerId,
+                        roomId: this.partie.roomId
+                    });
+                }, 1000);
                 socket.emit("STOP_MOVEMENT", this.partie.roomId, this.partie.player.numeroPlayer);
                 this.stopMovement = true;
                 this.aReadyText = false;
             }
+        });
+
+        socket.once('GAME_OVER',()=>{
+            this.scene.start('EndScene');
         });
     }
 
@@ -464,10 +495,9 @@ class GameScene extends Phaser.Scene {
 
     endGame() {
         console.log("fin du jeu");
-        socket.emit("GAME_OVER");
+        socket.emit("GAME_OVER", this.partie.roomId, this.partie.player.numeroPlayer);
         this.game.registry.remove('customerData');
         this.game.registry.remove('nbrCustomers');
-        this.scene.start('EndScene');
     }
 
     findObjectById(objects, id) {
@@ -530,6 +560,7 @@ class GameScene extends Phaser.Scene {
             'sens': sens,
             'sceneToMove': "CabinetFromGameScene"
         });
+        this.scene.bringToTop('ArmoireFictiveScene');
     }
 
     playerChoiceCorrect() {
@@ -664,7 +695,7 @@ class GameScene extends Phaser.Scene {
             for (let j = 0; j < currentDialogue.length; j++) {
                 if (dialogue === this.currentCustomer.firstDialogues && currentDialogue == dialogue[dialogue.length - 1]) {
                     console.log("Je dois écrire le nom de la boisson à la fin de ce dialogue")
-                    currentDialogue += this.currentCustomer.drink.name; // Ajouter le nom de la commande
+                    currentDialogue += this.currentCustomer.drink.name + "."; // Ajouter le nom de la commande
                 }
                 let displayedDialogue = currentDialogue.substring(0, j + 1);
                 // console.log("Je dois écrire la lettre '"+ displayedDialogue + "'")
@@ -694,6 +725,34 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    showScore(score, status){
+        this.scoreText = this.add.text(gameScale.width * 0.32+gameScale.width*0.085, gameScale.height * 0.8-gameScale.height*0.1, score, {
+            fill: '#FFA364',
+            fontFamily: 'alpinoBold',
+            fontSize: gameScale.width * 0.04 + 'px',
+            align: 'center',
+        }).setOrigin(0.5, 0.5).setStroke('#252422', 7);
+    
+        if(status === "perfect"){
+            this.scoreText.setFill('#FFA364');
+        } else if(status === "bad"){
+            this.scoreText.setFill('#DD4075');
+        } else if(status === "good"){
+            this.scoreText.setFill('#EFECEA');
+        }
+    
+        this.tweens.addCounter({
+            from: 0,
+            to: 1,
+            duration: 175,
+            yoyo: false,
+            onUpdate: (tween) => {
+                const v = tween.getValue();
+                this.scoreText.setFontSize(gameScale.width*0.02 + v * gameScale.width*0.02);
+            }
+        });
+    }
+
     startMouvement() {
         console.log("Je rentre dans le start du mouvement");
         socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[0], this.partie.roomId, this.partie.player.numeroPlayer); //Premier mouvement
@@ -703,16 +762,22 @@ class GameScene extends Phaser.Scene {
         console.log('duree score', duree, this.partie.player.score);
         if(duree == 5){
             this.partie.player.score += 800;
+            this.showScore("+800", "perfect");
         } else if(duree == 4){
             this.partie.player.score += 700;
+            this.showScore("+700", "good");
         } else if(duree == 3){
             this.partie.player.score += 600;
+            this.showScore("+600", "good");
         } else if(duree == 2){
             this.partie.player.score += 400;
+            this.showScore("+400", "good");
         } else if(duree == 1){
             this.partie.player.score += 200;
+            this.showScore("+200", "good");
         } else if(duree == 0){
             this.partie.player.score -= 100;
+            this.showScore("-100", "bad");
         }
         console.log('score', this.partie.player.score);
         this.game.registry.set('partie', this.partie);
@@ -774,6 +839,7 @@ class GameScene extends Phaser.Scene {
         this.shakerService.setScale(0.1);
         this.shakerService.displayWidth = gameScale.width * 0.17;
         this.shakerService.scaleY = this.shakerService.scaleX;
+        this.shakerService.setDepth(1);
         window.addEventListener('resize', () => {
             this.shakerService.displayWidth = gameScale.width * 0.17;
             this.shakerService.scaleY = this.shakerService.scaleX;
@@ -963,7 +1029,7 @@ class GameScene extends Phaser.Scene {
         this.transi = this.add.sprite(gameScale.width/2, gameScale.height/2, 'transi-carte0');
         this.transi.displayWidth = gameScale.width;
         this.transi.scaleY = this.transi.scaleX;
-        this.transi.setDepth(1);
+        this.transi.setDepth(2);
         this.transi.anims.play('transi-carte');
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-carte' && frame.index === 15) { 
@@ -979,6 +1045,61 @@ class GameScene extends Phaser.Scene {
             };
         }, this);
     }
+
+    
+    createAnimInterruption(){
+        this.interrAdversImg = this.game.registry.get('interrAdversImg');
+        this.interrDepecheImg = this.game.registry.get('interrDepecheImg');
+
+        let frames = [];
+        // Remplissez le tableau avec les clés des frames
+        for (let i = 0; i < this.interrAdversImg.length; i++) {
+            frames.push({ key: this.interrAdversImg[i] });
+        }
+        this.anims.create({
+            key: 'interr_advers',
+            frames: frames,
+            frameRate: 30,
+            repeat: 0
+        });
+
+        let frames2 = [];
+        for (let i = 0; i < this.interrDepecheImg.length; i++) {
+            frames2.push({ key: this.interrDepecheImg[i] });
+        }
+        this.anims.create({
+            key: 'interr_depeche',
+            frames: frames2,
+            frameRate: 30,
+            repeat: 0
+        });
+    }
+
+    drawInterruption(){
+        this.transi = this.add.sprite(gameScale.width/2, gameScale.height/2, 'interr_advers0');
+        this.transi.displayWidth = gameScale.width;
+        this.transi.scaleY = this.transi.scaleX;
+        this.transi.setDepth(1);
+        this.transi.anims.play('interr_advers');
+
+        this.transi2 = this.add.sprite(gameScale.width/2, gameScale.height/2, 'interr_depeche0');
+        this.transi2.displayWidth = gameScale.width;
+        this.transi2.scaleY = this.transi2.scaleX;
+        this.transi2.setDepth(1); //mettre shaker au dessus
+        this.transi2.anims.play('interr_depeche');
+
+        this.transi.on('animationcomplete', function (animation) {          
+            if (animation.key === 'interr_advers') {
+                this.transi.destroy();
+            };
+        }, this);
+        this.transi2.on('animationcomplete', function (animation) {          
+            if (animation.key === 'interr_depeche') {
+                this.transi2.destroy();
+            };
+        }, this);
+    }
+
 
     //pour le premier spriteSheet de préparez vous / prépare toi
     mouvementFirst() {

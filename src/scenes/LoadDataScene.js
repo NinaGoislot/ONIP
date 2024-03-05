@@ -29,19 +29,25 @@ const
     URL_TRANSITION_SWIPE_DROITE = "./media/img/transitions/carte-armoire/droite-gauche/",
     URL_TRANSITION_SWIPE_GAUCHE = "./media/img/transitions/carte-armoire/gauche-droite/",
     URL_TRANSITION_CARTE = "./media/img/transitions/start-carte/",
-    LENGTH_TRANSI = 30
+    LENGTH_TRANSI = 30,
+    //Interruptions
+    URL_INTERRUPTION_ADVERS = "./media/img/interruptions/adversaire/",
+    URL_INTERRUPTION_DEPECHE = "./media/img/interruptions/depeche-toi/",
+    LENGTH_INTERRUP = 75
     ;
 
 class LoadDataScene extends Phaser.Scene {
     preload() {
         this.load.json('globalGameData', './data/data.json');
         this.load.audio('theme', './media/audio/BE-song.mp3');
+        this.load.audio('themeGame', './media/audio/Jeu.mp3');
         socket.on("CONNECTED", () => {
             console.log("je suis connectée")
             this.game.registry.set('connected', true);
         });
         this.loadFont("soria", "./media/font/soria-font.ttf");
         this.loadFont("alpino", "./media/font/alpino-variable.ttf");
+        this.loadFont("alpinoBold", "./media/font/alpino-bold.ttf");
 
         // Load All Media
         // ******************* MenuScene *******************
@@ -214,6 +220,22 @@ class LoadDataScene extends Phaser.Scene {
             this.load.image(`transi-carte${i}`, `Transi-armoire-start-carte_${i}.png`);
         }
 
+        // ******************* INTERRUPTIONS ******************* 
+        this.interrAdversImg = [];
+        this.load.path = URL_INTERRUPTION_ADVERS;
+        for (let i = 0; i < LENGTH_INTERRUP; i++) {
+            this.load.image(`interr_advers${i}`, `Interruption_servi_${i}.png`);
+            this.interrAdversImg.push(`interr_advers${i}`);
+        }
+        this.game.registry.set('interrAdversImg', this.interrAdversImg);
+        this.interrDepecheImg = [];
+        this.load.path = URL_INTERRUPTION_DEPECHE;
+        for (let i = 0; i < LENGTH_INTERRUP; i++) {
+            this.load.image(`interr_depeche${i}`, `Interruption_depeche_${i}.png`);
+            this.interrDepecheImg.push(`interr_depeche${i}`);
+        }
+        this.game.registry.set('interrDepecheImg', this.interrDepecheImg);
+
     }
 
     create() {
@@ -229,9 +251,10 @@ class LoadDataScene extends Phaser.Scene {
         this.game.registry.set('score', 0);
 
 
-        // POUR LA MUSIQUE
+        // POUR LA MUSIQUEthemeGame
         // this.load.audio('theme', './media/audio/BE-song.mp3');
-        this.music = this.sound.add('theme');
+        this.music = this.sound.add('themeGame', {loop:true});
+        // this.music = this.sound.add('theme');
         this.game.registry.set('music', this.music);
         //juste pour pas que la musique dérange pendant les tests..
         this.game.registry.get('music').pause();

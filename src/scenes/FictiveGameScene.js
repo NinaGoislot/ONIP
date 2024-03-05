@@ -43,6 +43,7 @@ class FictiveGameScene extends Phaser.Scene {
         this.currentCustomer = this.game.registry.get('customerData');
         this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
         this.canva.menuPauseButton(this.scene, this);
+        this.bottleCocktailImgTab = [];
         this.drawGame();
 
         let rectangle = this.add.rectangle(gameScale.width*0.9, gameScale.height*0.9, 100, 100, 0x6666ff, 0);
@@ -70,8 +71,11 @@ class FictiveGameScene extends Phaser.Scene {
         })
 
         socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+            console.log("A_GOLD_BOTTLE_IS_TAKEN");
             this.partie.goldBottleStatus = true;
             this.game.registry.set('partie', this.partie);
+            this.removeBottleCocktail();
+            this.drawBottleCocktail();
         });
 
         socket.on("A_PLAYER_READY", () => {
@@ -112,6 +116,7 @@ class FictiveGameScene extends Phaser.Scene {
             'sens': sens,
             'sceneToMove': "CabinetScene"
         });
+        this.scene.bringToTop('ArmoireFictiveScene');
         // this.scene.stop('FictiveGameScene');
         // this.scene.start('CabinetScene');
     }
@@ -222,6 +227,7 @@ class FictiveGameScene extends Phaser.Scene {
                 bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
                 bottleImg.scaleY = bottleImg.scaleX
                 bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
+                this.bottleCocktailImgTab.push(bottleImg);
 
                 //pour le responsive et la suite des boucles
                 let bottleGapXSecondRow = 0;
@@ -250,6 +256,13 @@ class FictiveGameScene extends Phaser.Scene {
             posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE * 2 + gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER;
             posX = gameScale.width * BOTTLE_CARD_IMG_XSCALE - gameScale.width * BOTTLE_CARD_IMG_GAP_X_SECOND_ROW;
         }
+    }
+
+    removeBottleCocktail(){
+        for(let i=0; i < this.bottleCocktailImgTab.length; i++){
+            this.bottleCocktailImgTab[i].setVisible(false);
+        }
+        this.bottleCocktailImgTab = [];
     }
 }
 export default FictiveGameScene;

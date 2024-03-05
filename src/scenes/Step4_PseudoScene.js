@@ -28,6 +28,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.partie = this.game.registry.get('partie');
         this.aPlayerReady = false;
         this.j1Ready = false;
+        this.canEnter = true;
         this.resizeListeners = [];
 
 
@@ -99,6 +100,11 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.btnValidation = this.add.rectangle(gameScale.width*0.33, gameScale.height*0.6, gameScale.width*0.14, gameScale.height*0.09, 0x6666ff, 0).setOrigin(0.5,0.5);
         this.btnValidation.setInteractive({cursor: 'pointer'});
         this.btnValidation.on('pointerdown', ()=> this.validation());
+        this.input.keyboard.on('keydown-ENTER', () => {
+            if(this.canEnter){
+                this.validation();
+            }
+        });
         //resize
         window.addEventListener('resize', () => {
             this.formJoin.setPosition(gameScale.width * 0.14, gameScale.height * 0.42);
@@ -130,7 +136,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         }
     
         // ******************************* SOCKET ************************************************
-        socket.on("JOUEUR_READY", () => {
+        socket.once("JOUEUR_READY", () => {
             this.messageStatePlayer.text = "Le deuxième joueur est prêt !";
             this.aPlayerReady = true;
             if(this.j1Ready || this.isSolo){
@@ -140,7 +146,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             }
         });
 
-        socket.on("GO_PLAY", () => {
+        socket.once("GO_PLAY", () => {
             console.log("je reçois le 'GO_PLAY'");
             if (!this.isSolo) {
                 this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
@@ -153,6 +159,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.removeResizeListeners();
             this.scene.launch('StartScene');
+            this.scene.bringToTop('StartScene');
             setTimeout(() => {
                 this.putPseudo.setAttribute('hidden', '');
                 this.formJoin.destroy();
@@ -202,6 +209,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             this.messageInfos.text = "";
             //console.log(this.aPlayerReady);
             this.btnValidation.disableInteractive();
+            this.canEnter = false;
         }
     }
 }

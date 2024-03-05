@@ -71,7 +71,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         }
 
         // ******************************* SOCKET ************************************************
-        socket.on("READY_TO_PLAY", (roleJoueur) => {
+        socket.once("READY_TO_PLAY", (roleJoueur) => {
             if (this.isSolo) {
                 //this.rolePlayer = this.game.registry.set('rolePlayer', 1);
                 this.player = new Player(this, "joueurSolo", 1, this.playerId);
@@ -90,7 +90,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
             }
         })
 
-        socket.on("WAITING_FOR_SHAKER", (roomIdJoueur) => {
+        socket.once("WAITING_FOR_SHAKER", (roomIdJoueur) => {
             this.game.registry.set('roomIdJoueur', roomIdJoueur);
             this.playerId = this.game.registry.get('roomIdJoueur');
             this.infos.text = this.playerId;
@@ -103,6 +103,17 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
     }
 
     // ************************************* FONCTIONS ************************************************
+    back(){
+        //si solo, changer au menu
+        //si duo, rien
+        if(this.isSolo){
+            const roomId = this.playerId.slice(0, -1);
+            console.log("go back", roomId);
+            socket.emit("GO_BACK_FROM_STEP1", roomId);
+            this.isSolo = null;
+            this.scene.start('MenuScene');
+        }
+    }
 
     copy(texteARecopier) {
         navigator.clipboard.writeText(texteARecopier)

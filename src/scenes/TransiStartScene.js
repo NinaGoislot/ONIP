@@ -54,6 +54,7 @@ class StartScene extends Phaser.Scene {
         this.transi.anims.play('transi-start');
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-start' && frame.index === 18) { 
+                this.scene.stop('Step4_PseudoScene');
                 this.scene.run('GameScene');
                 this.scene.bringToTop('StartScene');
             }

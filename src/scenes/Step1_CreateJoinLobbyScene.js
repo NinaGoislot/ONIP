@@ -46,7 +46,7 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
         })
 
         // ******************************* SOCKET ************************************************
-        socket.on("GAME_MULTI_CREATED", (roomId) => {
+        socket.once("GAME_MULTI_CREATED", (roomId) => {
             this.scene.start('Step2_LobbyScene', {roomId : roomId, player : "J1"});
         })
     }

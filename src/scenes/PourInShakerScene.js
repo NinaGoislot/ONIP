@@ -185,6 +185,7 @@ class PourInShakerScene extends Phaser.Scene {
         });
 
         socket.on("A_GOLD_BOTTLE_IS_TAKEN", () => {
+            console.log("A_GOLD_BOTTLE_IS_TAKEN, pourInShaker");
             this.partie.goldBottleStatus = true;
             this.game.registry.set('partie', this.partie);
         });
@@ -318,6 +319,7 @@ class PourInShakerScene extends Phaser.Scene {
                 if (this.liquid.fillPercentage == this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5) {
                     return (this.tooMuch())
                 }
+                console.log('tooMuch Pourcentage : ', this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5);
             } else {
                 this.liquid.fillPercentage = Math.min(this.liquid.fillPercentage + this.liquid.fillSpeed, this.liquid.fillGoal + 5);
                 if (this.liquid.fillPercentage == this.liquid.fillGoal + 5) {
@@ -383,6 +385,7 @@ class PourInShakerScene extends Phaser.Scene {
         setTimeout(() => {
             this.divHTML.setAttribute('hidden', '');
         }, 200);
+        this.scene.bringToTop('VerseArmoireScene');
         // setTimeout(() => {
         //     this.scene.stop("PourInShakerScene");
         //     this.scene.run("CabinetScene");
@@ -399,6 +402,7 @@ class PourInShakerScene extends Phaser.Scene {
         // socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
         this.removeSocket();        
         this.scene.launch('VerseGameScene');
+        this.scene.bringToTop('VerseGameScene');
         setTimeout(() => {
             this.divHTML.setAttribute('hidden', '');
         }, 200);
@@ -427,25 +431,74 @@ class PourInShakerScene extends Phaser.Scene {
     }
 
     renduScore(pourcentFill) {
+        let goal = 0;
+        if(this.partie.liquids.length > 0){
+            goal = this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal;
+        } else{
+            goal = this.liquid.fillGoal;
+        }
+        console.log('poucentFill + goal', pourcentFill, goal);
         if (!this.isTooMuch) {
-            if (pourcentFill >= (this.goal - this.goal * 0.95) && pourcentFill < (this.goal + this.goal * 0.95)) {
+            if (pourcentFill >= (goal * 0.95) && pourcentFill < (goal * 1.05)) {
+                console.log('cran 1 : between ', goal * 0.95,' et ', goal *  1.05);
                 this.partie.player.score += 500;
+                this.showScore("+500", "perfect");
                 this.partie.player.perfectPourring += 1;
-            } else if (pourcentFill > (this.goal - this.goal * 0.90) && pourcentFill < (this.goal - this.goal * 0.95)) {
+
+            } else if (pourcentFill > (goal * 0.85) && pourcentFill < (goal * 0.95)) {
+                console.log('cran 2 : between ', goal * 0.85,' et ', goal * 0.95);
                 this.partie.player.score += 250;
-            } else if (pourcentFill > (this.goal - this.goal * 0.85) && pourcentFill < (this.goal - this.goal * 0.90)) {
+                this.showScore("+250", "good");
+
+            } else if (pourcentFill > (goal * 0.75) && pourcentFill < (goal * 0.85)) {
+                console.log('cran 3 : between ', goal * 0.75,' et ', goal * 0.85);
                 this.partie.player.score += 150;
-            } else if (pourcentFill < (this.goal - this.goal * 0.85)) {
+                this.showScore("+150", "good");
+
+            } else if (pourcentFill < (goal * 0.75)) {
+                console.log('cran 4 : bellow ', goal * 0.75);
                 this.partie.player.score -= 150;
+                this.showScore("-150", "bad");
+
             }
         }
         this.game.registry.set("partie", this.partie);
     }
 
+    showScore(score, status){
+        console.log("showScore");
+        this.scoreText = this.add.text(gameScale.width*0.9, gameScale.height*0.077, score, {
+            fontFamily: 'alpinoBold',
+            // fontSize: gameScale.width * 0.06 + 'px',
+            align: 'center',
+        }).setOrigin(0.5, 0.5).setStroke('#252422', 7);
+        if(status === "perfect"){
+            this.scoreText.setFill('#FFA364');
+        } else if(status === "bad"){
+            this.scoreText.setFill('#DD4075');
+        } else if(status === "good"){
+            this.scoreText.setFill('#EFECEA');
+        }
+        this.tweens.addCounter({
+            from: 0,
+            to: 1,
+            duration: 175,
+            yoyo: false,
+            onUpdate: (tween) => {
+                const v = tween.getValue();
+                this.scoreText.setFontSize(gameScale.width*0.05 + v * gameScale.width*0.02);
+            }
+        });
+    }
+
     tooMuch() {
-        this.cameras.main.shake(200);
-        this.partie.player.score -= 200;
-        this.isTooMuch = true;
+        if(!this.isTooMuch){
+            console.log("tooMuch");
+            this.cameras.main.shake(200);
+            this.partie.player.score -= 200;
+            this.isTooMuch = true;
+            this.showScore("-200", "bad");
+        }
     }
 }
 

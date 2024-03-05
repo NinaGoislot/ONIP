@@ -125,6 +125,7 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.resizeListeners.push(resizeListener2);
     
                 socket.on("BAD_GAME_ID", ()=>{
+                    console.log("BAD_GAME_ID");
                     this.messageInfos.text = "Mauvais code. Réessaie."
                 })
                 break;
@@ -134,11 +135,14 @@ class Step2_LobbyScene extends Phaser.Scene {
 
 
         // ******************************* SOCKET ************************************************
-        socket.on("READY_TO_CONNECT", () => {
-            socket.on("WAITING_FOR_SHAKERS", (roomIdJoueur) => {
+        socket.once("READY_TO_CONNECT", () => {
+            socket.once("WAITING_FOR_SHAKERS", (roomIdJoueur) => {
                 this.game.registry.set('roomIdJoueur', roomIdJoueur);
                 this.removeResizeListeners();
-                this.scene.start('Step3_ConnectPhoneScene');
+                socket.removeAllListeners("BAD_GAME_ID");
+                this.scene.start('Step3_ConnectPhoneScene', {
+                    'mode' : false,
+                });
                 // this.scene.remove('Step2_LobbyScene');
             });
         });
