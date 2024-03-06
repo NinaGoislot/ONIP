@@ -83,12 +83,16 @@ class LoadDataScene extends Phaser.Scene {
         this.load.audio('scoreBottle', './media/audio/armoire/cartoon_wink.mp3');
         this.load.audio('scoreBottleGold', './media/audio/armoire/short-success.mp3');
         //PourInShakerScene
-        this.load.audio('pourDrink', './media/audio/shaker/Liquid2.wav');
+        this.load.audio('pourDrink', './media/audio/shaker/Liquid3.wav');
         this.load.audio('beepDrink', './media/audio/shaker/beep-warning.mp3');
         //GameScene
         this.load.audio('lastClient', './media/audio/service/bell.mp3');
         this.load.audio('clientPOP', './media/audio/service/service-bell.mp3');
         this.load.audio('transiGameScene', './media/audio/service/swipe.wav');
+        this.load.audio('moveTicTac', './media/audio/dance-party/tic-tac.mp3');
+        this.load.audio('moveValid', './media/audio/dance-party/interface.mp3');
+        
+
 
         // ******************* Step1_CreateJoinLobbyScene *******************
         this.load.image('bg-step1', './media/img/lancement-partie/step1.webp');
@@ -408,8 +412,9 @@ class LoadDataScene extends Phaser.Scene {
         // POUR LA MUSIQUEthemeGame
         // this.load.audio('theme', './media/audio/BE-song.mp3');
         this.music = this.sound.add('themeGame', {loop:true});
-        // this.music = this.sound.add('theme');
         this.game.registry.set('music', this.music);
+        this.menuMusic = this.sound.add('menu', {loop:true});
+        this.game.registry.set('menuMusic', this.music);
         //juste pour pas que la musique dérange pendant les tests..
         this.game.registry.get('music').pause();
 

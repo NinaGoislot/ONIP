@@ -377,9 +377,9 @@
       {
         "id": 4,
         "name": "Méprisant",
-        "firstDialogues": ["Je vais aller droit au but : il faut payer des tips ici ?", "AH ! bon bah un "],
+        "firstDialogues": ["Je vais aller droit au but : il faut payer des tips ici ?", "AH ! Bon bah un "],
         "secondaryDialogues": [""],
-        "successText": ["Merci.", ".. ça a intérêt à être très très bon ...."],
+        "successText": ["Merci.", ".. ça a intérêt à être très très bon..."],
         "failureText": [""],
         "favoriteExtra": 1
       },
@@ -397,14 +397,14 @@
         "name": "Confiant",
         "firstDialogues": ["Bonsoir !", "C’est ma première fois ici, vous auriez une recommandation ?", "Oh hum… alors un "],
         "secondaryDialogues": [""],
-        "successText": [" 2 verres d’un coup, vraiment !", "Je sens que je vais bien profiter de la soirée eh eh eh !"],
+        "successText": ["Deux verres d’un coup, vraiment !", "Je sens que je vais bien profiter de la soirée eh eh eh !"],
         "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 7,
         "name": "Aigri",
-        "firstDialogues": ["Oh j't'ai jamais vu ici toi 0_0 ! Ce soir j’ai grand soif ᕕ༼⌐■-■༽ᕗ !", "Bon épate moi, t’as intérêt à être meilleure que ta vieille mentore (งಠ_ಠ)ง !", "Allez, un "],
+        "firstDialogues": ["Oh j't'ai jamais vu ici toi 0_0 ! Ce soir j’ai grand soif ᕕ༼⌐■-■༽ᕗ !", "Bon épate-moi, t’as intérêt à être meilleur.e que ta vieille mentore (งಠ_ಠ)ง !", "Allez, un "],
         "secondaryDialogues": [""],
         "successText": ["Oh oh, ça m’a l’air pas trop mal (º﹃º )..", "Sur ce (￣∠ ￣ )ﾉ"],
         "failureText": [""],

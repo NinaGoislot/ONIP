@@ -134,7 +134,7 @@ class GameScene extends Phaser.Scene {
                 this.game.registry.set('partie', this.partie);
 
                 this.drawGame();
-                this.clientPOP = this.scene.sound.add('clientPOP');
+                this.clientPOP = this.sound.add('clientPOP');
                 this.clientPOP.play();
                 this.resetPickedJuices();
 
@@ -170,6 +170,9 @@ class GameScene extends Phaser.Scene {
                     roomId: this.partie.roomId
                 });
             }
+            this.beepDrink = this.sound.add('beepDrink');
+            this.scoreGood = this.sound.add('scoreBottle');
+            this.scorePerfect = this.sound.add('scoreBottleGold');
 
             // ************************************* SOCKET ************************************************
             socket.on("MOBILE_READY", () => {
@@ -183,6 +186,8 @@ class GameScene extends Phaser.Scene {
             socket.on("MOVEMENT_DONE", (score) => {
                 console.log("Je rentre dans 'MOUVEMENT_DONE'");
                 if(!this.stopMovement){
+                    this.moveValid = this.sound.add('moveTicTac');
+                    this.moveValid.play();
                     console.log("Je fais 'MOUVEMENT_DONE' + score : ", score);
                     this.score = this.score + score;
                     this.score = this.game.registry.set('score', this.score);
@@ -255,7 +260,7 @@ class GameScene extends Phaser.Scene {
                     console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                     this.drawGame();
-                    this.clientPOP = this.scene.sound.add('clientPOP');
+                    this.clientPOP = this.sound.add('clientPOP');
                     this.clientPOP.play();
                     this.resetPickedJuices();
                     this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
@@ -268,6 +273,8 @@ class GameScene extends Phaser.Scene {
             });
 
             socket.on("SERVE_CUSTOMER", () => {
+                this.musicServe = this.sound.add('musicJ2Join');
+                this.musicServe.play();
                 console.log("SERVE_CUSTOMER");
                 if(this.aReadyText){
                     console.log("SERVE_CUSTOMER après un joueur + this.reboursFinal", this.reboursFinal);
@@ -515,6 +522,8 @@ class GameScene extends Phaser.Scene {
     serveCustomer() {
         this.currentCustomer.succeed = true;
         console.log("Fonction serveCustomer(), la valeur de succeed est a ", this.currentCustomer.succeed);
+        // this.musicServe = this.sound.add('musicJ2Join');
+        // this.musicServe.play();
         if (!this.isSolo) {
             // console.log("clique pour servir", this.partie.player.playerId, this.partie.roomId);
             console.log("le joueur attend l'autre avec SET_PLAYER_READY")
@@ -561,7 +570,7 @@ class GameScene extends Phaser.Scene {
                                 console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                                 this.drawGame();
-                                this.clientPOP = this.scene.sound.add('clientPOP');
+                                this.clientPOP = this.sound.add('clientPOP');
                                 this.clientPOP.play();
                                 this.resetPickedJuices();
                                 this.showNextDialogue(this.currentCustomer.firstDialogues).then(() => {
@@ -666,21 +675,27 @@ class GameScene extends Phaser.Scene {
         if(duree == 5){
             this.partie.player.score += 800;
             this.showScore("+800", "perfect");
+            this.scorePerfect.play();
         } else if(duree == 4){
             this.partie.player.score += 700;
             this.showScore("+700", "good");
+            this.scoreGood.play();
         } else if(duree == 3){
             this.partie.player.score += 600;
             this.showScore("+600", "good");
+            this.scoreGood.play();
         } else if(duree == 2){
             this.partie.player.score += 400;
             this.showScore("+400", "good");
+            this.scoreGood.play();
         } else if(duree == 1){
             this.partie.player.score += 200;
             this.showScore("+200", "good");
+            this.scoreGood.play();
         } else if(duree == 0){
             this.partie.player.score -= 100;
             this.showScore("-100", "bad");
+            this.beepDrink.play();
         }
         console.log('score', this.partie.player.score);
         this.game.registry.set('partie', this.partie);
@@ -852,6 +867,8 @@ class GameScene extends Phaser.Scene {
             duration: movementObject.duree*1000,
             repeat: 0
         });
+        this.moveTicTac = this.sound.add('moveTicTac');
+        this.moveTicTac.play();
     }
 
     removeCocktailFinal() {
