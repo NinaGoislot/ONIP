@@ -58,6 +58,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         };
         window.addEventListener('resize', resizeListener);
         this.resizeListeners.push(resizeListener);
+        this.menuTransi = this.game.registry.get('menuTransi');
 
         // ****** Actions ******
 
@@ -88,6 +89,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
                 this.scene.start('Step4_PseudoScene', roleJoueur);
                 // this.scene.remove('Step3_ConnectPhoneScene');
             }
+            this.menuTransi.play();
         })
 
         socket.once("WAITING_FOR_SHAKER", (roomIdJoueur) => {
@@ -112,6 +114,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
             socket.emit("GO_BACK_FROM_STEP1", roomId);
             this.isSolo = null;
             this.scene.start('MenuScene');
+            this.menuTransi.play();
         }
     }
 

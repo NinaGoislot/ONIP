@@ -104,6 +104,13 @@ class EndScene extends Phaser.Scene {
             }
         });
 
+        this.gameMusic = this.game.registry.get('music');
+        this.gameMusic.stop();
+        this.gameMusic = this.game.registry.set('music',this.gameMusic);
+        this.menuMusic = this.game.registry.get('musicMenu');
+        this.menuMusic.play();
+        this.menuMusic = this.game.registry.set('musicMenu',this.menuMusic);
+
 
         let pseudoPlayer = this.add.text(gameScale.width * 0.515, gameScale.height * 0.865, this.partie.player.pseudo, {
             fill: '#252422',

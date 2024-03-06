@@ -110,6 +110,11 @@ class PourInShakerScene extends Phaser.Scene {
             this.insideShaker.height = shakerService.displayHeight - gameScale.height * 0.1;
         });
 
+        this.pourDrink = this.sound.add('pourDrink');
+        this.beepDrink = this.sound.add('beepDrink');
+        this.scoreGood = this.sound.add('scoreBottle');
+        this.scorePerfect = this.sound.add('scoreBottleGold');
+
 
         // ******************************** SHAKER SERVIR ********************************
         this.pourcentBottle = this.getQuantityForSelectedBottle();
@@ -233,10 +238,12 @@ class PourInShakerScene extends Phaser.Scene {
         socket.once("IS_POURING_TRUE", () => {
             console.log("IS_POURING_TRUE : true");
             this.liquid.isFilling = true;
+            this.pourDrink.play();
         });
 
         socket.once("IS_POURING_FALSE", () => {
             console.log("IS_POURING_FALSE ► false");
+            this.pourDrink.stop();
             this.liquid.isFilling = false;
             this.renduScore(this.liquid.fillPercentage);
             console.log("Nombre de bouteilles choisies", this.nbrBottleChoose);
@@ -343,6 +350,11 @@ class PourInShakerScene extends Phaser.Scene {
                 this.ctx.fillStyle = this.partie.liquids[i].fillColor;
                 this.ctx.fillRect(this.insideShaker.x, this.insideShaker.y + emptyHeight, this.insideShaker.width, filledHeight);
             }
+            // var imageSprite = this.add.image(this.insideShaker.x, this.insideShaker.y, 'shaker-texture');
+            // var imageElement = imageSprite.texture.getSourceImage();
+            // this.ctx.drawImage(imageElement, this.insideShaker.x, this.insideShaker.y + emptyHeight, this.insideShaker.width, filledHeight);
+            // var image = document.getElementById("texture2"); // Récupérer l'image depuis le DOM
+            // this.ctx.drawImage(image, this.insideShaker.x, this.insideShaker.y + emptyHeight, this.insideShaker.width, filledHeight);
         }
 
         requestAnimationFrame(this.fillShaker.bind(this));
@@ -439,26 +451,31 @@ class PourInShakerScene extends Phaser.Scene {
         }
         console.log('poucentFill + goal', pourcentFill, goal);
         if (!this.isTooMuch) {
-            if (pourcentFill >= (goal * 0.95) && pourcentFill < (goal * 1.05)) {
+            if (pourcentFill >= (goal * 0.95)) {
+                // if (pourcentFill >= (goal * 0.95) && pourcentFill < (goal * 1.05)) {
                 console.log('cran 1 : between ', goal * 0.95,' et ', goal *  1.05);
                 this.partie.player.score += 500;
                 this.showScore("+500", "perfect");
                 this.partie.player.perfectPourring += 1;
+                this.scorePerfect.play();
 
             } else if (pourcentFill > (goal * 0.85) && pourcentFill < (goal * 0.95)) {
                 console.log('cran 2 : between ', goal * 0.85,' et ', goal * 0.95);
                 this.partie.player.score += 250;
                 this.showScore("+250", "good");
+                this.scoreGood.play();
 
             } else if (pourcentFill > (goal * 0.75) && pourcentFill < (goal * 0.85)) {
                 console.log('cran 3 : between ', goal * 0.75,' et ', goal * 0.85);
                 this.partie.player.score += 150;
                 this.showScore("+150", "good");
+                this.scoreGood.play();
 
             } else if (pourcentFill < (goal * 0.75)) {
                 console.log('cran 4 : bellow ', goal * 0.75);
                 this.partie.player.score -= 150;
                 this.showScore("-150", "bad");
+                this.beepDrink.play();
 
             }
         }
@@ -498,6 +515,7 @@ class PourInShakerScene extends Phaser.Scene {
             this.partie.player.score -= 200;
             this.isTooMuch = true;
             this.showScore("-200", "bad");
+            this.beepDrink.play();
         }
     }
 }

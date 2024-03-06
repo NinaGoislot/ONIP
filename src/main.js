@@ -20,13 +20,13 @@ import StartScene from '@/scenes/TransiStartScene';
 import ArmoireFictiveScene from '@/scenes/TransiArmoireFictiveScene';
 import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
 
-// Maëlle Cégep :
+// Maëlle Cégep : 
 const socket = io("https://10.1.180.121:3006");
 // Maëlle Bloc : const socket = io("https://192.168.20.227:3006");
 // Nina Cégep : const socket = io("https://10.1.180.126:3006");
 // Nina Bloc: const socket = io("https://192.168.30.233:3006");
 // Local : const socket = io("http://127.0.0.1:3006"); 
-// Déploiement externe : const socket = io("https://paradox.timmatane.ca"); 
+// Déploiement externe : const socket = io("https://paradoxe.timmatane.ca"); 
 
 const VALUES = {
   width: 1920,

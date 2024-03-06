@@ -45,15 +45,19 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
             this.btnJoin.setPosition(gameScale.width*0.495, gameScale.height*0.722);
         })
 
+        this.menuTransi = this.game.registry.get('menuTransi');
+
         // ******************************* SOCKET ************************************************
         socket.once("GAME_MULTI_CREATED", (roomId) => {
             this.scene.start('Step2_LobbyScene', {roomId : roomId, player : "J1"});
+            this.menuTransi.play();
         })
     }
 
     // ************************************* FONCTIONS ************************************************
     back(){
         this.scene.start('MenuScene');
+        this.menuTransi.play();
     }
 
     createGame() {
@@ -62,6 +66,7 @@ class Step1_CreateJoinLobbyScene extends Phaser.Scene {
 
     joinGame() {
         this.scene.start('Step2_LobbyScene', {roomId : 0, player : "J2"});
+        this.menuTransi.play();
         // this.scene.remove('Step1_CreateJoinLobbyScene');
     }
 }

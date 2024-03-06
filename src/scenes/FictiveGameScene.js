@@ -29,13 +29,6 @@ class FictiveGameScene extends Phaser.Scene {
     preload() {;
         this.bottlesData = this.game.registry.get('ingredients');
         this.cocktailsData = this.game.registry.get('cocktails');
-        this.bottleCarteImgKeys = this.game.registry.get('bottleCarteImgKeys');
-        this.bottleGoldImgKeys = this.game.registry.get('bottleGoldImgKeys');
-        this.bottleCarteTakenImgKeys = this.game.registry.get('bottleCarteTakenImgKeys');
-        this.bottleGoldTakenImgKeys = this.game.registry.get('bottleGoldTakenImgKeys');
-        this.bottleGoldStolenImgKeys = this.game.registry.get('bottleGoldStolenImgKeys');
-        this.bottleGoldStolenTakenImgKeys = this.game.registry.get('bottleGoldStolenTakenImgKeys');
-
     }
 
     create() {
@@ -45,10 +38,6 @@ class FictiveGameScene extends Phaser.Scene {
         this.canva.menuPauseButton(this.scene, this);
         this.bottleCocktailImgTab = [];
         this.drawGame();
-
-        let rectangle = this.add.rectangle(gameScale.width*0.9, gameScale.height*0.9, 100, 100, 0x6666ff, 0);
-        rectangle.setInteractive({cursor: 'pointer'})
-        rectangle.on('pointerdown', ()=> this.openCabinet())
 
         // ************************************************ SOCKET ************************************************
         socket.on('JUICE_TAKEN', (bottleId, bottlesData)=>{
@@ -117,8 +106,6 @@ class FictiveGameScene extends Phaser.Scene {
             'sceneToMove': "CabinetScene"
         });
         this.scene.bringToTop('ArmoireFictiveScene');
-        // this.scene.stop('FictiveGameScene');
-        // this.scene.start('CabinetScene');
     }
 
     removeSocket(){
@@ -206,23 +193,38 @@ class FictiveGameScene extends Phaser.Scene {
         for (let i = 0; i < BOTTLE_CARD_GRID_NBR_ROW; i++) {
             for (let j = 1; j < BOTTLE_CARD_GRID_NBR_COL_PLUS_1; j++) {
                 let imageKey;
+                let frameKey;
                 let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId);
                 let takenOrNot = this.alreadyTaken(cocktailBottleImg);
                 if (takenOrNot) {
                     console.log('status gold bottle ', this.partie.goldBottleStatus);
                     if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
-                        imageKey = this.bottleGoldStolenTakenImgKeys.find(image => image == `carte-luxe-stolen-taken-bouteille` + goldenBottle);
+                        imageKey =  "carte-luxe-vole-prise-sprite";
+                        frameKey = goldenBottle-1;
                     } else {
-                        cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldTakenImgKeys.find(image => image == `carte-luxe-taken-bouteille` + goldenBottle) : imageKey = this.bottleCarteTakenImgKeys.find(image => image == `carte-normale-taken-bouteille` + cocktailBottleImg.id);
+                        if(cocktailBottleImg.id == goldenBottle){
+                            imageKey =  "carte-luxe-prise-sprite";
+                            frameKey = goldenBottle-1;
+                        }else{
+                            imageKey =  "carte-normal-prise-sprite";
+                            frameKey = cocktailBottleImg.id-1;
+                        }
                     }
                 } else {
                     if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
-                        imageKey = this.bottleGoldStolenImgKeys.find(image => image == `carte-luxe-stolen-bouteille` + goldenBottle);
+                        imageKey =  "carte-luxe-vole-sprite";
+                        frameKey = goldenBottle -1;
                     } else {
-                        cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleCarteImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
+                        if(cocktailBottleImg.id == goldenBottle){
+                            imageKey =  "carte-luxe-sprite";
+                            frameKey = goldenBottle-1;
+                        }else{
+                            imageKey =  "carte-normal-sprite";
+                            frameKey = cocktailBottleImg.id -1 ;
+                        }
                     }
                 }
-                let bottleImg = this.add.image(posX, posY, imageKey)
+                let bottleImg = this.add.image(posX, posY, imageKey, frameKey)
                 bottleImg.scaleX = 1;
                 bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
                 bottleImg.scaleY = bottleImg.scaleX

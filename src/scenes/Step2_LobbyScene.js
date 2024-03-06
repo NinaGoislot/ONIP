@@ -95,6 +95,10 @@ class Step2_LobbyScene extends Phaser.Scene {
         window.addEventListener('resize', resizeListener);
         this.resizeListeners.push(resizeListener);
 
+        this.menuTransi = this.game.registry.get('menuTransi');
+        this.menuToc = this.game.registry.get('menuToc');
+        this.menuPingPong = this.game.registry.get('menuPingPong');
+
         switch (this.numeroPlayer) {
             case "J1":
                 this.codePin.text = this.roomId;
@@ -127,6 +131,7 @@ class Step2_LobbyScene extends Phaser.Scene {
                 socket.on("BAD_GAME_ID", ()=>{
                     console.log("BAD_GAME_ID");
                     this.messageInfos.text = "Mauvais code. Réessaie."
+                    this.menuToc.play();
                 })
                 break;
             default:
@@ -143,6 +148,7 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.scene.start('Step3_ConnectPhoneScene', {
                     'mode' : false,
                 });
+                this.menuTransi.play();
                 // this.scene.remove('Step2_LobbyScene');
             });
         });
@@ -152,6 +158,7 @@ class Step2_LobbyScene extends Phaser.Scene {
 
     back(){
         this.scene.start('Step1_CreateJoinLobbyScene');
+        this.menuTransi.play();
         socket.emit("GO_BACK_FROM_STEP1", this.roomId);
     }
 
@@ -162,6 +169,7 @@ class Step2_LobbyScene extends Phaser.Scene {
             this.messageInfos.setVisible(true);
             this.messageInfos.text = "Code copié !"
             console.log('Contenu copié avec succès !', texteARecopier);
+            this.menuPingPong.play();
         })
         .catch(err => {
             console.error('Erreur lors de la copie du contenu :', err);
@@ -171,6 +179,7 @@ class Step2_LobbyScene extends Phaser.Scene {
     onCheck(){
         if (this.inputRoomId.value == null || this.inputRoomId.value == "") {
             this.messageInfos.text = "Entre un code de partie."
+            this.menuToc.play();
         } else {
             this.inputRoomId.value = this.inputRoomId.value.toUpperCase();
             this.inputRoomId.value = this.inputRoomId.value.replace(/O/g, '0');

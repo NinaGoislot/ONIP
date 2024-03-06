@@ -51,6 +51,12 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.btnBack = this.add.rectangle(gameScale.width*0.06, gameScale.height*0.105, gameScale.width*0.072, gameScale.width*0.072, 0x6666ff, 0);
         this.btnBack.setInteractive({cursor: 'pointer'});
         this.btnBack.on('pointerdown', ()=> this.back());
+        this.menuMusic = this.game.registry.get('musicMenu');
+        this.menuTransi = this.game.registry.get('menuTransi');
+        this.menuPingPong = this.game.registry.get('menuPingPong');
+        this.menuToc = this.game.registry.get('menuToc');
+        this.musicJ2JOIN = this.sound.add('musicJ2Join');
+        this.musicValid = this.sound.add('PingPongPaddle');
 
         // ****** Events Listeners ******
         window.addEventListener('resize', () => {
@@ -128,6 +134,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         if(this.game.registry.get('aPlayerReady')){
             this.messageStatePlayer.text = "Le deuxième joueur est prêt !";
             this.aPlayerReady = true;
+            this.musicJ2JOIN.play();
             if(this.j1Ready || this.isSolo){
                 this.btnPreReady.setVisible(false);
                 this.btnIsReady.setVisible(true);
@@ -158,12 +165,15 @@ class Step4_PseudoScene extends Phaser.Scene {
             }
             socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.removeResizeListeners();
+            this.game.registry.get('musicMenu');
+            this.menuMusic.stop();
             this.scene.launch('StartScene');
             this.scene.bringToTop('StartScene');
             setTimeout(() => {
                 this.putPseudo.setAttribute('hidden', '');
                 this.formJoin.destroy();
             }, 300);
+            this.menuTransi.play();
             // setTimeout(() => {
             //     this.scene.start('GameScene');
             //     this.scene.bringToTop('StartScene');
@@ -192,6 +202,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             this.messageInfos.text = "Écris ton pseudo."
         } else if (this.pseudo.length > 15) {
             this.messageInfos.text = "Le pseudo ne peut pas dépasser 15 caractères.";
+            this.menuToc.play();
         } else {
             console.log('test isSolo', this.isSolo);
             if(!this.aPlayerReady && !this.isSolo){
@@ -210,6 +221,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             //console.log(this.aPlayerReady);
             this.btnValidation.disableInteractive();
             this.canEnter = false;
+            this.musicValid.play();
         }
     }
 }

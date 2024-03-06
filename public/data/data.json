@@ -11,7 +11,7 @@
           { "alcoholId": 8, "quantity": 10 },
           { "alcoholId": 5, "quantity": 60 }
         ],
-        "movements": ["BOD1", "BOD2", "BOD3"] 
+        "movements": ["HAN4", "BOD1", "HAN4", "BOD1"] 
       },
       {
         "id": 2,
@@ -22,7 +22,7 @@
           { "alcoholId": 1, "quantity": 50 },
           { "alcoholId": 10, "quantity": 10 }
         ],
-        "movements": ["BOD4", "BOD2", "BOD1"] 
+        "movements": ["HAN2", "BOD3", "HAN2", "BOD3"] 
       },
       {
         "id": 3,
@@ -34,7 +34,7 @@
           { "alcoholId": 15, "quantity": 25 },
           { "alcoholId": 18, "quantity": 25 }
         ],
-        "movements": ["BOD2", "BOD3", "BOD2"] 
+        "movements": ["BOD6", "BOD8", "HAN1", "BOD6", "BOD8", "HAN1"] 
       },
       {
         "id": 4,
@@ -47,7 +47,7 @@
           { "alcoholId": 11, "quantity": 25 },
           { "alcoholId": 2, "quantity": 25 }
         ],
-        "movements": ["BOD8", "BOD1", "BOD6"] 
+        "movements": ["HAN5", "HAN4", "HAN1"] 
       },
       {
         "id": 5,
@@ -58,7 +58,7 @@
           { "alcoholId": 7, "quantity": 10 },
           { "alcoholId": 16, "quantity": 80 }
         ],
-        "movements": ["BOD7", "BOD6", "BOD3"] 
+        "movements": ["BOD4", "HAN3", "BOD4", "HAN3"] 
       },
       {
         "id": 6,
@@ -69,7 +69,7 @@
           { "alcoholId": 4, "quantity": 20 },
           { "alcoholId": 10, "quantity":10 }
         ],
-        "movements": ["BOD5", "BOD4", "BOD8"] 
+        "movements": ["HAN1", "BOD5"] 
       },
       {
         "id": 7,
@@ -81,7 +81,7 @@
           { "alcoholId": 10, "quantity": 10 },
           { "alcoholId": 19, "quantity": 10 }
         ],
-        "movements": ["BOD5", "BOD2", "BOD3"] 
+        "movements": ["BOD2", "BOD1", "BOD2", "BOD1"] 
       },
       {
         "id": 8,
@@ -93,7 +93,7 @@
           { "alcoholId": 7, "quantity": 30 },
           { "alcoholId": 13, "quantity": 30 }
         ],
-        "movements": ["BOD6", "BOD8", "BOD4"] 
+        "movements": ["HAN4", "BOD2"] 
       },
       {
         "id": 9,
@@ -107,7 +107,7 @@
           { "alcoholId": 6, "quantity": 30 },
           { "alcoholId": 9, "quantity": 30 }
         ],
-        "movements": ["BOD6", "BOD2", "BOD7"] 
+        "movements": ["HAN5", "BOD4", "HAN5", "BOD4", "HAN4", "BOD4"] 
       },
       {
         "id": 10,
@@ -118,7 +118,7 @@
           { "alcoholId": 17, "quantity": 10 },
           { "alcoholId": 15, "quantity": 10 }
         ],
-        "movements": ["BOD3", "BOD2", "BOD7"] 
+        "movements": ["HAN1", "BOD3", "BOD5", "HAN1", "BOD3", "BOD5"] 
       }
     ],
 
@@ -269,132 +269,145 @@
       {
         "id": "BOD1",
         "description": "Secoue à gauche puis secoue à droite !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD2",
         "description": "Secoue au niveau des genoux puis élance en diagonale !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD3",
         "description": "Berce ton téléphone !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD4",
         "description": "Fais un cercle !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD5",
         "description": "Fais un 8 horizontal !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD6",
         "description": "Fais un carré !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD7",
         "description": "Secoue au niveau des genoux puis remonte vers le haut !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
         "id": "BOD8",
         "description": "Tend le téléphone devant puis ramène le en arc de cercle !",
-        "image": ""
+        "image": "",
+        "duree":5
       },
       {
-          "id": "HAN1",
-          "description": "Secoue en diagonale !",
-          "image": ""
-        },
-        {
-          "id": "HAN2",
-          "description": "Secoue de haut en bas",
-          "image": ""
-        },
-        {
-          "id": "HAN3",
-          "description": "Secoue de gauche à droite",
-          "image": ""
-        },
-        {
-          "id": "HAN4",
-          "description": "Fait basculer ton téléphone de haut en bas en faisant un arc de cercle",
-          "image": ""
-        },
-        {
-          "id": "HAN5",
-          "description": "Fait pivoter en rond ton téléphone",
-          "image": ""
-        }
+        "id": "HAN1",
+        "description": "Secoue en diagonale !",
+        "image": "",
+        "duree":5
+      },
+      {
+        "id": "HAN2",
+        "description": "Secoue de haut en bas",
+        "image": "",
+        "duree":5
+      },
+      {
+        "id": "HAN3",
+        "description": "Secoue de gauche à droite",
+        "image": "",
+        "duree":5
+      },
+      {
+        "id": "HAN4",
+        "description": "Fait basculer ton téléphone de haut en bas en faisant un arc de cercle",
+        "image": "",
+        "duree":5
+      },
+      {
+        "id": "HAN5",
+        "description": "Fait pivoter en rond ton téléphone",
+        "image": "",
+        "duree":5
+      }
     ],
 
     "emotions": [
       {
         "id": 1,
         "name": "Calme",
-        "firstDialogues": ["Bonjour, je voudrais un "],
-        "secondaryDialogues": ["...", "C'est plutôt agréable ici.", "...", "...", "Vous vous en sortez bien.", "..."],
-        "successText": ["Merci."],
-        "failureText": ["Merci..."],
+        "firstDialogues": ["Bonsoir, alors vous êtes vraiment en compétition pour me servir ?!?", "Et bien alors un "],
+        "secondaryDialogues": [""],
+        "successText": ["Eh eh, j’ai hâte de goûter ça, merci !"],
+        "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 2,
         "name": "Enjôleur",
-        "firstDialogues": ["Hey ! C'est la première fois que je viens ici, je compte sur vous.", "Huuuum, je pense que je vais prendre un "],
-        "secondaryDialogues": ["Cet endroit a l'air sympa.", "Je pense que je viendrais avec ma petite amie la prochaine fois.", "Ce bar dégage quelque chose de romantique un peu, ça ferait un beau rencard."],
-        "successText": ["Vous avez refait ma journée !"],
-        "failureText": ["Oh, c'est assez... inattendu."],
+        "firstDialogues": ["Et bien, il y a de l’animation en ville ce soir !", "Comme d’habitude : un "],
+        "secondaryDialogues": [""],
+        "successText": ["Merci !"],
+        "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 3,
         "name": "Joyeux",
-        "firstDialogues": ["Allo ! Je vais vous prendre un "],
-        "secondaryDialogues": ["Vous êtes nouveau au paradoxe ? ", "Je viens souvent ici, c'est la première fois que je vous vois ! ", "Je suis ravie de faire partie de vos premiers clients ! "],
-        "successText": ["C'est parfait ! Vous êtes au top !"],
-        "failureText": ["Ce n'est pas exactement ça, mais vous avez fait de votre mieux, c'est le principal !"],
+        "firstDialogues": ["Allo !", "Je vais vous prendre un "],
+        "secondaryDialogues": [""],
+        "successText": ["C'est parfait, quel service !"],
+        "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 4,
         "name": "Méprisant",
-        "firstDialogues": ["Hey toi, je voudrais un "],
-        "secondaryDialogues": ["Il est plutot petit ce bar. J'espère que la qualité sera au rendez vous au moins.", "Vous ne semblez pas vraiment savoir ce que vous faites.", "À ce stade, j'aurais pu le faire moi-même ce cocktail."],
-        "successText": ["C'est pas trop tôt. Hum... Il y a un service correct ici, c'est déjà ça."],
-        "failureText": ["Tss, vous n'êtes même pas capable de suivre une simple commande. Une telle incompétence, c'est désolant."],
+        "firstDialogues": ["Je vais aller droit au but : il faut payer des tips ici ?", "AH ! bon bah un "],
+        "secondaryDialogues": [""],
+        "successText": ["Merci.", ".. ça a intérêt à être très très bon ...."],
+        "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 5,
         "name": "Dépressif",
-        "firstDialogues": ["J'ai besoin d'un bon remontant... un "],
-        "secondaryDialogues": ["Dure journée...", "Le paradoxe c'est le bar idéal pour s'éloigner un peu de tous les soucis de la vie.", "... juste un peu."],
-        "successText": ["Merci, c'est un bon remontant."],
-        "failureText": ["Je n'attendais plus grand chose de cette journée de toute façon.... Merci quand même."],
+        "firstDialogues": ["Bonsoir..", "Il me faudrait un bon remontant aujourd’hui, je vais vous prendre un "],
+        "secondaryDialogues": [""],
+        "successText": ["Vous voir à l'œuvre est toujours aussi impressionnant.", "Merci !"],
+        "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 6,
         "name": "Confiant",
-        "firstDialogues": ["Allo ! Humm, tu as beaucoup de choix, je ne sais pas quoi prendre.", "Je vais tenter ton cocktail du jour ! Le "],
-        "secondaryDialogues": ["J'ai hâte de goûter.", "Peu importe ce que tu prépares, ce sera tip top.", "Tu sais y faire avec un shaker dis donc !"],
-        "successText": ["Tip top !"],
-        "failureText": ["Ce n'est pas exactement ça, mais tu feras à coup sûr mieux la prochaine fois !"],
+        "firstDialogues": ["Bonsoir !", "C’est ma première fois ici, vous auriez une recommandation ?", "Oh hum… alors un "],
+        "secondaryDialogues": [""],
+        "successText": [" 2 verres d’un coup, vraiment !", "Je sens que je vais bien profiter de la soirée eh eh eh !"],
+        "failureText": [""],
         "favoriteExtra": 1
       },
       {
         "id": 7,
         "name": "Aigri",
-        "firstDialogues": ["...", "Un "],
-        "secondaryDialogues": ["Ce n'est pas la première fois que je viens ici.", "J'ai donc l'habitude de vos prestations plus que passables...", "Je n'attends pas grand chose pour être honnête."],
-        "successText": ["... Ce n'est pas si mal que ça cette fois."],
-        "failureText": ["Pff, ça ne changera donc pas hein ?"],
+        "firstDialogues": ["Oh j't'ai jamais vu ici toi 0_0 ! Ce soir j’ai grand soif ᕕ༼⌐■-■༽ᕗ !", "Bon épate moi, t’as intérêt à être meilleure que ta vieille mentore (งಠ_ಠ)ง !", "Allez, un "],
+        "secondaryDialogues": [""],
+        "successText": ["Oh oh, ça m’a l’air pas trop mal (º﹃º )..", "Sur ce (￣∠ ￣ )ﾉ"],
+        "failureText": [""],
         "favoriteExtra": 1
       }
     ],
