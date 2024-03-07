@@ -25,7 +25,8 @@ class VerseGameScene extends Phaser.Scene {
         this.transi.displayWidth = gameScale.width;
         this.transi.scaleY = this.transi.scaleX;
         this.transi.anims.play('transi-verse-game');
-
+        this.transiSwipe2 = this.sound.add('transiSwipe2');
+        this.transiSwipe2.play();
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-verse-game' && frame.index === 18) { 
                 this.scene.stop("CabinetScene");

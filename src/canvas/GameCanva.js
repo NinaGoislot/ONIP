@@ -76,13 +76,16 @@ class GameCanva {
     // --------------------------- FONCTIONS SECONDAIRES ---------------------------
 
     animClientTalk(isTalking) {
+        // this.blabla = this.scene.sound.add('blabla');
         if (isTalking == "talk") {
             this.clientImage.play('clientTalk')
-            this.isTalking = "isTalking"
+            this.isTalking = "isTalking";
+            // this.blabla.play();
         } else if (isTalking == "stop") {
             this.clientImage.anims.restart();
             this.clientImage.stop('clientTalk')
             this.clientImage.play('blink');
+            // this.blabla.pause();
         }
     }
 

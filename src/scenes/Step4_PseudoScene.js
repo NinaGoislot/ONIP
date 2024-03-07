@@ -51,7 +51,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.btnBack = this.add.rectangle(gameScale.width*0.06, gameScale.height*0.105, gameScale.width*0.072, gameScale.width*0.072, 0x6666ff, 0);
         this.btnBack.setInteractive({cursor: 'pointer'});
         this.btnBack.on('pointerdown', ()=> this.back());
-        this.menuMusic = this.game.registry.get('musicMenu');
+
         this.menuTransi = this.game.registry.get('menuTransi');
         this.menuPingPong = this.game.registry.get('menuPingPong');
         this.menuToc = this.game.registry.get('menuToc');
@@ -165,15 +165,17 @@ class Step4_PseudoScene extends Phaser.Scene {
             }
             socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.removeResizeListeners();
-            this.game.registry.get('musicMenu');
+
+            this.menuMusic = this.game.registry.get('musicMenu');
             this.menuMusic.stop();
+            this.game.registry.set('musicMenu', this.music);
             this.scene.launch('StartScene');
             this.scene.bringToTop('StartScene');
             setTimeout(() => {
                 this.putPseudo.setAttribute('hidden', '');
                 this.formJoin.destroy();
             }, 300);
-            this.menuTransi.play();
+            // this.menuTransi.play();
             // setTimeout(() => {
             //     this.scene.start('GameScene');
             //     this.scene.bringToTop('StartScene');

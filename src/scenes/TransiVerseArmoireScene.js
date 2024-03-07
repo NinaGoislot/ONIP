@@ -24,6 +24,10 @@ class VerseArmoireScene extends Phaser.Scene {
         this.transi = this.add.sprite(gameScale.width/2, gameScale.height/2, 'transi-armoire');
         this.transi.displayWidth = gameScale.width;
         this.transi.scaleY = this.transi.scaleX;
+        this.transi.anims.play('transi-armoire');
+        this.transiSwipe2 = this.sound.add('transiSwipe2');
+        this.transiSwipe2.play();
+
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-armoire' && frame.index === 15) { 
                 this.scene.stop("PourInShakerScene");
@@ -32,8 +36,6 @@ class VerseArmoireScene extends Phaser.Scene {
                 socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
             }
         }, this);
-
-        this.transi.anims.play('transi-armoire');
         this.transi.on('animationcomplete', function (animation) {          
             if (animation.key === 'transi-armoire') {
                 socket.emit("CAN_SWIPE", this.partie.roomId, this.partie.player.numeroPlayer);

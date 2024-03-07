@@ -54,7 +54,6 @@ class GameScene extends Phaser.Scene {
         this.createAnimTransiCarte();
         this.transiGameScene = this.sound.add('transiGameScene');
 
-
         if (this.currentCustomer === null) {
 
             // Création du canva 
@@ -179,26 +178,44 @@ class GameScene extends Phaser.Scene {
                 console.log("Id à envoyer 1ère fois: ", this.currentCustomer.drink.movements[this.indexMove]);
                 this.drawMovement(this.currentCustomer.drink.movements[this.indexMove]);
                 socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer); //Premier mouvement
-                this.startMouvement();
+                // this.startMouvement();
+                this.createMovStop();
             });
 
             //Demander de faire les mouvements du cocktail
             socket.on("MOVEMENT_DONE", (score) => {
                 console.log("Je rentre dans 'MOUVEMENT_DONE'");
                 if(!this.stopMovement){
-                    this.moveValid = this.sound.add('moveTicTac');
+                    this.moveValid = this.sound.add('moveValid');
                     this.moveValid.play();
                     console.log("Je fais 'MOUVEMENT_DONE' + score : ", score);
                     this.score = this.score + score;
                     this.score = this.game.registry.set('score', this.score);
 
+                    this.stopTicTac();
                     this.removeMovement();
 
                     this.indexMove++;
                     if (this.indexMove < this.currentCustomer.drink.movements.length) {
-                        console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
-                        this.drawMovement(this.currentCustomer.drink.movements[this.indexMove]);
-                        socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer);
+                        if (this.animMovStop.anims.isPlaying && this.animMov.anims.getCurrentKey() === this.movStop.intro){
+                            this.animMovStop.anims.stop(this.movStop.intro);
+                            this.animMovStop.setFrame(8);
+                        }
+                        if(this.animMovStop){
+                            this.animMovStop.anims.play(this.movStop.mov);
+                            this.animMovStop.on('animationcomplete', function (animation) {      
+                                if (animation.key === this.movStop.mov) {
+                                    console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
+                                    this.drawMovement(this.currentCustomer.drink.movements[this.indexMove]);
+                                    socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer);
+                                }
+                            }, this);
+                        } else{
+                            console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
+                            this.drawMovement(this.currentCustomer.drink.movements[this.indexMove]);
+                            socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer);
+                        }
+                        
                     } else {
                         console.log("les mouvements sont finis ?")
                         socket.emit("MOVEMENTS_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
@@ -224,6 +241,8 @@ class GameScene extends Phaser.Scene {
                 // this.showFinalDialogue().then(() => {
                     if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
                         this.canva.remove();
+                        this.clientDePOP = this.sound.add('clientDePOP');
+                        this.clientDePOP.play();
                         this.removeCocktailFinal();
                         if (this.rolePlayer == 1) {
                             this.generateNewClient().then(() => {
@@ -377,13 +396,17 @@ class GameScene extends Phaser.Scene {
         });
 
         socket.once('GAME_OVER',()=>{
-            this.scene.start('EndScene');
+            this.scene.launch('TransiEndScene');
+            this.scene.bringToTop('TransiEndScene');
+            // this.scene.start('EndScene');
         });
     }
 
     // ************************************* FONCTIONS ************************************************
 
     compteARebours = (resolve) => {
+        this.decompte = this.sound.add('decompte');
+        this.decompte.play();
         var duree = 5;
         var intervalId = setInterval(() => {
             this.rebours.text = duree - 2;
@@ -434,6 +457,7 @@ class GameScene extends Phaser.Scene {
 
         const currentCocktail = this.findObjectById(this.cocktailsData, cocktail.id)
         const goldBottle = this.goldBottle(currentCocktail);
+        console.log("GOLD BOUTEILLE ID", goldBottle);
 
         const indicesTabBottle = this.generateRandomIndices(this.bottlesData.length);
 
@@ -547,6 +571,8 @@ class GameScene extends Phaser.Scene {
             this.showFinalDialogue().then(() => {
                 if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
                     this.canva.remove();
+                    this.clientDePOP = this.sound.add('clientDePOP');
+                    this.clientDePOP.play();
                     this.removeCocktailFinal();
                     if(this.scoreText){
                         this.scoreText.destroy();
@@ -603,7 +629,7 @@ class GameScene extends Phaser.Scene {
     showNextDialogue = async (dialogue) => {
         for (let i = 0; i < dialogue.length; i++) {
             let currentDialogue = dialogue[i];
-            this.canva.isTalking = "talk"
+            this.canva.isTalking = "talk";
             for (let j = 0; j < currentDialogue.length; j++) {
                 if (dialogue === this.currentCustomer.firstDialogues && currentDialogue == dialogue[dialogue.length - 1]) {
                     console.log("Je dois écrire le nom de la boisson à la fin de ce dialogue")
@@ -626,12 +652,15 @@ class GameScene extends Phaser.Scene {
         const dialogue = this.currentCustomer.succeed ? this.currentCustomer.successDialogue : this.currentCustomer.failureDialogue;
         for (let i = 0; i < dialogue.length; i++) {
             let currentDialogue = dialogue[i];
+            this.canva.isTalking = "talk";
             for (let j = 0; j < currentDialogue.length; j++) {
                 let displayedDialogue = currentDialogue.substring(0, j + 1);
                 this.canva.updateDialogue(displayedDialogue); // Afficher les dialogues lettre par lettre
                 // Attendre un court laps de temps avant d'afficher la prochaine lettre
                 await new Promise(resolve => this.time.delayedCall(50, resolve));
             }
+            this.canva.isTalking = "stop"
+            this.canva.animClientTalk(this.canva.isTalking)
             // Attendre 3 secondes après l'affichage complet du dialogue
             await new Promise(resolve => this.time.delayedCall(3000, resolve));
         }
@@ -841,35 +870,57 @@ class GameScene extends Phaser.Scene {
     drawMovement(movementId) {
         let movementImgData = this.tabMovAllImg[movementId];
         console.log("dessine mouv", movementId, movementImgData)
-        let imgMovementKey = "HAN4";
-        if(movementImgData.intro){
-            console.log("existe");
-            this.createAnimMov(movementImgData);
-        } else{
-            console.log("existe pas")
-            imgMovementKey = movementImgData;
-            this.currentMovement = this.add.image(gameScale.width*0.75, gameScale.height*0.5 , imgMovementKey);
-            this.currentMovement.setOrigin(0.5);
-        }
+        // let imgMovementKey = "HAN4";
+        // if(movementImgData.intro){
+        //     console.log("existe");
+        //     this.createAnimMov(movementImgData);
+        // } else{
+        //     console.log("existe pas")
+        //     imgMovementKey = movementImgData;
+        //     this.currentMovement = this.add.image(gameScale.width*0.75, gameScale.height*0.5 , imgMovementKey);
+        //     this.currentMovement.setOrigin(0.5);
+        // }
 
         const movementObject = this.movementsData.find(movement => movement.id == movementId);
         console.log("Tableau des mouvements : ", this.movementsData);
         // console.log("Id que j'ai : ", movementId);
         console.log("Id que j'ai : ", movementId, "movement qui correspond : ", movementObject);
+        this.createAnimMov(movementImgData, movementObject);
+        setTimeout(() => {
+            this.drawTicTac(movementObject);
+        }, 1000);
+    }
+
+    drawTicTac(movementObject){
         this.horloge = this.add.circle(gameScale.width*0.5, gameScale.height*0.1, gameScale.width*0.04, 0xEFECEA).setOrigin(0.5,0.5)
         this.horloge.setStrokeStyle(4, 0x252422);
         this.ligneTemps = this.add.image(gameScale.width*0.5, gameScale.height*0.1, "fleche").setOrigin(0.5,1);
         this.ligneTemps.displayWidth = gameScale.width * 0.01;
         this.ligneTemps.scaleY = this.ligneTemps.scaleX;
+        this.moveTicTac = this.sound.add('moveTicTac');
+        this.moveTicTac.play();
         this.tweens.add({
             targets: this.ligneTemps,
             angle: '+=360',
             duration: movementObject.duree*1000,
-            repeat: 0
+            repeat: 0,
+            onComplete: function () {
+                // this.moveTicTac.stop();
+                this.stopTicTac();
+            }.bind(this),
+            onCompleteScope: this 
         });
-        this.moveTicTac = this.sound.add('moveTicTac');
-        this.moveTicTac.play();
     }
+
+    stopTicTac() {
+        if (this.tweens.isTweening(this.ligneTemps)) {
+            this.tweens.killTweensOf(this.ligneTemps);
+        }
+        if (this.moveTicTac.isPlaying) {
+            this.moveTicTac.stop();
+        }
+    }
+    
 
     removeCocktailFinal() {
         if(this.imgCocktail){
@@ -878,9 +929,9 @@ class GameScene extends Phaser.Scene {
     }
 
     removeMovement() {
-        if(this.currentMovement){
-            this.currentMovement.destroy();
-        }
+        // if(this.currentMovement){
+        //     this.currentMovement.destroy();
+        // }
         if(this.animMov){
             this.animMov.destroy();
         }
@@ -904,7 +955,7 @@ class GameScene extends Phaser.Scene {
         this.transi = this.add.sprite(gameScale.width/2, gameScale.height/2, 'transi-carte');
         this.transi.displayWidth = gameScale.width;
         this.transi.scaleY = this.transi.scaleX;
-        this.transi.setDepth(2);
+        this.transi.setDepth(3);
         this.transi.anims.play('transi-carte');
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-carte' && frame.index === 15) { 
@@ -919,9 +970,11 @@ class GameScene extends Phaser.Scene {
                 socket.emit("CABINET_SWIPE_ON", this.partie.roomId, this.partie.player.numeroPlayer);
             };
         }, this);
+        this.cartePOP = this.sound.add('cartePOP');
+        this.cartePOP.play();
     }
 
-    createAnimMov(tabMov){
+    createAnimMov(tabMov, movObject){
         this.anims.create({
             key: tabMov.intro,
             frames: this.anims.generateFrameNumbers(tabMov.intro, {
@@ -953,6 +1006,54 @@ class GameScene extends Phaser.Scene {
                 this.animMov.anims.play(tabMov.mov);
             }
         }, this);
+
+        setTimeout(() => {
+            if (this.animMov && this.animMov.anims.isPlaying && this.animMov.anims.getCurrentKey() === tabMov.mov) {
+                console.log('this.animMov est en train de jouer l\'animation', tabMov.mov);
+                this.animMov.anims.stop(tabMov.mov);
+                this.animMov.setVisible(false);
+                this.drawMovStop();
+            }
+        }, movObject.duree*1000);
+    }
+
+    createMovStop(){
+        this.movStop = this.game.registry.get('tabMovStop');
+        this.anims.create({
+            key: this.movStop.intro,
+            frames: this.anims.generateFrameNumbers(this.movStop.intro, {
+                start: 0,
+                end: this.movStop.lengthIntro
+            }),
+            frameRate: 30,
+            repeat: 0
+        });
+        this.anims.create({
+            key: this.movStop.mov,
+            frames: this.anims.generateFrameNumbers(this.movStop.mov, {
+                start: 0,
+                end: this.movStop.lengthMov
+            }),
+            frameRate: 30,
+            repeat: -1
+        });
+    }
+
+    drawMovStop(){
+        this.animMovStop = this.add.sprite(gameScale.width*0.75, gameScale.height*0.5, this.movStop.intro);
+        this.animMovStop.displayWidth = gameScale.width*0.4;
+        this.animMovStop.scaleY = this.animMovStop.scaleX;
+        this.animMovStop.anims.play(this.movStop.intro);
+
+        this.animMovStop.on('animationcomplete', function (animation) {   
+            console.log('Animation complete:', animation.key);     
+            if (animation.key === this.movStop.intro) {
+                console.log('changement anim to anim_mov');
+            }
+        }, this);
+
+        this.animMovStop.anims.play(this.movStop.mov);
+
     }
     
     createAnimInterruption(){

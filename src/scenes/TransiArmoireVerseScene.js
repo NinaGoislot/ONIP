@@ -30,6 +30,8 @@ class ArmoireVerseScene extends Phaser.Scene {
         this.transi.displayWidth = gameScale.width;
         this.transi.scaleY = this.transi.scaleX;
         this.transi.anims.play('transi-verse');
+        this.transiRound = this.sound.add('transiRound');
+        this.transiRound.play();
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-verse' && frame.index === 15) { 
                 console.log('this.bottleChoosed',this.bottleChoosed);

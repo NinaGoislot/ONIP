@@ -23,6 +23,8 @@ class EndScene extends Phaser.Scene {
         if (this.partie.mode === "solo") {
             this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'ecran-victoire');
             this.drawScene();
+            this.winMusic = this.sound.add('win');
+            this.winMusic.play();
         }
         if (this.partie.mode == "multi") {
             socket.emit("SCORE", this.partie.player.playerId, this.partie.player.score);
@@ -31,11 +33,15 @@ class EndScene extends Phaser.Scene {
                     console.log("victoire")
                     this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'ecran-victoire');
                     this.drawScene();
+                    this.winMusic = this.sound.add('win');
+                    this.winMusic.play();
                 }
                 if (playerWin == "D") {
                     console.log("défaite")
                     this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'ecran-defaite');
                     this.drawScene();
+                    this.loseMusic = this.sound.add('lose');
+                    this.loseMusic.play();
                 }
             })
             // socket.on("SCORE_OTHER_PLAYER", (score) => {
@@ -104,12 +110,23 @@ class EndScene extends Phaser.Scene {
             }
         });
 
+        // this.menuMusicAH = this.game.registry.get('musicMenu');
+        // console.log("musique2", this.menuMusicAH)
+        // this.menuMusicAH.play();
+        // this.menuMusicAH = this.game.registry.set('musicMenu',this.menuMusicAH);
         this.gameMusic = this.game.registry.get('music');
-        this.gameMusic.stop();
-        this.gameMusic = this.game.registry.set('music',this.gameMusic);
-        this.menuMusic = this.game.registry.get('musicMenu');
+        console.log("musique", this.gameMusic,this.gameMusic.isPlaying)
+        if(this.gameMusic.isPlaying){
+            console.log("oui gameMusic is playing")
+            this.gameMusic.stop();
+            this.gameMusic = this.game.registry.set('music',this.gameMusic);
+        }
+        console.log("après if");
+        this.menuMusic = this.sound.add('menu', {loop:true});
         this.menuMusic.play();
-        this.menuMusic = this.game.registry.set('musicMenu',this.menuMusic);
+        this.game.registry.set('musicMenu', this.menuMusic);
+        console.log("après if menuMusic", this.menuMusic);
+        
 
 
         let pseudoPlayer = this.add.text(gameScale.width * 0.515, gameScale.height * 0.865, this.partie.player.pseudo, {

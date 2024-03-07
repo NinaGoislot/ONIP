@@ -50,6 +50,8 @@ class ArmoireFictiveScene extends Phaser.Scene {
             this.transi.anims.play('transi-swipe-droite');
             console.log("play transi droite");
         }
+        this.transiGameScene = this.sound.add('transiGameScene');
+        this.transiGameScene.play();
 
         this.transi.on('animationupdate', function (animation, frame) {
             if ((animation.key === 'transi-swipe-gauche' && frame.index === 18) || (animation.key === 'transi-swipe-droite' && frame.index === 18)) { 

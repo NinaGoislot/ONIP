@@ -96,12 +96,13 @@ class MenuScene extends Phaser.Scene {
         //     // music.play();
         //     // this.game.registry.set('music', music);
         // }
-        this.menuMusic = this.game.registry.get('menuMusic');
+        this.menuMusic = this.game.registry.get('musicMenu');
+        cconsole.log('musicMenu', this.menuMusic)
         if (!this.menuMusic.isPlaying){
             console.log('this.menuMusic.isPlaying',this.menuMusic.isPlaying)
             this.menuMusic.play();
+            this.game.registry.set('musicMenu', this.menuMusic);
         }
-        this.game.registry.set('musicMenu', this.menuMusic);
 
         this.menuTransi = this.sound.add('PasTransi');
         this.game.registry.set('menuTransi', this.menuTransi);
@@ -167,16 +168,18 @@ class MenuScene extends Phaser.Scene {
 
     goToLobby(mode){
         this.removeResizeListeners();
+        this.menuTransi.play();
+        if (!this.menuMusic.isPlaying){
+            console.log('this.menuMusic.isPlaying',this.menuMusic.isPlaying)
+            this.menuMusic.play();
+            this.game.registry.set('musicMenu', this.menuMusic);
+        }
         if(mode == "solo"){
             this.scene.start('Step3_ConnectPhoneScene', {
                 'mode' : true,
             });
         } else {
             this.scene.start('Step1_CreateJoinLobbyScene');
-        }
-        this.menuTransi.play();
-        if (!this.menuMusic.isPlaying){
-            this.menuMusic.play();
         }
     }
 

@@ -18,6 +18,7 @@ import VerseArmoireScene from '@/scenes/TransiVerseArmoireScene';
 import VerseGameScene from '@/scenes/TransiVerseGameScene';
 import StartScene from '@/scenes/TransiStartScene';
 import ArmoireFictiveScene from '@/scenes/TransiArmoireFictiveScene';
+import TransiEndScene from '@/scenes/TransiEndScene';
 import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
 
 // Maëlle Cégep : 
@@ -58,7 +59,7 @@ const config = {
   audio: {
     disableWebAudio: true //pour ajouter du son
   },
-  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene, PourInShakerScene, FictiveGameScene, ArmoireVerseScene, VerseArmoireScene, VerseGameScene, StartScene, ArmoireFictiveScene], // Ajouter toutes les scènes ici
+  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene, PourInShakerScene, FictiveGameScene, ArmoireVerseScene, VerseArmoireScene, VerseGameScene, StartScene, ArmoireFictiveScene, TransiEndScene], // Ajouter toutes les scènes ici
 };
 
 var game = new Phaser.Game(config);

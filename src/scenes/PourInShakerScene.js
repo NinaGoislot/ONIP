@@ -431,6 +431,7 @@ class PourInShakerScene extends Phaser.Scene {
 
     removeSocket() {
         socket.removeAllListeners("POURING");
+        socket.removeAllListeners("POURING_SPEED");
         socket.removeAllListeners("NOMORE_CLIENT");
         socket.removeAllListeners("GAME_PAUSED");
         socket.removeAllListeners("A_JUICE_IS_RETURNED");
@@ -440,6 +441,7 @@ class PourInShakerScene extends Phaser.Scene {
         socket.removeAllListeners("GO_TO_CABINET");
         socket.removeAllListeners("A_GOLD_BOTTLE_IS_TAKEN");
         socket.removeAllListeners("A_PLAYER_READY");
+        socket.removeAllListeners("ERROR");
     }
 
     renduScore(pourcentFill) {
