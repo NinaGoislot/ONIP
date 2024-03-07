@@ -416,7 +416,7 @@ class LoadDataScene extends Phaser.Scene {
         this.menuMusic = this.sound.add('menu', {loop:true});
         this.game.registry.set('menuMusic', this.music);
         //juste pour pas que la musique dérange pendant les tests..
-        this.game.registry.get('music').pause();
+        // this.game.registry.get('music').pause();
 
         // this.scale.startFullscreen();
         // Lancer la scène suivante (MenuScene dans cet exemple)
