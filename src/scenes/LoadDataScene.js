@@ -28,10 +28,6 @@ class LoadDataScene extends Phaser.Scene {
     preload() {
         this.load.json('globalGameData', './data/data.json');
         this.load.audio('theme', './media/audio/BE-song.mp3');
-        socket.on("CONNECTED", () => {
-            console.log("je suis connectée")
-            this.game.registry.set('connected', true);
-        });
         this.loadFont("soria", "./media/font/soria-font.ttf");
         this.loadFont("alpino", "./media/font/alpino-variable.ttf");
 
@@ -164,6 +160,11 @@ class LoadDataScene extends Phaser.Scene {
         for (let i = 0; i < LENGTH_TRANSI; i++) {
             this.load.image(`transi-verse-game${i}`, `Transi-verticale-verse-shake_${i}.png`);
         }
+
+        socket.on("CONNECTED", () => {
+            console.log("je suis connectée")
+            this.game.registry.set('connected', true);
+        });
 
     }
 

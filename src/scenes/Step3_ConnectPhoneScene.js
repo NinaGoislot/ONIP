@@ -85,6 +85,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
 
         // ******************************* SOCKET ************************************************
         socket.on("READY_TO_PLAY", (roleJoueur) => {
+            console.log("READY_TO_PLAY : Le role du joueur est ", roleJoueur);
             if (this.isSolo) {
                 //this.rolePlayer = this.game.registry.set('rolePlayer', 1);
                 this.player = new Player(this, "joueurSolo", 1, this.playerId);
@@ -93,7 +94,6 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
                 this.game.registry.set('isSolo', true);
                 // this.btnPlaySolo.input.enabled = true;
                 this.removeResizeListeners();
-
                 this.scene.start('Step4_PseudoScene', roleJoueur);
             } else {
                 this.game.registry.set('isSolo', false);
