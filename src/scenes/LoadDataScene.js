@@ -506,7 +506,7 @@ class LoadDataScene extends Phaser.Scene {
         };
         this.game.registry.set('tabMovAll', this.tabMovAll);
 
-        //HAN5
+        //STOP
         this.load.spritesheet('mov-stop-start', './media/img/mouvements/start.webp', {
             frameWidth: 960,
             frameHeight: 540,
@@ -521,6 +521,11 @@ class LoadDataScene extends Phaser.Scene {
         }); 
         this.movStop = {intro : 'mov-stop-start', mov : 'mov-stop-end', lengthIntro:LENGTH_MOV_STOP, lengthMov:LENGTH_MOV_STOP};
         this.game.registry.set('tabMovStop', this.movStop);
+
+        socket.on("CONNECTED", () => {
+            console.log("je suis connectée")
+            this.game.registry.set('connected', true);
+        });
     }
 
     create() {

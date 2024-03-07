@@ -81,7 +81,6 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
                 this.game.registry.set('isSolo', true);
                 // this.btnPlaySolo.input.enabled = true;
                 this.removeResizeListeners();
-
                 this.scene.start('Step4_PseudoScene', roleJoueur);
             } else {
                 this.game.registry.set('isSolo', false);
