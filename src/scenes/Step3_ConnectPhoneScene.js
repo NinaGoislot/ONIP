@@ -58,25 +58,13 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         };
         window.addEventListener('resize', resizeListener);
         this.resizeListeners.push(resizeListener);
+        this.menuTransi = this.game.registry.get('menuTransi');
 
         // ****** Actions ******
 
         console.log('solo?', this.isSolo)
         if (this.isSolo) {
             socket.emit("CREATE_GAME_SOLO");
-
-            //ENELEVER CA
-            // this.btnPlaySolo = this.add.text(200, 100, "Start game solo", {
-            //         fontSize: '24px',
-            //         fill: '#fff'
-            //     })
-            //     .setInteractive({
-            //         cursor: 'pointer'
-            //     })
-            //     .on('pointerdown', () => this.startGameSolo())
-            //     .on('pointerover', () => this.btnPlaySolo.setTint(0x90ee90))
-            //     .on('pointerout', () => this.btnPlaySolo.setTint(0xffffff));
-            // this.btnPlaySolo.input.enabled = false;
         } else {
             this.playerId = this.game.registry.get('roomIdJoueur');
             this.infos.text = this.playerId;
@@ -84,8 +72,7 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         }
 
         // ******************************* SOCKET ************************************************
-        socket.on("READY_TO_PLAY", (roleJoueur) => {
-            console.log("READY_TO_PLAY : Le role du joueur est ", roleJoueur);
+        socket.once("READY_TO_PLAY", (roleJoueur) => {
             if (this.isSolo) {
                 //this.rolePlayer = this.game.registry.set('rolePlayer', 1);
                 this.player = new Player(this, "joueurSolo", 1, this.playerId);
@@ -101,9 +88,10 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
                 this.scene.start('Step4_PseudoScene', roleJoueur);
                 // this.scene.remove('Step3_ConnectPhoneScene');
             }
+            this.menuTransi.play();
         })
 
-        socket.on("WAITING_FOR_SHAKER", (roomIdJoueur) => {
+        socket.once("WAITING_FOR_SHAKER", (roomIdJoueur) => {
             this.game.registry.set('roomIdJoueur', roomIdJoueur);
             this.playerId = this.game.registry.get('roomIdJoueur');
             this.infos.text = this.playerId;
@@ -116,6 +104,18 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
     }
 
     // ************************************* FONCTIONS ************************************************
+    back(){
+        //si solo, changer au menu
+        //si duo, rien
+        if(this.isSolo){
+            const roomId = this.playerId.slice(0, -1);
+            console.log("go back", roomId);
+            socket.emit("GO_BACK_FROM_STEP1", roomId);
+            this.isSolo = null;
+            this.scene.start('MenuScene');
+            this.menuTransi.play();
+        }
+    }
 
     copy(texteARecopier) {
         navigator.clipboard.writeText(texteARecopier)
@@ -131,13 +131,6 @@ class Step3_ConnectPhoneScene extends Phaser.Scene {
         this.resizeListeners.forEach(listener => {
             window.removeEventListener('resize', listener);
         });
-    }
-
-    startGameSolo() {
-        console.log(this.playerId.slice(0, -1), this.player.numeroPlayer)
-        socket.emit("START_GAME", this.playerId.slice(0, -1), this.player.numeroPlayer);
-        this.scene.start('GameScene');
-        // this.scene.remove('Step3_ConnectPhoneScene');
     }
 
     wait = async (amount) => {

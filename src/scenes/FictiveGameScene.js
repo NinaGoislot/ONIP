@@ -29,8 +29,6 @@ class FictiveGameScene extends Phaser.Scene {
     preload() {;
         this.bottlesData = this.game.registry.get('ingredients');
         this.cocktailsData = this.game.registry.get('cocktails');
-        this.bottleCarteImgKeys = this.game.registry.get('bottleCarteImgKeys');
-        this.bottleGoldImgKeys = this.game.registry.get('bottleGoldImgKeys');
     }
 
     create() {
@@ -38,11 +36,8 @@ class FictiveGameScene extends Phaser.Scene {
         this.currentCustomer = this.game.registry.get('customerData');
         this.canva = new GameCanva(this, this.currentCustomer, this.game.registry.get('score'));
         this.canva.menuPauseButton(this.scene, this);
+        this.bottleCocktailImgTab = [];
         this.drawGame();
-
-        let rectangle = this.add.rectangle(gameScale.width*0.9, gameScale.height*0.9, 100, 100, 0x6666ff, 0);
-        rectangle.setInteractive({cursor: 'pointer'})
-        rectangle.on('pointerdown', ()=> this.openCabinet())
 
         // ************************************************ SOCKET ************************************************
         socket.on('JUICE_TAKEN', (bottleId, bottlesData)=>{
@@ -65,8 +60,11 @@ class FictiveGameScene extends Phaser.Scene {
         })
 
         socket.on("A_GOLD_BOTTLE_IS_TAKEN", ()=>{
+            console.log("A_GOLD_BOTTLE_IS_TAKEN");
             this.partie.goldBottleStatus = true;
             this.game.registry.set('partie', this.partie);
+            this.removeBottleCocktail();
+            this.drawBottleCocktail();
         });
 
         socket.on("A_PLAYER_READY", () => {
@@ -80,9 +78,9 @@ class FictiveGameScene extends Phaser.Scene {
             this.scene.run("GameScene");
         });
 
-        socket.once("NAVIGATE_CABINETSCENE", () => {
-            this.openCabinet();
-          });
+        socket.once("NAVIGATE_CABINETSCENE", (sens) => {
+            this.openCabinet(sens);
+        });
     }
 
     // ************************************************ FONCTIONS ************************************************
@@ -99,12 +97,15 @@ class FictiveGameScene extends Phaser.Scene {
         return this.bottlesData.find(bottle => bottle.id == cocktailBottleId)
     }
 
-    openCabinet() {
+    openCabinet(sens) {
         // Changement de scène vers la sélection des jus
         this.canva.removeResizeListeners();
         this.removeSocket();
-        this.scene.stop('FictiveGameScene');
-        this.scene.start('CabinetScene');
+        this.scene.launch('ArmoireFictiveScene',{
+            'sens': sens,
+            'sceneToMove': "CabinetScene"
+        });
+        this.scene.bringToTop('ArmoireFictiveScene');
     }
 
     removeSocket(){
@@ -176,6 +177,12 @@ class FictiveGameScene extends Phaser.Scene {
         });
     }
 
+    alreadyTaken(juice){
+        const alreadyChosen = this.partie.tabBottlesChoosed.find(id => id == juice.id);
+        console.log(alreadyChosen, juice.id);
+        return(alreadyChosen)
+    }
+
     drawBottleCocktail() {
         let goldenBottle = this.partie.goldBottleId;
         let posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE;
@@ -186,14 +193,43 @@ class FictiveGameScene extends Phaser.Scene {
         for (let i = 0; i < BOTTLE_CARD_GRID_NBR_ROW; i++) {
             for (let j = 1; j < BOTTLE_CARD_GRID_NBR_COL_PLUS_1; j++) {
                 let imageKey;
-                let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId)
-                cocktailBottleImg.id == goldenBottle ? imageKey = this.bottleGoldImgKeys.find(image => image == `carte-luxe-bouteille` + goldenBottle) : imageKey = this.bottleCarteImgKeys.find(image => image == `carte-bouteille` + cocktailBottleImg.id);
-
-                let bottleImg = this.add.image(posX, posY, imageKey)
+                let frameKey;
+                let cocktailBottleImg = this.getBottleImg(this.currentCustomer.drink.ingredients[k].alcoholId);
+                let takenOrNot = this.alreadyTaken(cocktailBottleImg);
+                if (takenOrNot) {
+                    console.log('status gold bottle ', this.partie.goldBottleStatus);
+                    if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
+                        imageKey =  "carte-luxe-vole-prise-sprite";
+                        frameKey = goldenBottle-1;
+                    } else {
+                        if(cocktailBottleImg.id == goldenBottle){
+                            imageKey =  "carte-luxe-prise-sprite";
+                            frameKey = goldenBottle-1;
+                        }else{
+                            imageKey =  "carte-normal-prise-sprite";
+                            frameKey = cocktailBottleImg.id-1;
+                        }
+                    }
+                } else {
+                    if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
+                        imageKey =  "carte-luxe-vole-sprite";
+                        frameKey = goldenBottle -1;
+                    } else {
+                        if(cocktailBottleImg.id == goldenBottle){
+                            imageKey =  "carte-luxe-sprite";
+                            frameKey = goldenBottle-1;
+                        }else{
+                            imageKey =  "carte-normal-sprite";
+                            frameKey = cocktailBottleImg.id -1 ;
+                        }
+                    }
+                }
+                let bottleImg = this.add.image(posX, posY, imageKey, frameKey)
                 bottleImg.scaleX = 1;
                 bottleImg.displayWidth = gameScale.width * BOTTLE_CARD_IMG_WIDTHSCALE;
                 bottleImg.scaleY = bottleImg.scaleX
                 bottleImg.angle = BOTTLE_CARD_IMG_ANGLE;
+                this.bottleCocktailImgTab.push(bottleImg);
 
                 //pour le responsive et la suite des boucles
                 let bottleGapXSecondRow = 0;
@@ -222,6 +258,13 @@ class FictiveGameScene extends Phaser.Scene {
             posY = gameScale.height * BOTTLE_CARD_IMG_YSCALE * 2 + gameScale.height * BOTTLE_CARD_IMG_YSCALEAFTER;
             posX = gameScale.width * BOTTLE_CARD_IMG_XSCALE - gameScale.width * BOTTLE_CARD_IMG_GAP_X_SECOND_ROW;
         }
+    }
+
+    removeBottleCocktail(){
+        for(let i=0; i < this.bottleCocktailImgTab.length; i++){
+            this.bottleCocktailImgTab[i].setVisible(false);
+        }
+        this.bottleCocktailImgTab = [];
     }
 }
 export default FictiveGameScene;

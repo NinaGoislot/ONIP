@@ -17,14 +17,16 @@ import ArmoireVerseScene from '@/scenes/TransiArmoireVerseScene';
 import VerseArmoireScene from '@/scenes/TransiVerseArmoireScene';
 import VerseGameScene from '@/scenes/TransiVerseGameScene';
 import StartScene from '@/scenes/TransiStartScene';
+import ArmoireFictiveScene from '@/scenes/TransiArmoireFictiveScene';
 import {io} from "https://cdn.socket.io/4.7.3/socket.io.esm.min.js";
 
-// Maëlle : const socket = io("https://10.1.180.121:3006");
+// Maëlle Cégep : const socket = io("https://10.1.180.121:3006");
+// Maëlle Bloc : const socket = io("https://192.168.20.227:3006");
 // Nina Cégep : const socket = io("https://10.1.180.126:3006");
 // Nina Bloc: 
 const socket = io("https://192.168.30.233:3006");
 // Local : const socket = io("http://127.0.0.1:3006"); 
-// Déploiement externe : const socket = io("https://paradox.timmatane.ca"); 
+// Déploiement externe : const socket = io("https://paradoxe.timmatane.ca"); 
 
 const VALUES = {
   width: 1920,
@@ -56,7 +58,7 @@ const config = {
   audio: {
     disableWebAudio: true //pour ajouter du son
   },
-  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene, PourInShakerScene, FictiveGameScene, ArmoireVerseScene, VerseArmoireScene, VerseGameScene, StartScene], // Ajouter toutes les scènes ici
+  scene: [LoadDataScene, MenuScene, ConnexionScene, Step1_CreateJoinLobbyScene, Step2_LobbyScene, Step3_ConnectPhoneScene, Step4_PseudoScene, GameScene, EndScene, CabinetScene, OptionsScene, PauseScene, PourInShakerScene, FictiveGameScene, ArmoireVerseScene, VerseArmoireScene, VerseGameScene, StartScene, ArmoireFictiveScene], // Ajouter toutes les scènes ici
 };
 
 var game = new Phaser.Game(config);

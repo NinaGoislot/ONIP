@@ -44,14 +44,14 @@ class Step2_LobbyScene extends Phaser.Scene {
         this.btnBack.on('pointerdown', ()=> this.back());
         //faire la fonction retour
 
-        this.title = this.add.text(gameScale.width * 0.535, gameScale.height * 0.335, "Partage ce code à ton ami.e", {
+        this.title = this.add.text(gameScale.width * 0.525, gameScale.height * 0.335, "Partage ce code à ton ami.e", {
             fontFamily:'soria',
             fontSize: gameScale.width*0.05 + 'px',
             // fontSize:  '70px',
             fill: '#EFECEA',
             align: 'center'
         }).setOrigin(0.5,0.5);
-        this.codePin = this.add.text(gameScale.width * 0.535, gameScale.height * 0.5, "", {
+        this.codePin = this.add.text(gameScale.width * 0.525, gameScale.height * 0.5, "", {
             fontFamily:'soria',
             fontSize: gameScale.width*0.08 + 'px',
             // fontSize: '120px',
@@ -59,7 +59,7 @@ class Step2_LobbyScene extends Phaser.Scene {
         }).setOrigin(0.5,0.5);
         this.codePin.setLetterSpacing(gameScale.width*0.025);
         this.codePin.setVisible(false);
-        this.messageInfos = this.add.text(gameScale.width * 0.535, gameScale.height * 0.71, "", {
+        this.messageInfos = this.add.text(gameScale.width * 0.525, gameScale.height * 0.71, "", {
             fontFamily:'soria',
             fontSize:  gameScale.width*0.03 + 'px',
             // fontSize: '45px',
@@ -84,16 +84,20 @@ class Step2_LobbyScene extends Phaser.Scene {
         });
 
         const resizeListener = () => {
-            this.title.setPosition(gameScale.width * 0.535, gameScale.height * 0.335);
+            this.title.setPosition(gameScale.width * 0.525, gameScale.height * 0.335);
             this.title.setFontSize(gameScale.width*0.05);
-            this.codePin.setPosition(gameScale.width * 0.535, gameScale.height * 0.5);
+            this.codePin.setPosition(gameScale.width * 0.525, gameScale.height * 0.5);
             this.codePin.setFontSize(gameScale.width*0.08);
             this.codePin.setLetterSpacing(gameScale.width*0.025);
-            this.messageInfos.setPosition(gameScale.width * 0.535, gameScale.height * 0.71);
+            this.messageInfos.setPosition(gameScale.width * 0.525, gameScale.height * 0.71);
             this.messageInfos.setFontSize(gameScale.width*0.03);
         };
         window.addEventListener('resize', resizeListener);
         this.resizeListeners.push(resizeListener);
+
+        this.menuTransi = this.game.registry.get('menuTransi');
+        this.menuToc = this.game.registry.get('menuToc');
+        this.menuPingPong = this.game.registry.get('menuPingPong');
 
         switch (this.numeroPlayer) {
             case "J1":
@@ -113,6 +117,7 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.inputRoomId = document.querySelector('#inputRoomId');
                 this.inputRoomId.style.letterSpacing = gameScale.width * 0.04 + "px";
                 this.inputRoomId.style.fontSize = gameScale.width * 0.07 + "px";
+                check.setInteractive({cursor: 'pointer'});
                 check.on('pointerdown', ()=> this.onCheck());
 
                 const resizeListener2 = () => {
@@ -124,7 +129,9 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.resizeListeners.push(resizeListener2);
     
                 socket.on("BAD_GAME_ID", ()=>{
+                    console.log("BAD_GAME_ID");
                     this.messageInfos.text = "Mauvais code. Réessaie."
+                    this.menuToc.play();
                 })
                 break;
             default:
@@ -133,11 +140,15 @@ class Step2_LobbyScene extends Phaser.Scene {
 
 
         // ******************************* SOCKET ************************************************
-        socket.on("READY_TO_CONNECT", () => {
-            socket.on("WAITING_FOR_SHAKERS", (roomIdJoueur) => {
+        socket.once("READY_TO_CONNECT", () => {
+            socket.once("WAITING_FOR_SHAKERS", (roomIdJoueur) => {
                 this.game.registry.set('roomIdJoueur', roomIdJoueur);
                 this.removeResizeListeners();
-                this.scene.start('Step3_ConnectPhoneScene');
+                socket.removeAllListeners("BAD_GAME_ID");
+                this.scene.start('Step3_ConnectPhoneScene', {
+                    'mode' : false,
+                });
+                this.menuTransi.play();
                 // this.scene.remove('Step2_LobbyScene');
             });
         });
@@ -147,6 +158,7 @@ class Step2_LobbyScene extends Phaser.Scene {
 
     back(){
         this.scene.start('Step1_CreateJoinLobbyScene');
+        this.menuTransi.play();
         socket.emit("GO_BACK_FROM_STEP1", this.roomId);
     }
 
@@ -157,6 +169,7 @@ class Step2_LobbyScene extends Phaser.Scene {
             this.messageInfos.setVisible(true);
             this.messageInfos.text = "Code copié !"
             console.log('Contenu copié avec succès !', texteARecopier);
+            this.menuPingPong.play();
         })
         .catch(err => {
             console.error('Erreur lors de la copie du contenu :', err);
@@ -166,6 +179,7 @@ class Step2_LobbyScene extends Phaser.Scene {
     onCheck(){
         if (this.inputRoomId.value == null || this.inputRoomId.value == "") {
             this.messageInfos.text = "Entre un code de partie."
+            this.menuToc.play();
         } else {
             this.inputRoomId.value = this.inputRoomId.value.toUpperCase();
             this.inputRoomId.value = this.inputRoomId.value.replace(/O/g, '0');

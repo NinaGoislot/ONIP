@@ -73,7 +73,16 @@ class CabinetScene extends Phaser.Scene {
     this.drinkBottles = this.currentCustomer.drink.ingredients;
     this.bottlesData = this.game.registry.get('ingredients');
     this.canMove = true;
-    this.bottleImgKeys = this.game.registry.get('bottleImgKeys');
+    // this.bottleImgKeys = this.game.registry.get('bottleImgKeys');
+    this.cursorHaut = this.sound.add('cursorHaut');
+    this.cursorGauche = this.sound.add('cursorGauche');
+    this.cursorBas = this.sound.add('cursorBas');
+    this.cursorDroite = this.sound.add('cursorDroite');
+    this.bottlePOP = this.sound.add('bottlePOP');
+    this.bottleDePOP = this.sound.add('bottleDePOP');
+    this.beep = this.sound.add('beep');
+    this.scoreBottle = this.sound.add('scoreBottle');
+    this.scoreBottleGold = this.sound.add('scoreBottleGold');
 
     // add background to scene
     let background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'armoireBouteilles');
@@ -109,7 +118,7 @@ class CabinetScene extends Phaser.Scene {
     rectangle.setInteractive({
       cursor: 'pointer'
     });
-    rectangle.on('pointerdown', () => this.test());
+    rectangle.on('pointerdown', () => this.openFictiveScene());
 
 
     this.cameras.main.on('camerashakestart', function () {
@@ -190,17 +199,18 @@ class CabinetScene extends Phaser.Scene {
 
     //pour éviter de redéclencher la fonction de disparition de bouteille
     socket.on('A_JUICE_TAKEN', (isAJuiceTaken) => {
-      console.log("est-ce que ça sert ?????????????????????????")
+      console.log("est-ce que ça sert ?????????????")
       this.aJuiceTaken = isAJuiceTaken;
     });
 
     socket.on("A_GOLD_BOTTLE_IS_TAKEN", () => {
+      console.log("A_GOLD_BOTTLE_IS_TAKEN cabinetScene");
       this.partie.goldBottleStatus = true;
       this.game.registry.set('partie', this.partie);
     });
 
-    socket.once("NAVIGATE_FICTIVESCENE", () => {
-      this.test();
+    socket.once("NAVIGATE_FICTIVESCENE", (sens) => {
+      this.openFictiveScene(sens);
     });
 
     socket.on("A_PLAYER_READY", () => {
@@ -218,41 +228,50 @@ class CabinetScene extends Phaser.Scene {
 
   // ***************************************** FONCTIONS *****************************************
   animeCursorRefus(){
+    // this.anims.create({
+    //   key: 'cursor_refus',
+    //   frames: [
+    //     {key: 'curseur-refus0'},
+    //     {key: 'curseur-refus1'},
+    //     {key: 'curseur-refus2'},
+    //     {key: 'curseur-refus3'},
+    //     {key: 'curseur-refus4'},
+    //     {key: 'curseur-refus5'},
+    //     {key: 'curseur-refus6'},
+    //     {key: 'curseur-refus7'},
+    //     {key: 'curseur-refus8'},
+    //     {key: 'curseur-refus9'},
+    //     {key: 'curseur-refus10'},
+    //     {key: 'curseur-refus11'},
+    //     {key: 'curseur-refus12'},
+    //     {key: 'curseur-refus13'},
+    //     {key: 'curseur-refus14'}
+    //   ],
+    //   frameRate: 30,
+    //   repeat: 3
+    // });
     this.anims.create({
-      key: 'cursor_refus',
-      frames: [
-        {key: 'curseur-refus0'},
-        {key: 'curseur-refus1'},
-        {key: 'curseur-refus2'},
-        {key: 'curseur-refus3'},
-        {key: 'curseur-refus4'},
-        {key: 'curseur-refus5'},
-        {key: 'curseur-refus6'},
-        {key: 'curseur-refus7'},
-        {key: 'curseur-refus8'},
-        {key: 'curseur-refus9'},
-        {key: 'curseur-refus10'},
-        {key: 'curseur-refus11'},
-        {key: 'curseur-refus12'},
-        {key: 'curseur-refus13'},
-        {key: 'curseur-refus14'}
-      ],
+      key: 'curseur-refus',
+      frames: this.anims.generateFrameNumbers('curseur-refus', {
+          start: 0,
+          end: 14
+      }),
       frameRate: 30,
       repeat: 3
     });
   }
 
   animCursorRefusPlay(){
-    this.cursorRefus = this.add.sprite(this.curseur.x, this.curseur.y, 'curseur-refus0');
+    this.cursorRefus = this.add.sprite(this.curseur.x, this.curseur.y, 'curseur-refus');
     this.cursorRefus.displayWidth = gameScale.width * 0.22;
     this.cursorRefus.scaleY = this.cursorRefus.scaleX;
     this.curseur.setVisible(false);
     this.canMove = false;
-    this.cursorRefus.anims.play('cursor_refus');
+    this.cursorRefus.anims.play('curseur-refus');
 
     this.cursorRefus.on('animationcomplete', function (animation) {          
       // Si l'animation est celle que vous surveillez, détruisez le sprite
-      if (animation.key === 'cursor_refus') {
+      if (animation.key === 'curseur-refus') {
           this.cursorRefus.destroy();
           this.curseur.setVisible(true);
           this.canMove = true;
@@ -261,43 +280,51 @@ class CabinetScene extends Phaser.Scene {
   }
 
   animeAllCursorMove(){
+    // this.anims.create({
+    //   key: 'cursor_move',
+    //   frames: [
+    //     {key: 'move0'},
+    //     {key: 'move1'},
+    //     {key: 'move2'},
+    //     {key: 'move3'},
+    //     {key: 'move4'},
+    //     {key: 'move5'},
+    //     {key: 'move6'},
+    //     {key: 'move7'},
+    //     {key: 'move8'},
+    //   ],
+    //   frameRate: 30,
+    //   repeat: 0 
+    // });
     this.anims.create({
-      key: 'cursor_move',
-      frames: [
-        {key: 'move0'},
-        {key: 'move1'},
-        {key: 'move2'},
-        {key: 'move3'},
-        {key: 'move4'},
-        {key: 'move5'},
-        {key: 'move6'},
-        {key: 'move7'},
-        {key: 'move8'},
-      ],
+      key: 'curseur-move',
+      frames: this.anims.generateFrameNumbers('curseur-move', {
+          start: 0,
+          end: 8
+      }),
       frameRate: 30,
-      repeat: 0 
+      repeat: 0
     });
   }
 
   animCursorStopMove(){
     this.cursorMove.on('animationcomplete', function (animation) {          
-      // Si l'animation est celle que vous surveillez, détruisez le sprite
-      if (animation.key === 'cursor_move') {
-          this.cursorMove.destroy();
+      if (animation.key === 'curseur-move') {
           this.curseur.setVisible(true);
+          this.cursorMove.destroy();
           this.canMove = true;
       };
     }, this);
   }
 
   animeCursorMove() {
-    this.cursorMove = this.add.sprite(this.curseur.x, this.curseur.y, 'move0');
+    this.cursorMove = this.add.sprite(this.curseur.x, this.curseur.y, 'curseur-move');
     this.cursorMove.displayWidth = gameScale.width * 0.22;
     this.cursorMove.scaleY = this.cursorMove.scaleX;
     this.curseur.setVisible(false);
     this.animCursorStopMove();
     this.canMove = false;
-    this.cursorMove.anims.play('cursor_move');
+    this.cursorMove.anims.play('curseur-move');
   }
 
   createBoxBottle(nbrRow, nbrCol) {
@@ -315,8 +342,10 @@ class CabinetScene extends Phaser.Scene {
           posX = gameScale.width * posXScale;
         } else {
           let bottleAssocie = this.getBottleById(this.randomIndices[k]);
-          const imageKey = this.bottleImgKeys.find(image => image == `bouteille` + bottleAssocie.id);
-          let bottleImg = this.add.image(posX, posY, imageKey)
+          let imageKey = bottleAssocie.id-1;
+          // const imageKey = this.bottleImgKeys.find(image => image == `bouteille` + bottleAssocie.id);
+          let bottleImg = this.add.image(posX, posY, "bouteillesSprite", imageKey)
+          // let bottleImg = this.add.image(posX, posY, imageKey)
           bottleImg.setVisible(true);
           if (this.bottlesData[bottleAssocie.id - 1].picked == true) {
             console.log('déjà pris', this.bottlesData[bottleAssocie.id - 1].name)
@@ -352,6 +381,7 @@ class CabinetScene extends Phaser.Scene {
     }
     this.curseur.setPosition(this.curseur.x + gameScale.width * BOTTLE_GAP_X, this.curseur.y);
     this.animeCursorMove();
+    this.cursorDroite.play();
   }
 
   gauche() {
@@ -362,6 +392,7 @@ class CabinetScene extends Phaser.Scene {
     }
     this.curseur.setPosition(this.curseur.x - gameScale.width * BOTTLE_GAP_X, this.curseur.y);
     this.animeCursorMove();
+    this.cursorGauche.play();
   }
 
   haut() {
@@ -372,6 +403,7 @@ class CabinetScene extends Phaser.Scene {
     }
     this.curseur.setPosition(this.curseur.x, this.curseur.y - gameScale.height * BOTTLE_GAP_Y_BETWEEN);
     this.animeCursorMove();
+    this.cursorHaut.play();
   }
 
   bas() {
@@ -382,6 +414,7 @@ class CabinetScene extends Phaser.Scene {
     }
     this.curseur.setPosition(this.curseur.x, this.curseur.y + gameScale.height * BOTTLE_GAP_Y_BETWEEN);
     this.animeCursorMove();
+    this.cursorBas.play();
   }
 
   getBottleAtCursor() {
@@ -393,14 +426,26 @@ class CabinetScene extends Phaser.Scene {
 
   getSelectBottle() {
     this.bottleAtCursor = this.getBottleAtCursor();
-    if (this.bottleAtCursor && this.bottleAtCursor[0] && this.bottleAtCursor[0].texture) {
-      const textureKey = this.bottleAtCursor[0].texture.key;
-      this.bottleAtCursorData = this.getBottleByName(textureKey);
-      this.selectJuice(this.bottleAtCursorData)
+    if (this.bottleAtCursor && this.bottleAtCursor[0]) {
+      // const textureKey = this.bottleAtCursor[0].texture.key;
+      // this.bottleAtCursorData = this.getBottleByName(textureKey);
+      // this.selectJuice(this.bottleAtCursorData)
+
+      const bottleImgKey = this.bottleAtCursor[0];
+      const frameIndex = bottleImgKey.frame.name; // Get the frame index of the sprite
+      console.log("getSelectBottle", bottleImgKey, frameIndex);
+      // const bottleData = this.bottlesData[frameIndex]; // Assuming frame index corresponds to the bottle id
+      const bottleAtCursorData = this.getBottleByFrameIndex(frameIndex);
+      console.log("bottleData", bottleAtCursorData);
+      this.selectJuice(bottleAtCursorData);
     } else {
       console.log("La bouteille à la position du curseur n'est pas valide.");
     }
   }
+  getBottleByFrameIndex(frameIndex) {
+    // frameIndex commence à 0, donc on ajoute 1 pour correspondre à l'ID de la bouteille
+    return this.bottlesData.find(bottle => bottle.id === frameIndex + 1);
+}
 
   getBottleByName(name) {
     return this.bottlesData.find(bottle => bottle.image.slice(0, -5) == name);
@@ -424,17 +469,25 @@ class CabinetScene extends Phaser.Scene {
       if (juiceType.id == this.partie.goldBottleId && !this.partie.goldBottleStatus) {
         this.partie.player.score += 500;
         this.partie.player.nbGoldenBottles += 1;
-        socket.emit("GOLD_BOTTLE_TAKEN", this.partie.roomId);
+        if(this.partie.mode === "multi"){
+          socket.emit("GOLD_BOTTLE_TAKEN", this.partie.roomId, this.partie.player.numeroPlayer);
+        }
+        this.showScore("gold");
       } else {
+        this.showScore("normal");
         this.partie.player.score += 50;
       }
       this.game.registry.set('partie', this.partie);
       this.currentCustomer.indexNbrBottleChoosed += 1;
-      socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
-      this.removeSocket();
-      this.scene.launch('ArmoireVerseScene',{
+      setTimeout(() => {
+        this.removeSocket();
+        this.scene.launch('ArmoireVerseScene',{
         'bottleChoosed': juiceType
-      });
+        });
+        this.scene.bringToTop('ArmoireVerseScene');
+      }, 1000);
+      
+      // socket.emit("GO_TO_POUR", this.partie.roomId, this.partie.player.numeroPlayer);
       // this.scene.bringToTop('ArmoireVerseScene');
     //   setTimeout(() => {
     //     this.scene.stop('CabinetScene');
@@ -449,6 +502,7 @@ class CabinetScene extends Phaser.Scene {
   }
 
   goodOrBadBottle(juice) {
+    console.log('this.partie.tabBottlesChoosed : ', this.partie.tabBottlesChoosed);
     const drinkBottle = this.drinkBottles.find(bottle => bottle.alcoholId == juice.id);
     if (drinkBottle) {
       const alreadyChosen = this.partie.tabBottlesChoosed.find(id => id == juice.id);
@@ -463,6 +517,10 @@ class CabinetScene extends Phaser.Scene {
   }
 
   juicePicked(juice) {
+    this.canMove = false;
+    // let takenBottleImg = this.getBottleImg(juice.id);
+    // console.log('test disabled pitié',juice, takenBottleImg);
+    // takenBottleImg[0].disableInteractive();
     this.bottlesData = this.game.registry.get('ingredients');
     this.bottlesData[juice.id - 1].picked = true
     console.log(this.bottlesData[juice.id - 1])
@@ -470,10 +528,15 @@ class CabinetScene extends Phaser.Scene {
     this.game.registry.set('ingredients', this.bottlesData);
   }
 
-  test() {
+  openFictiveScene(sens) {
     this.removeSocket();
-    this.scene.stop('CabinetScene');
-    this.scene.start('FictiveGameScene')
+    this.scene.launch('ArmoireFictiveScene',{
+      'sens': sens,
+      'sceneToMove': "FictiveGameScene"
+    });
+    this.scene.bringToTop('ArmoireFictiveScene');
+    // this.scene.stop('CabinetScene');
+    // this.scene.start('FictiveGameScene');
   }
 
   removeSocket() {
@@ -494,10 +557,40 @@ class CabinetScene extends Phaser.Scene {
     console.log("déclenche la fonction");
     // this.cameras.main.shake(200);
     this.animCursorRefusPlay();
-    //puis pas possible de bouger pdt 2 secondes --> voir PWA
-    //si bouge pdt interdiction = mini shake
+    this.beep.play();
     this.partie.player.nbBadBottles += 1;
     this.game.registry.set('partie', this.partie);
+  }
+
+  showScore(status){
+    if(status == "gold"){
+      this.scoreText = this.add.text(this.curseur.x+gameScale.width*0.04, this.curseur.y-gameScale.height*0.08, "+500", {
+        fill: '#FFA364',
+        fontFamily: 'alpinoBold',
+        // fontSize: gameScale.width * 0.03 + 'px',
+        align: 'center',
+      }).setOrigin(0.5, 0.5).setAngle(15).setStroke('#252422', 7);
+      this.scoreBottleGold.play();
+    } else if(status == "normal"){
+      this.scoreText = this.add.text(this.curseur.x+gameScale.width*0.04, this.curseur.y-gameScale.height*0.08, "+50", {
+        fill: '#EFECEA',
+        fontFamily: 'alpinoBold',
+        fontSize: gameScale.width * 0.03 + 'px',
+        align: 'center',
+      }).setOrigin(0.5, 0.5).setAngle(15).setStroke('#252422', 7);
+      this.scoreBottle.play();
+    }
+
+    this.tweens.addCounter({
+        from: 0,
+        to: 1,
+        duration: 175,
+        yoyo: false,
+        onUpdate: (tween) => {
+            const v = tween.getValue();
+            this.scoreText.setFontSize(gameScale.width*0.01 + v * gameScale.width*0.02);
+        }
+    });
   }
 }
 

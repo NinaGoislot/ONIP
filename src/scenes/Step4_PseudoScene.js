@@ -28,6 +28,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.partie = this.game.registry.get('partie');
         this.aPlayerReady = false;
         this.j1Ready = false;
+        this.canEnter = true;
         this.resizeListeners = [];
 
 
@@ -50,6 +51,12 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.btnBack = this.add.rectangle(gameScale.width*0.06, gameScale.height*0.105, gameScale.width*0.072, gameScale.width*0.072, 0x6666ff, 0);
         this.btnBack.setInteractive({cursor: 'pointer'});
         this.btnBack.on('pointerdown', ()=> this.back());
+        this.menuMusic = this.game.registry.get('musicMenu');
+        this.menuTransi = this.game.registry.get('menuTransi');
+        this.menuPingPong = this.game.registry.get('menuPingPong');
+        this.menuToc = this.game.registry.get('menuToc');
+        this.musicJ2JOIN = this.sound.add('musicJ2Join');
+        this.musicValid = this.sound.add('PingPongPaddle');
 
         // ****** Events Listeners ******
         window.addEventListener('resize', () => {
@@ -99,6 +106,11 @@ class Step4_PseudoScene extends Phaser.Scene {
         this.btnValidation = this.add.rectangle(gameScale.width*0.33, gameScale.height*0.6, gameScale.width*0.14, gameScale.height*0.09, 0x6666ff, 0).setOrigin(0.5,0.5);
         this.btnValidation.setInteractive({cursor: 'pointer'});
         this.btnValidation.on('pointerdown', ()=> this.validation());
+        this.input.keyboard.on('keydown-ENTER', () => {
+            if(this.canEnter){
+                this.validation();
+            }
+        });
         //resize
         window.addEventListener('resize', () => {
             this.formJoin.setPosition(gameScale.width * 0.14, gameScale.height * 0.42);
@@ -122,6 +134,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         if(this.game.registry.get('aPlayerReady')){
             this.messageStatePlayer.text = "Le deuxième joueur est prêt !";
             this.aPlayerReady = true;
+            this.musicJ2JOIN.play();
             if(this.j1Ready || this.isSolo){
                 this.btnPreReady.setVisible(false);
                 this.btnIsReady.setVisible(true);
@@ -130,7 +143,7 @@ class Step4_PseudoScene extends Phaser.Scene {
         }
     
         // ******************************* SOCKET ************************************************
-        socket.on("JOUEUR_READY", () => {
+        socket.once("JOUEUR_READY", () => {
             this.messageStatePlayer.text = "Le deuxième joueur est prêt !";
             this.aPlayerReady = true;
             if(this.j1Ready || this.isSolo){
@@ -140,7 +153,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             }
         });
 
-        socket.on("GO_PLAY", () => {
+        socket.once("GO_PLAY", () => {
             console.log("je reçois le 'GO_PLAY'");
             if (!this.isSolo) {
                 this.player = new Player(this, this.pseudo, this.rolePlayer, this.roomIdPlayer);
@@ -152,11 +165,15 @@ class Step4_PseudoScene extends Phaser.Scene {
             }
             socket.emit("START_GAME", this.roomIdPlayer.slice(0, -1), this.rolePlayer);
             this.removeResizeListeners();
+            this.game.registry.get('musicMenu');
+            this.menuMusic.stop();
             this.scene.launch('StartScene');
+            this.scene.bringToTop('StartScene');
             setTimeout(() => {
                 this.putPseudo.setAttribute('hidden', '');
                 this.formJoin.destroy();
             }, 300);
+            this.menuTransi.play();
             // setTimeout(() => {
             //     this.scene.start('GameScene');
             //     this.scene.bringToTop('StartScene');
@@ -169,6 +186,7 @@ class Step4_PseudoScene extends Phaser.Scene {
     goPlay(){
         console.log("J'envoie WANT_TO_PLAY");
         socket.emit("WANT_TO_PLAY", this.roomIdPlayer);
+        this.btnIsReady.disableInteractive();
     }
 
     removeResizeListeners() {
@@ -184,6 +202,7 @@ class Step4_PseudoScene extends Phaser.Scene {
             this.messageInfos.text = "Écris ton pseudo."
         } else if (this.pseudo.length > 15) {
             this.messageInfos.text = "Le pseudo ne peut pas dépasser 15 caractères.";
+            this.menuToc.play();
         } else {
             console.log('test isSolo', this.isSolo);
             if(!this.aPlayerReady && !this.isSolo){
@@ -200,7 +219,9 @@ class Step4_PseudoScene extends Phaser.Scene {
             socket.emit("PSEUDO_READY", this.pseudo, this.roomIdPlayer, this.isSolo ? "solo" : "multi");
             this.messageInfos.text = "";
             //console.log(this.aPlayerReady);
-            this.btnValidation.setInteractive(false);
+            this.btnValidation.disableInteractive();
+            this.canEnter = false;
+            this.musicValid.play();
         }
     }
 }

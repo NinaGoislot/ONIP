@@ -110,10 +110,15 @@ class PourInShakerScene extends Phaser.Scene {
             this.insideShaker.height = shakerService.displayHeight - gameScale.height * 0.1;
         });
 
+        this.pourDrink = this.sound.add('pourDrink');
+        this.beepDrink = this.sound.add('beepDrink');
+        this.scoreGood = this.sound.add('scoreBottle');
+        this.scorePerfect = this.sound.add('scoreBottleGold');
+
 
         // ******************************** SHAKER SERVIR ********************************
         this.pourcentBottle = this.getQuantityForSelectedBottle();
-        console.log("pourcentage de la bouteille :", this.pourcentBottle)
+        console.log("pourcentage de la bouteille :", this.pourcentBottle);
         this.bottleChoosedData = this.getIngredientsById();
 
         // let rectangle = this.add.rectangle(gameScale.width * 0.9, gameScale.height * 0.9, 100, 100, 0x6666ff, 0.5);
@@ -137,7 +142,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         if (this.partie.liquids.length > 0) {
             this.liquid.fillPercentage = this.partie.liquids[this.partie.liquids.length - 1].fillPercentage;
-            console.log(this.liquid.fillPercentage)
+            console.log(this.liquid.fillPercentage);
             for (let i = this.partie.liquids.length - 1; i >= 0; i--) {
                 var filledHeight = this.insideShaker.height * (this.partie.liquids[i].fillPercentage / 100);
                 var emptyHeight = this.insideShaker.height - filledHeight;
@@ -149,9 +154,9 @@ class PourInShakerScene extends Phaser.Scene {
         this.goal = (100 - this.liquid.fillGoal - this.liquid.fillPercentage) / 100 * (shakerService.displayHeight - gameScale.height * 0.1) - gameScale.height * 0.025
         this.shakerLigneMoy.style.top = this.goal + 'px';
 
-        console.log(100 - this.liquid.fillGoal - this.liquid.fillPercentage);
-        console.log(shakerService.displayHeight - gameScale.height * 0.1);
-        console.log(gameScale.height);
+        // console.log(100 - this.liquid.fillGoal - this.liquid.fillPercentage);
+        // console.log(shakerService.displayHeight - gameScale.height * 0.1);
+        // console.log(gameScale.height);
 
 
         this.fillShaker();
@@ -185,6 +190,7 @@ class PourInShakerScene extends Phaser.Scene {
         });
 
         socket.on("A_GOLD_BOTTLE_IS_TAKEN", () => {
+            console.log("A_GOLD_BOTTLE_IS_TAKEN, pourInShaker");
             this.partie.goldBottleStatus = true;
             this.game.registry.set('partie', this.partie);
         });
@@ -224,7 +230,7 @@ class PourInShakerScene extends Phaser.Scene {
 
         socket.on("POURING_SPEED", (speed) => {
             if(this.liquid.isFilling) {
-                console.log("POURING_SPEED ► vitesse de versement : ", speed);
+                // console.log("POURING_SPEED ► vitesse de versement : ", speed);
                 this.liquid.fillSpeed = speed;
             }
         });
@@ -232,10 +238,12 @@ class PourInShakerScene extends Phaser.Scene {
         socket.once("IS_POURING_TRUE", () => {
             console.log("IS_POURING_TRUE : true");
             this.liquid.isFilling = true;
+            this.pourDrink.play();
         });
 
         socket.once("IS_POURING_FALSE", () => {
             console.log("IS_POURING_FALSE ► false");
+            this.pourDrink.stop();
             this.liquid.isFilling = false;
             this.renduScore(this.liquid.fillPercentage);
             console.log("Nombre de bouteilles choisies", this.nbrBottleChoose);
@@ -312,12 +320,13 @@ class PourInShakerScene extends Phaser.Scene {
         if (this.liquid.isFilling) {
             // Limiter fillPercentage à 100%
             if (this.partie.liquids.length > 0) {
-                console.log("liquide fill speed : ", this.liquid.fillSpeed);
+                // console.log("liquide fill speed : ", this.liquid.fillSpeed);
                 this.liquid.fillPercentage = Math.min(this.liquid.fillPercentage + this.liquid.fillSpeed, this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5);
-                console.log("PourInShaker ► % du liquide", this.liquid.fillPercentage);
+                // console.log("PourInShaker ► % du liquide", this.liquid.fillPercentage);
                 if (this.liquid.fillPercentage == this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5) {
                     return (this.tooMuch())
                 }
+                console.log('tooMuch Pourcentage : ', this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal + 5);
             } else {
                 this.liquid.fillPercentage = Math.min(this.liquid.fillPercentage + this.liquid.fillSpeed, this.liquid.fillGoal + 5);
                 if (this.liquid.fillPercentage == this.liquid.fillGoal + 5) {
@@ -341,6 +350,11 @@ class PourInShakerScene extends Phaser.Scene {
                 this.ctx.fillStyle = this.partie.liquids[i].fillColor;
                 this.ctx.fillRect(this.insideShaker.x, this.insideShaker.y + emptyHeight, this.insideShaker.width, filledHeight);
             }
+            // var imageSprite = this.add.image(this.insideShaker.x, this.insideShaker.y, 'shaker-texture');
+            // var imageElement = imageSprite.texture.getSourceImage();
+            // this.ctx.drawImage(imageElement, this.insideShaker.x, this.insideShaker.y + emptyHeight, this.insideShaker.width, filledHeight);
+            // var image = document.getElementById("texture2"); // Récupérer l'image depuis le DOM
+            // this.ctx.drawImage(image, this.insideShaker.x, this.insideShaker.y + emptyHeight, this.insideShaker.width, filledHeight);
         }
 
         requestAnimationFrame(this.fillShaker.bind(this));
@@ -376,13 +390,14 @@ class PourInShakerScene extends Phaser.Scene {
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
         //console.log("je rends le jus", this.bottlesData, this.bottleChoosed, this.partie.roomId);
-        socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
+        // socket.emit("GO_TO_CABINET", this.partie.roomId, this.partie.player.numeroPlayer);
         this.removeSocket();
 
         this.scene.launch('VerseArmoireScene');
         setTimeout(() => {
             this.divHTML.setAttribute('hidden', '');
         }, 200);
+        this.scene.bringToTop('VerseArmoireScene');
         // setTimeout(() => {
         //     this.scene.stop("PourInShakerScene");
         //     this.scene.run("CabinetScene");
@@ -396,21 +411,22 @@ class PourInShakerScene extends Phaser.Scene {
         this.bottlesData[this.bottleChoosed.id - 1].picked = false;
         this.game.registry.set('ingredients', this.bottlesData);
         socket.emit("JUICE_RETURNED", this.bottlesData, this.bottleChoosed, this.partie.roomId);
-        socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
+        // socket.emit("POURING_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
         this.removeSocket();        
-        // this.scene.launch('VerseGameScene');
-        // setTimeout(() => {
-        //     this.divHTML.setAttribute('hidden', '');
-        // }, 200);
+        this.scene.launch('VerseGameScene');
+        this.scene.bringToTop('VerseGameScene');
+        setTimeout(() => {
+            this.divHTML.setAttribute('hidden', '');
+        }, 200);
         // setTimeout(() => {
         //     this.scene.stop("CabinetScene");
         //     this.scene.stop("PourInShakerScene");
         //     this.scene.run("GameScene");
         //     this.scene.bringToTop('VerseGameScene');
         // }, 600);
-        this.scene.stop("CabinetScene");
-        this.scene.stop("PourInShakerScene");
-        this.scene.run("GameScene");
+        // this.scene.stop("CabinetScene");
+        // this.scene.stop("PourInShakerScene");
+        // this.scene.run("GameScene");
     }
 
     removeSocket() {
@@ -427,25 +443,80 @@ class PourInShakerScene extends Phaser.Scene {
     }
 
     renduScore(pourcentFill) {
+        let goal = 0;
+        if(this.partie.liquids.length > 0){
+            goal = this.partie.liquids[this.partie.liquids.length - 1].fillPercentage + this.liquid.fillGoal;
+        } else{
+            goal = this.liquid.fillGoal;
+        }
+        console.log('poucentFill + goal', pourcentFill, goal);
         if (!this.isTooMuch) {
-            if (pourcentFill >= (this.goal - this.goal * 0.95) && pourcentFill < (this.goal + this.goal * 0.95)) {
+            if (pourcentFill >= (goal * 0.95)) {
+                // if (pourcentFill >= (goal * 0.95) && pourcentFill < (goal * 1.05)) {
+                console.log('cran 1 : between ', goal * 0.95,' et ', goal *  1.05);
                 this.partie.player.score += 500;
+                this.showScore("+500", "perfect");
                 this.partie.player.perfectPourring += 1;
-            } else if (pourcentFill > (this.goal - this.goal * 0.90) && pourcentFill < (this.goal - this.goal * 0.95)) {
+                this.scorePerfect.play();
+
+            } else if (pourcentFill > (goal * 0.85) && pourcentFill < (goal * 0.95)) {
+                console.log('cran 2 : between ', goal * 0.85,' et ', goal * 0.95);
                 this.partie.player.score += 250;
-            } else if (pourcentFill > (this.goal - this.goal * 0.85) && pourcentFill < (this.goal - this.goal * 0.90)) {
+                this.showScore("+250", "good");
+                this.scoreGood.play();
+
+            } else if (pourcentFill > (goal * 0.75) && pourcentFill < (goal * 0.85)) {
+                console.log('cran 3 : between ', goal * 0.75,' et ', goal * 0.85);
                 this.partie.player.score += 150;
-            } else if (pourcentFill < (this.goal - this.goal * 0.85)) {
+                this.showScore("+150", "good");
+                this.scoreGood.play();
+
+            } else if (pourcentFill < (goal * 0.75)) {
+                console.log('cran 4 : bellow ', goal * 0.75);
                 this.partie.player.score -= 150;
+                this.showScore("-150", "bad");
+                this.beepDrink.play();
+
             }
         }
         this.game.registry.set("partie", this.partie);
     }
 
+    showScore(score, status){
+        console.log("showScore");
+        this.scoreText = this.add.text(gameScale.width*0.9, gameScale.height*0.077, score, {
+            fontFamily: 'alpinoBold',
+            // fontSize: gameScale.width * 0.06 + 'px',
+            align: 'center',
+        }).setOrigin(0.5, 0.5).setStroke('#252422', 7);
+        if(status === "perfect"){
+            this.scoreText.setFill('#FFA364');
+        } else if(status === "bad"){
+            this.scoreText.setFill('#DD4075');
+        } else if(status === "good"){
+            this.scoreText.setFill('#EFECEA');
+        }
+        this.tweens.addCounter({
+            from: 0,
+            to: 1,
+            duration: 175,
+            yoyo: false,
+            onUpdate: (tween) => {
+                const v = tween.getValue();
+                this.scoreText.setFontSize(gameScale.width*0.05 + v * gameScale.width*0.02);
+            }
+        });
+    }
+
     tooMuch() {
-        this.cameras.main.shake(200);
-        this.partie.player.score -= 200;
-        this.isTooMuch = true;
+        if(!this.isTooMuch){
+            console.log("tooMuch");
+            this.cameras.main.shake(200);
+            this.partie.player.score -= 200;
+            this.isTooMuch = true;
+            this.showScore("-200", "bad");
+            this.beepDrink.play();
+        }
     }
 }
 

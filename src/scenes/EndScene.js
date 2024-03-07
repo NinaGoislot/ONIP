@@ -18,6 +18,7 @@ class EndScene extends Phaser.Scene {
     create() {
         this.partie = this.game.registry.get('partie');
         console.log(this.partie.mode);
+        this.scene.stop('TimerScene');
 
         if (this.partie.mode === "solo") {
             this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'ecran-victoire');
@@ -62,7 +63,9 @@ class EndScene extends Phaser.Scene {
 
     goToMenu() {
         // Retour au menu
+        console.log("retour au MenuScene");
         this.scene.start('MenuScene');
+        // this.scene.run('MenuScene');
     }
 
     rePlay() {
@@ -79,12 +82,35 @@ class EndScene extends Phaser.Scene {
             this.background.setPosition(gameScale.width / 2, gameScale.height / 2);
         });
 
-        let scoreText = this.add.text(gameScale.width * 0.211, gameScale.height * 0.305, this.partie.player.score, {
+        let scoreText = this.add.text(gameScale.width * 0.211, gameScale.height * 0.305, 0, {
             fill: '#FFF4E3',
             fontFamily: 'soria',
             fontSize: gameScale.width * 0.07 + 'px',
             align: 'center'
         }).setOrigin(0.5, 0.5);
+
+        let currentScore = 0;
+        let newScore = this.partie.player.score;
+        this.tweens.addCounter({
+            from: currentScore,
+            to: newScore,
+            duration: 2000,
+            ease: 'linear',
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue() / 50) * 50; // Augmente de 50 en 50
+                // const value = Math.round(tween.getValue());
+                scoreText.setText(`${value}`);
+            }
+        });
+
+        this.gameMusic = this.game.registry.get('music');
+        this.gameMusic.stop();
+        this.gameMusic = this.game.registry.set('music',this.gameMusic);
+        this.menuMusic = this.game.registry.get('musicMenu');
+        this.menuMusic.play();
+        this.menuMusic = this.game.registry.set('musicMenu',this.menuMusic);
+
 
         let pseudoPlayer = this.add.text(gameScale.width * 0.515, gameScale.height * 0.865, this.partie.player.pseudo, {
             fill: '#252422',
