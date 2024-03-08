@@ -220,6 +220,9 @@ class GameScene extends Phaser.Scene {
                         
                     } else {
                         console.log("les mouvements sont finis ?")
+                        if(this.animMovStop){
+                            this.animMovStop.destroy();
+                        }
                         socket.emit("MOVEMENTS_FINISHED", this.partie.roomId, this.partie.player.numeroPlayer);
                     }
                 }
@@ -233,19 +236,25 @@ class GameScene extends Phaser.Scene {
             socket.on("ALL_PLAYERS_READY_TO_SERVE", () => {
                 console.log("ALL_PLAYERS_READY_TO_SERVE")
                 if(this.waitText){
-                    console.log('this.waitText', this.waitText)
                     this.waitText.setVisible(false);
+                    console.log('this.waitText', this.waitText)
                     this.waitText.destroy();
                 }
                 if(this.scoreText){
                     this.scoreText.destroy();
+                    console.log('this.scoreText', this.scoreText)
                 }
                 // this.showFinalDialogue().then(() => {
                     if (this.game.registry.get('nbrCustomers') > 0 && this.partie.addCustomer == true) {
+                        console.log("nouveau client");
                         this.canva.remove();
+                        console.log("this.canva.remove");
                         this.clientDePOP = this.sound.add('clientDePOP');
+                        console.log("this.sound.add('clientDePOP");
                         this.clientDePOP.play();
+                        console.log("clientDePOP.play");
                         this.removeCocktailFinal();
+                        console.log("removeCocktailFinal");
                         if (this.rolePlayer == 1) {
                             this.generateNewClient().then(() => {
                                 console.log("J'ai créé un client : ", this.dataCustomer)
@@ -263,7 +272,7 @@ class GameScene extends Phaser.Scene {
             });
 
             socket.on("RECEIVE_NEXT_CUSTOMER", (currentCustomer) => {
-                console.log("Je rentre dans le emit du client n°2");
+                console.log("Je rentre dans le emit du client n°2", currentCustomer);
 
                 this.currentCustomer = new Customer(this, 300, 300, this.findObjectById(this.emotionsData, currentCustomer[0]), this.findObjectById(this.cocktailsData, currentCustomer[1]), currentCustomer[2]);
                 this.canva.customer = this.currentCustomer;
@@ -281,6 +290,7 @@ class GameScene extends Phaser.Scene {
                     console.log("Voici les dialogues que j'envoie : ", this.currentCustomer.firstDialogues);
 
                     this.drawGame();
+                    console.log("j'ai redessiné la scène");
                     this.clientPOP = this.sound.add('clientPOP');
                     this.clientPOP.play();
                     this.resetPickedJuices();
@@ -404,6 +414,10 @@ class GameScene extends Phaser.Scene {
             this.scene.bringToTop('TransiEndScene');
             // this.scene.start('EndScene');
         });
+
+        socket.on("SCORE_PLAYER", (playerWin) => {
+            console.log('bug ??', playerWin);
+        })
     }
 
     // ************************************* FONCTIONS ************************************************
@@ -445,6 +459,7 @@ class GameScene extends Phaser.Scene {
         socket.emit("GAME_OVER", this.partie.roomId, this.partie.player.numeroPlayer);
         this.game.registry.remove('customerData');
         this.game.registry.remove('nbrCustomers');
+        console.log("après remove('nbrCustomers");
     }
 
     findObjectById(objects, id) {
@@ -554,12 +569,16 @@ class GameScene extends Phaser.Scene {
         // this.musicServe.play();
         if (!this.isSolo) {
             // console.log("clique pour servir", this.partie.player.playerId, this.partie.roomId);
-            console.log("le joueur attend l'autre avec SET_PLAYER_READY")
-            socket.emit("SET_PLAYER_READY", {
-                playerId: this.partie.player.playerId,
-                roomId: this.partie.roomId
-            });
+            // socket.emit("SET_PLAYER_READY", {
+            //     playerId: this.partie.player.playerId,
+            //     roomId: this.partie.roomId
+            // });
             this.showFinalDialogue().then(() => {
+                console.log("le joueur attend l'autre avec SET_PLAYER_READY")
+                socket.emit("SET_PLAYER_READY", {
+                    playerId: this.partie.player.playerId,
+                    roomId: this.partie.roomId
+                });
                 if(!this.aReadyText){
                     this.waitText = this.add.text(gameScale.width * 0.5, gameScale.height * 0.1, "En attente de l'adversaire", {
                         fill: '#EFECEA',
@@ -1019,7 +1038,7 @@ class GameScene extends Phaser.Scene {
 
         setTimeout(() => {
             console.log('setTimeout this.animMov')
-            if (this.animMov && this.animMov.anims.isPlaying && this.animMov.anims.currentAnim.key === tabMov.mov) {
+            if (this.animMov && this.animMov.anims && this.animMov.anims.isPlaying && this.animMov.anims.currentAnim.key === tabMov.mov) {
                 console.log('this.animMov est en train de jouer l\'animation', tabMov.mov);
                 this.animMov.anims.stop(tabMov.mov);
                 this.animMov.setVisible(false);

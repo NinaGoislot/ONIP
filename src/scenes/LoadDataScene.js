@@ -225,14 +225,14 @@ class LoadDataScene extends Phaser.Scene {
             endFrame: BOTTLESSPRITE_LENGTH
         }); 
         this.load.spritesheet('carte-normal-sprite', './media/img/bouteilles-carte/carte-normal-bouteilles.webp', {
-            frameWidth: 360,
-            frameHeight: 492,
+            frameWidth: 358,
+            frameHeight: 490,
             startFrame: 0,
             endFrame: BOTTLESSPRITE_LENGTH
         }); 
         this.load.spritesheet('carte-normal-prise-sprite', './media/img/bouteilles-carte/carte-normal-prise.webp', {
-            frameWidth: 360,
-            frameHeight: 492,
+            frameWidth: 358,
+            frameHeight: 490,
             startFrame: 0,
             endFrame: BOTTLESSPRITE_LENGTH
         });
@@ -551,6 +551,7 @@ class LoadDataScene extends Phaser.Scene {
 
         // Lancer la scène suivante
         this.scene.start('MenuScene');
+        this.scene.destroy();
     }
 
     loadFont(name, url) {

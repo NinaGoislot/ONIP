@@ -28,7 +28,9 @@ class EndScene extends Phaser.Scene {
         }
         if (this.partie.mode == "multi") {
             socket.emit("SCORE", this.partie.player.playerId, this.partie.player.score);
+            console.log("SCORE");
             socket.on("SCORE_PLAYER", (playerWin) => {
+                console.log("SCORE_PLAYER", playerWin);
                 if (playerWin == "V") {
                     console.log("victoire")
                     this.background = this.add.image(gameScale.width / 2, gameScale.height / 2, 'ecran-victoire');

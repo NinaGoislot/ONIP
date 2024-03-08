@@ -254,9 +254,8 @@ class CabinetScene extends Phaser.Scene {
       this.game.registry.set('partie', this.partie);
       this.removeSocket();
       this.scene.stop("CabinetScene");
+      this.scene.stop("PourInShakerScene");
       this.scene.run("GameScene");
-      this.partie.tooLateToServe = true;
-      this.game.registry.set('partie', this.partie);
     });
   }
 

@@ -107,6 +107,7 @@ class Step2_LobbyScene extends Phaser.Scene {
                 copy.on('pointerdown', ()=> this.copy(this.roomId));
                 break;
             case "J2":
+                this.canEnter = true;
                 this.title.text = "Entre le code pour rejoindre";
                 check.setVisible(true);
                 this.messageInfos.setVisible(true);
@@ -119,6 +120,11 @@ class Step2_LobbyScene extends Phaser.Scene {
                 this.inputRoomId.style.fontSize = gameScale.width * 0.07 + "px";
                 check.setInteractive({cursor: 'pointer'});
                 check.on('pointerdown', ()=> this.onCheck());
+                this.input.keyboard.on('keydown-ENTER', () => {
+                    if(this.canEnter){
+                        this.onCheck();
+                    }
+                });
 
                 const resizeListener2 = () => {
                     this.formJoin.setPosition(gameScale.width * 0.05, gameScale.height * 0.42);
@@ -181,6 +187,7 @@ class Step2_LobbyScene extends Phaser.Scene {
             this.messageInfos.text = "Entre un code de partie."
             this.menuToc.play();
         } else {
+            this.canEnter = false;
             this.inputRoomId.value = this.inputRoomId.value.toUpperCase();
             this.inputRoomId.value = this.inputRoomId.value.replace(/O/g, '0');
             socket.emit("JOIN_GAME", this.inputRoomId.value);

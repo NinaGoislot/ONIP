@@ -19,6 +19,7 @@ class TransiEndScene extends Phaser.Scene {
             frameRate: 30,
             repeat: 0
         });
+        console.log("lancer transi")
 
         this.transi = this.add.sprite(gameScale.width/2, gameScale.height/2, 'transi-end');
         this.transi.displayWidth = gameScale.width;
@@ -29,6 +30,7 @@ class TransiEndScene extends Phaser.Scene {
 
         this.transi.on('animationupdate', function (animation, frame) {
             if (animation.key === 'transi-end' && frame.index === 18) { 
+                console.log("animationupdate change to EndScene")
                 this.scene.stop('GameScene');
                 this.scene.run('EndScene');
                 this.scene.bringToTop('TransiEndScene');
@@ -37,6 +39,7 @@ class TransiEndScene extends Phaser.Scene {
 
         this.transi.on('animationcomplete', function (animation) {          
             if (animation.key === 'transi-end') {
+                console.log("stop TransiEndScene")
                 this.scene.stop('TransiEndScene');
             };
         }, this);
