@@ -551,7 +551,7 @@ class LoadDataScene extends Phaser.Scene {
 
         // Lancer la scène suivante
         this.scene.start('MenuScene');
-        this.scene.destroy();
+        // this.scene.destroy();
     }
 
     loadFont(name, url) {
