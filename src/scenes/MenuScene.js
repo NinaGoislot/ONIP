@@ -97,7 +97,7 @@ class MenuScene extends Phaser.Scene {
         //     // this.game.registry.set('music', music);
         // }
         this.menuMusic = this.game.registry.get('musicMenu');
-        cconsole.log('musicMenu', this.menuMusic)
+        console.log('musicMenu', this.menuMusic)
         if (!this.menuMusic.isPlaying){
             console.log('this.menuMusic.isPlaying',this.menuMusic.isPlaying)
             this.menuMusic.play();

@@ -170,6 +170,7 @@ class CabinetScene extends Phaser.Scene {
     });
 
     socket.on("NOMORE_CLIENT", (peutPlus) => {
+      console.log('NOMORE_CLIENT cabinetScene')
       this.partie.addCustomer = peutPlus;
       this.game.registry.set('partie', this.partie);
     });
@@ -177,9 +178,26 @@ class CabinetScene extends Phaser.Scene {
     // fonctionnalité du multijoueur avec la bouteille prise 
     socket.on('JUICE_TAKEN', (bottleId, bottlesData) => {
       if (!(this.partie.mode === "solo") && !this.aJuiceTaken) {
-        let takenBottleImg = this.getBottleImg(bottleId);
-        takenBottleImg[0].disableInteractive();
-        takenBottleImg[0].setVisible(false);
+        // let takenBottleImg = this.getBottleByFrameIndex(bottleId);
+        for (const [image, position] of this.tabBottle) {
+          // Obtenez le nom de la frame de l'image
+          const frameName = image.frame.name;
+          
+          // Comparez le nom de la frame avec l'ID recherché
+          if (parseInt(frameName) === bottleId-1) {
+              // Si les IDs correspondent, image correspond à la bouteille recherchée
+              console.log("Bouteille trouvée :", image);
+              // Faites ce que vous voulez avec l'image ici
+              // Par exemple, désactivez l'interaction avec l'image
+              image.disableInteractive();
+              // Rendez l'image invisible
+              image.setVisible(false);
+              // Sortez de la boucle car vous avez trouvé l'image correspondante
+              break;
+          }
+      }
+        // takenBottleImg[0].disableInteractive();
+        // takenBottleImg[0].setVisible(false);
         this.game.registry.set('ingredients', bottlesData);
         this.bottlesData = this.game.registry.get('ingredients');
         socket.emit('A_JUICE_IS_TAKEN', this.aJuiceTaken, this.partie.roomId);
@@ -190,10 +208,26 @@ class CabinetScene extends Phaser.Scene {
     socket.on('A_JUICE_IS_RETURNED', (bottlesData, bottleChoosed) => {
       this.game.registry.set('ingredients', bottlesData);
       this.bottlesData = this.game.registry.get('ingredients');
-      let returnBottleImg = this.getBottleImg(bottleChoosed.id);
-      returnBottleImg[0].setInteractive();
-      returnBottleImg[0].setVisible(true);
-      console.log('image de la bouteille retournée', returnBottleImg)
+      // let returnBottleImg = this.getBottleImg(bottleChoosed.id);
+      // returnBottleImg[0].setInteractive();
+      // returnBottleImg[0].setVisible(true);
+      for (const [image, position] of this.tabBottle) {
+        // Obtenez le nom de la frame de l'image
+        const frameName = image.frame.name;
+        
+        // Comparez le nom de la frame avec l'ID recherché
+        if (parseInt(frameName) === bottleChoosed.id-1) {
+            // Si les IDs correspondent, image correspond à la bouteille recherchée
+            console.log("Bouteille trouvée :", image);
+            // Faites ce que vous voulez avec l'image ici
+            // Par exemple, désactivez l'interaction avec l'image
+            image.setInteractive();
+            // Rendez l'image invisible
+            image.setVisible(true);
+            // Sortez de la boucle car vous avez trouvé l'image correspondante
+            break;
+        }
+    }
     });
 
 
@@ -442,10 +476,11 @@ class CabinetScene extends Phaser.Scene {
       console.log("La bouteille à la position du curseur n'est pas valide.");
     }
   }
+
   getBottleByFrameIndex(frameIndex) {
     // frameIndex commence à 0, donc on ajoute 1 pour correspondre à l'ID de la bouteille
     return this.bottlesData.find(bottle => bottle.id === frameIndex + 1);
-}
+  }
 
   getBottleByName(name) {
     return this.bottlesData.find(bottle => bottle.image.slice(0, -5) == name);
@@ -461,6 +496,7 @@ class CabinetScene extends Phaser.Scene {
 
   selectJuice(juiceType) {
     // console.log(`Vous avez sélectionné ${juiceType.name}.`);
+    console.log("euuhuh c'est le bon hein ?", juiceType);
     this.goodOrBad = this.goodOrBadBottle(juiceType);
     if (this.goodOrBad) {
       this.juicePicked(juiceType);
@@ -523,7 +559,7 @@ class CabinetScene extends Phaser.Scene {
     // takenBottleImg[0].disableInteractive();
     this.bottlesData = this.game.registry.get('ingredients');
     this.bottlesData[juice.id - 1].picked = true
-    console.log(this.bottlesData[juice.id - 1])
+    console.log('bouteille choisie',this.bottlesData[juice.id - 1])
     // console.log(this.bottlesData[juice.id-1].picked)
     this.game.registry.set('ingredients', this.bottlesData);
   }

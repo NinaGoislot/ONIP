@@ -55,7 +55,8 @@ class FictiveGameScene extends Phaser.Scene {
         })
 
         socket.on("NOMORE_CLIENT", (peutPlus) => {
-            this.partie.addCustomer = peutPlus;
+      console.log('NOMORE_CLIENT ficvtive')
+      this.partie.addCustomer = peutPlus;
             this.game.registry.set('partie', this.partie);
         })
 
@@ -91,9 +92,6 @@ class FictiveGameScene extends Phaser.Scene {
     }
 
     getBottleImg(cocktailBottleId) {
-        if (cocktailBottleId == 666) {
-            return this.bottlesData[0]
-        }
         return this.bottlesData.find(bottle => bottle.id == cocktailBottleId)
     }
 
@@ -179,7 +177,7 @@ class FictiveGameScene extends Phaser.Scene {
 
     alreadyTaken(juice){
         const alreadyChosen = this.partie.tabBottlesChoosed.find(id => id == juice.id);
-        console.log(alreadyChosen, juice.id);
+        console.log('alreadyChosen + juice.id',alreadyChosen, juice.id);
         return(alreadyChosen)
     }
 
@@ -200,14 +198,16 @@ class FictiveGameScene extends Phaser.Scene {
                     console.log('status gold bottle ', this.partie.goldBottleStatus);
                     if (cocktailBottleImg.id == goldenBottle && this.partie.goldBottleStatus) {
                         imageKey =  "carte-luxe-vole-prise-sprite";
-                        frameKey = goldenBottle-1;
+                        frameKey = goldenBottle -1;
+                        console.log('why luxe vole prise', cocktailBottleImg.id, frameKey);
                     } else {
                         if(cocktailBottleImg.id == goldenBottle){
                             imageKey =  "carte-luxe-prise-sprite";
-                            frameKey = goldenBottle-1;
+                            frameKey = goldenBottle -1;
+                            console.log('why luxe prise', cocktailBottleImg.id, frameKey);
                         }else{
                             imageKey =  "carte-normal-prise-sprite";
-                            frameKey = cocktailBottleImg.id-1;
+                            frameKey = cocktailBottleImg.id;
                         }
                     }
                 } else {
@@ -217,11 +217,13 @@ class FictiveGameScene extends Phaser.Scene {
                     } else {
                         if(cocktailBottleImg.id == goldenBottle){
                             imageKey =  "carte-luxe-sprite";
-                            frameKey = goldenBottle-1;
+                            frameKey = goldenBottle -1;
+                        console.log('why luxe', cocktailBottleImg.id, frameKey);
                         }else{
                             imageKey =  "carte-normal-sprite";
                             frameKey = cocktailBottleImg.id -1 ;
-                        }
+                        console.log('why normal', cocktailBottleImg.id, frameKey);
+                    }
                     }
                 }
                 let bottleImg = this.add.image(posX, posY, imageKey, frameKey)

@@ -15,7 +15,7 @@ class TimerScene extends Phaser.Scene {
         console.log('TimerScene???');
         timer = this.time.addEvent({
             // delay: 5000,
-            delay: 100000,
+            delay: 480000,
             // delay: 300000,
             paused: false
         });
@@ -42,13 +42,13 @@ class TimerScene extends Phaser.Scene {
 
 
 
-        socket.on("NOMORE_CLIENT", (peutPlus) => {
-            this.textLastClient.setVisible(true);
-            this.textChrono.setVisible(false);
-            this.timerFinished = !peutPlus;
-            console.log('TEMPS DE JEU FINI ', this.timerFinished);
-            // this.lastClient.play();
-        });
+        // socket.on("NOMORE_CLIENT", (peutPlus) => {
+        //     this.textLastClient.setVisible(true);
+        //     this.textChrono.setVisible(false);
+        //     this.timerFinished = !peutPlus;
+        //     console.log('TEMPS DE JEU FINI ', this.timerFinished);
+        //     // this.lastClient.play();
+        // });
     }
 
     update() {
@@ -57,8 +57,8 @@ class TimerScene extends Phaser.Scene {
         if(remainingTime <= 0 || this.timerFinished){
             this.textLastClient.setVisible(true);
             this.textChrono.setVisible(false);
-            this.lastClient = this.sound.add('lastClient');
-            this.lastClient.play();
+            // this.lastClient = this.sound.add('lastClient');
+            // this.lastClient.play();
             // this.text.setText('Fin de service');
         } else{
             let minutes = Math.floor(remainingTime / 60);

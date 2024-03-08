@@ -200,7 +200,8 @@ class PourInShakerScene extends Phaser.Scene {
         });
 
         socket.on("NOMORE_CLIENT", (peutPlus) => {
-            this.partie.addCustomer = peutPlus;
+      console.log('NOMORE_CLIENT pourInShaker')
+      this.partie.addCustomer = peutPlus;
             this.game.registry.set('partie', this.partie);
         });
 

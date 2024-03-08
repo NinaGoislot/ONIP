@@ -197,14 +197,16 @@ class GameScene extends Phaser.Scene {
 
                     this.indexMove++;
                     if (this.indexMove < this.currentCustomer.drink.movements.length) {
-                        if (this.animMovStop.anims.isPlaying && this.animMov.anims.getCurrentKey() === this.movStop.intro){
-                            this.animMovStop.anims.stop(this.movStop.intro);
-                            this.animMovStop.setFrame(8);
-                        }
-                        if(this.animMovStop){
+                        if(this.animMovStop && this.animMovStop.anims){
+                            console.log("this.animMovStop.anims.isPlaying move done");
+                            if (this.animMovStop.anims.isPlaying && this.animMovStop.anims.currentAnim.key === this.movStop.intro){
+                                this.animMovStop.anims.stop(this.movStop.intro);
+                                this.animMovStop.setFrame(8);
+                            }
                             this.animMovStop.anims.play(this.movStop.mov);
                             this.animMovStop.on('animationcomplete', function (animation) {      
                                 if (animation.key === this.movStop.mov) {
+                                    this.animMovStop.destroy();
                                     console.log("Id à envoyer : ", this.currentCustomer.drink.movements[this.indexMove]);
                                     this.drawMovement(this.currentCustomer.drink.movements[this.indexMove]);
                                     socket.emit("MOVEMENT_TO_DO", this.currentCustomer.drink.movements[this.indexMove], this.partie.roomId, this.partie.player.numeroPlayer);
@@ -334,7 +336,8 @@ class GameScene extends Phaser.Scene {
             this.canva.startPause(this.scene, this, secondPaused);
         });
 
-        socket.on("NOMORE_CLIENT", (peutPlus) => {
+        socket.on("NOMORE_CLIENT", (peutPlus, duree, finish,text ) => {
+            console.log('NOMORE_CLIENT gameScene', duree,finish,text)
             this.partie.addCustomer = peutPlus;
             this.game.registry.set('partie', this.partie);
         });
@@ -396,6 +399,7 @@ class GameScene extends Phaser.Scene {
         });
 
         socket.once('GAME_OVER',()=>{
+            console.log("transi qui bug game over ?");
             this.scene.launch('TransiEndScene');
             this.scene.bringToTop('TransiEndScene');
             // this.scene.start('EndScene');
@@ -916,6 +920,7 @@ class GameScene extends Phaser.Scene {
         if (this.tweens.isTweening(this.ligneTemps)) {
             this.tweens.killTweensOf(this.ligneTemps);
         }
+        console.log('moveTicTac isPlaying')
         if (this.moveTicTac.isPlaying) {
             this.moveTicTac.stop();
         }
@@ -933,10 +938,15 @@ class GameScene extends Phaser.Scene {
         //     this.currentMovement.destroy();
         // }
         if(this.animMov){
+            console.log("destroy this.animMov");
             this.animMov.destroy();
         }
-        this.horloge.destroy();
-        this.ligneTemps.destroy();
+        if(this.horloge){
+            this.horloge.destroy();
+        }
+        if(this.ligneTemps){
+            this.ligneTemps.destroy();
+        }
     }
 
     createAnimTransiCarte(){
@@ -1008,10 +1018,12 @@ class GameScene extends Phaser.Scene {
         }, this);
 
         setTimeout(() => {
-            if (this.animMov && this.animMov.anims.isPlaying && this.animMov.anims.getCurrentKey() === tabMov.mov) {
+            console.log('setTimeout this.animMov')
+            if (this.animMov && this.animMov.anims.isPlaying && this.animMov.anims.currentAnim.key === tabMov.mov) {
                 console.log('this.animMov est en train de jouer l\'animation', tabMov.mov);
                 this.animMov.anims.stop(tabMov.mov);
                 this.animMov.setVisible(false);
+                this.removeMovement();
                 this.drawMovStop();
             }
         }, movObject.duree*1000);
@@ -1035,7 +1047,7 @@ class GameScene extends Phaser.Scene {
                 end: this.movStop.lengthMov
             }),
             frameRate: 30,
-            repeat: -1
+            repeat: 0
         });
     }
 
@@ -1048,11 +1060,12 @@ class GameScene extends Phaser.Scene {
         this.animMovStop.on('animationcomplete', function (animation) {   
             console.log('Animation complete:', animation.key);     
             if (animation.key === this.movStop.intro) {
+                this.animMov.setFrame(8);
                 console.log('changement anim to anim_mov');
             }
         }, this);
 
-        this.animMovStop.anims.play(this.movStop.mov);
+        // this.animMovStop.anims.play(this.movStop.mov);
 
     }
     

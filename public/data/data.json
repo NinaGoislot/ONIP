@@ -270,7 +270,7 @@
         "id": "BOD1",
         "description": "Secoue à gauche puis secoue à droite !",
         "image": "",
-        "duree":5
+        "duree":10
       },
       {
         "id": "BOD2",

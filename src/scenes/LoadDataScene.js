@@ -12,7 +12,7 @@ const
     //TRANSI
     LENGTH_TRANSI = 30,
     //Interruptions
-    LENGTH_INTERRUP = 75,
+    LENGTH_INTERRUP = 74,
     //MOUVEMNTS
     LENGTH_MOV_INTRO = 29,
     LENGTH_MOV_HAND = 29,
@@ -308,182 +308,182 @@ class LoadDataScene extends Phaser.Scene {
         // ******************* MOUVEMENTS ******************* 
         //BOD1
         this.load.spritesheet('BOD1-INTRO', './media/img/mouvements/Corps_1/corps1_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD1-MOV', './media/img/mouvements/Corps_1/corps1_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD1
         }); 
         this.tabBOD1 = {intro : 'BOD1-INTRO', mov : 'BOD1-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD1};
         //BOD2
         this.load.spritesheet('BOD2-INTRO', './media/img/mouvements/Corps_2/corps2_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD2-MOV', './media/img/mouvements/Corps_2/corps2_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD2
         }); 
         this.tabBOD2 = {intro : 'BOD2-INTRO', mov : 'BOD2-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD2};
         //BOD3
         this.load.spritesheet('BOD3-INTRO', './media/img/mouvements/Corps_3/corps3_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD3-MOV', './media/img/mouvements/Corps_3/corps3_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD3
         }); 
         this.tabBOD3 = {intro : 'BOD3-INTRO', mov : 'BOD3-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD3};
         //BOD4
         this.load.spritesheet('BOD4-INTRO', './media/img/mouvements/Corps_4/corps4_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD4-MOV', './media/img/mouvements/Corps_4/corps4_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD4
         }); 
         this.tabBOD4 = {intro : 'BOD4-INTRO', mov : 'BOD4-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD4};
         //BOD5
         this.load.spritesheet('BOD5-INTRO', './media/img/mouvements/Corps_5/corps5_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD5-MOV', './media/img/mouvements/Corps_5/corps5_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD5
         }); 
         this.tabBOD5 = {intro : 'BOD5-INTRO', mov : 'BOD5-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD5};
         //BOD6
         this.load.spritesheet('BOD6-INTRO', './media/img/mouvements/Corps_6/corps6_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD6-MOV', './media/img/mouvements/Corps_6/corps6_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD6
         }); 
         this.tabBOD6 = {intro : 'BOD6-INTRO', mov : 'BOD6-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD6};
         //BOD7
         this.load.spritesheet('BOD7-INTRO', './media/img/mouvements/Corps_7/corps7_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD7-MOV', './media/img/mouvements/Corps_7/corps7_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD7
         }); 
         this.tabBOD7 = {intro : 'BOD7-INTRO', mov : 'BOD7-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD7};
         //BOD8
         this.load.spritesheet('BOD8-INTRO', './media/img/mouvements/Corps_8/corps8_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('BOD8-MOV', './media/img/mouvements/Corps_8/corps8_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_BOD8
         }); 
         this.tabBOD8 = {intro : 'BOD8-INTRO', mov : 'BOD8-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_BOD8};
         //HAN1
         this.load.spritesheet('HAN1-INTRO', './media/img/mouvements/Main_1/main1_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('HAN1-MOV', './media/img/mouvements/Main_1/main1_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_HAND
         }); 
         this.tabHAN1 = {intro : 'HAN1-INTRO', mov : 'HAN1-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_HAND};
         //HAN2
         this.load.spritesheet('HAN2-INTRO', './media/img/mouvements/Main_2/main2_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('HAN2-MOV', './media/img/mouvements/Main_2/main2_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_HAND
         }); 
         this.tabHAN2 = {intro : 'HAN2-INTRO', mov : 'HAN2-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_HAND};
         //HAN3
         this.load.spritesheet('HAN3-INTRO', './media/img/mouvements/Main_3/main3_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('HAN3-MOV', './media/img/mouvements/Main_3/main3_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_HAND
         }); 
         this.tabHAN3 = {intro : 'HAN3-INTRO', mov : 'HAN3-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_HAND};
         //HAN4
         this.load.spritesheet('HAN4-INTRO', './media/img/mouvements/Main_4/main4_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
         this.load.spritesheet('HAN4-MOV', './media/img/mouvements/Main_4/main4_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_HAND
         }); 
         this.tabHAN4 = {intro : 'HAN4-INTRO', mov : 'HAN4-MOV', lengthIntro:LENGTH_MOV_INTRO, lengthMov:LENGTH_MOV_HAND};
         //HAN5
         this.load.spritesheet('HAN5-INTRO', './media/img/mouvements/Main_5/main5_intro.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_INTRO
         }); 
-        this.load.spritesheet('HAN4-MOV', './media/img/mouvements/Main_5/main5_mov.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+        this.load.spritesheet('HAN5-MOV', './media/img/mouvements/Main_5/main5_mov.webp', {
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_HAND
         }); 
@@ -508,14 +508,14 @@ class LoadDataScene extends Phaser.Scene {
 
         //STOP
         this.load.spritesheet('mov-stop-start', './media/img/mouvements/start.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_STOP
         }); 
         this.load.spritesheet('mov-stop-end', './media/img/mouvements/end.webp', {
-            frameWidth: 960,
-            frameHeight: 540,
+            frameWidth: 720,
+            frameHeight: 405,
             startFrame: 0,
             endFrame: LENGTH_MOV_STOP
         }); 
@@ -547,7 +547,7 @@ class LoadDataScene extends Phaser.Scene {
         this.menuMusic = this.sound.add('menu', {loop:true});
         this.menuMusic.play();
         this.game.registry.set('musicMenu', this.menuMusic);
-        cconsole.log('musicMenu load', this.menuMusic)
+        console.log('musicMenu load', this.menuMusic)
 
         // Lancer la scène suivante
         this.scene.start('MenuScene');
